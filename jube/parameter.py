@@ -447,6 +447,7 @@ class Parameter(object):
             self._update_mode = NEVER_MODE
         self._eval_helper = eval_helper
         self._duplicate=duplicate
+        self._id = None
 
     @staticmethod
     def create_parameter(name, value, separator=None, parameter_type="string",
@@ -684,7 +685,33 @@ class Parameter(object):
         if self._unit != "":
             parameter_data["unit"] = self._unit
 
-        parameter_id = db.insert("Parameter", parameter_data)
+        self._id = db.insert("Parameter", parameter_data)
+
+    def add_selected_parameter_to_database(self, db, workpackage_id):
+        if not self._id:
+            condition = f"parameter_name='{self._name}' AND"
+            condition += f" value='{self.based_on_value}'"
+            self._id = db.select("Parameter", ["parameter_id"], condition)[0][0]
+        selected_data = {
+            "parameter_id": self._id,
+            "selected": self.value,
+            "workpackage_id": workpackage_id
+        }
+        if self._idx != -1:
+            selected_data["idx"] = self._idx
+        #Check if parameter already selected
+        condition = f"parameter_id='{self._id}' AND"
+        condition += f" workpackage_id='{workpackage_id}'"
+        row = db.select("SelectedParameter", None, condition)
+        if len(row) > 0:
+            # Update existing parameter selection
+            db.update("SelectedParameter", selected_data, condition)
+        else:
+            # Insert parameter selection
+            db.insert("SelectedParameter", selected_data)
+
+        #Update mode in Parameter
+        db.update("Parameter", {"mode": self.based_on_mode}, f"parameter_id='{self._id}'")
 
     def etree_repr(self, use_current_selection=False):
         """Return etree object representation"""

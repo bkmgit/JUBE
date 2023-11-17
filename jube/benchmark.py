@@ -145,6 +145,15 @@ class Benchmark(object):
         """Return workpackages"""
         return self._workpackages
 
+    def deinitialize_db(self):
+        """Remove database instance"""
+        if self._db:
+            try:
+                self._db.disconnect()
+            except:
+                pass
+            self._db = None
+
     def add_tags(self, other_tags):
         if other_tags is not None:
             self._tags = self._tags.union(set(other_tags))
@@ -587,6 +596,12 @@ class Benchmark(object):
 
         # Store workpackage information
         LOGGER.debug("Store initial workpackage information")
+        self._db.connect()
+        for workpackages in self._workpackages.values():
+            for workpackage in workpackages:
+                workpackage.add_information_to_database(self._db)
+        self._db.disconnect()
+
         self.write_workpackage_information(
             os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
 
@@ -647,6 +662,9 @@ class Benchmark(object):
             if not workpackage.done:
                 # execute wps in parallel which have the same name
                 if workpackage.step.procs > 1:
+                    #Remove database instance to run parallel
+                    self.deinitialize_db()
+
                     run_parallel = True
                     procs = workpackage.step.procs
                     name = workpackage.step.name
@@ -697,6 +715,16 @@ class Benchmark(object):
             # Store workpackage information
             self.write_workpackage_information(
                 os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
+
+        db = self._db
+        db.connect()
+        # Add new workpackages that have not yet been executed (open)
+        for workpackages in self.workpackages.values():
+            for workpackage in workpackages:
+                row = db.select("Workpackage", condition=f"workpackage_id='{workpackage.id}'")
+                if not row:
+                    workpackage.add_information_to_database(db)
+        db.disconnect()
 
         print("\n")
         status_data = [("stepname", "all", "open", "wait", "error", "done")]
