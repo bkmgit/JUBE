@@ -246,6 +246,19 @@ class Result(object):
                     units[parameter.name] = parameter.unit
         return units
 
+    def add_information_to_database(self, db, benchmark_id):
+        result_data = {
+            "benchmark_id": benchmark_id
+        }
+        if self._result_dir is not None:
+            result_data["result_dir"] = self._result_dir
+        result_id = db.insert("Result", result_data)
+        for use in self._use:
+            db.insert("ResultAnalyser", {"result_id": result_id,
+                                         "analyser_name": use})
+
+        return result_id
+
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = ET.Element("result")

@@ -46,6 +46,7 @@ SYSLOG_FMT_STRING = "jube[%(process)s]: %(message)s"
 PREPROCESS_MAX_ITERATION = 10
 
 # filenames
+DATABASE_FILENAME = "database.db"
 WORKPACKAGE_DONE_FILENAME = "done"
 WORKPACKAGE_ERROR_FILENAME = "error"
 DO_LOG_FILENAME = "do_log"

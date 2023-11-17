@@ -314,6 +314,18 @@ class Parameterset(object):
         for parameter in self.all_parameters:
             yield parameter
 
+    def add_information_to_database(self, db, benchmark_id):
+        parameterset_data = {
+            "parameterset_name": self._name,
+            "benchmark_id": benchmark_id
+        }
+        if self._duplicate != "replace":
+            parameterset_data["duplicate"] = self._duplicate
+        db.insert("Parameterset", parameterset_data)
+        
+        for parameter in self._parameters.values():
+            parameter.add_information_to_database(db, self._name)
+
     def etree_repr(self, use_current_selection=False):
         """Return etree object representation"""
         parameterset_etree = ET.Element('parameterset')
@@ -650,6 +662,29 @@ class Parameter(object):
             result = result and self_based_on.is_equivalent(other_based_on,
                                                             False)
         return result
+
+    def add_information_to_database(self, db, parameterset_name):
+        parameter_data = {
+            "parameter_name": self._name,
+            "value": self.based_on_value,
+            "parameterset_name": parameterset_name
+        }
+        if self._type != "string":
+            parameter_data["type"] = self._type
+        if self._mode != "text":
+            parameter_data["mode"] = self._mode
+        if self._separator != jube.conf.DEFAULT_SEPARATOR:
+            parameter_data["separator"] = self._separator
+        if self._duplicate != "none":
+            parameter_data["duplicate"] = self._duplicate
+        if self._update_mode != NEVER_MODE:
+            parameter_data["update_mode"] = self._update_mode
+        if self._export:
+            parameter_data["export"] = 1
+        if self._unit != "":
+            parameter_data["unit"] = self._unit
+
+        parameter_id = db.insert("Parameter", parameter_data)
 
     def etree_repr(self, use_current_selection=False):
         """Return etree object representation"""

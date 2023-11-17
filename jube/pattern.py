@@ -58,6 +58,17 @@ class Patternset(object):
         """Return the derived pattern storage"""
         return self._derived_pattern
 
+    def add_information_to_database(self, db, benchmark_id):
+        set_data = {
+            "patternset_name": self._name,
+            "benchmark_id": benchmark_id
+        }
+        db.insert("Patternset", set_data)
+        for pattern in self._pattern:
+            pattern.add_information_to_database(db, self._name)
+        for pattern in self._derived_pattern:
+            pattern.add_information_to_database(db, self._name)
+
     def etree_repr(self):
         """Return etree object representation"""
         patternset_etree = ET.Element('patternset')
@@ -263,6 +274,24 @@ class Pattern(jube.parameter.StaticParameter):
         else:
             pattern = param
         return pattern, changed
+
+    def add_information_to_database(self, db, patternset_name):
+        pattern_data = {
+            "pattern_name": self._name,
+            "value": self.value,
+            "patternset_name": patternset_name
+        }
+        if self._type != "string":
+            pattern_data["type"] = self._type
+        if self._dotall:
+            pattern_data["dotall"] = 1
+        if self._default is not None:
+            pattern_data["pattern_default"] = self._default
+        if self._derived:
+            pattern_data["mode"] = self._mode
+        if self._unit != "":
+            pattern_data["unit"] = self._unit
+        db.insert("Pattern", pattern_data)
 
     def etree_repr(self, use_current_selection=False):
         """Return etree object representation"""

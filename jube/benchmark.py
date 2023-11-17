@@ -34,6 +34,7 @@ import itertools
 import jube.parameter
 import jube.util.util
 import jube.util.output
+import jube.util.database_interface
 import jube.conf
 import jube.log
 
@@ -72,6 +73,7 @@ class Benchmark(object):
         else:
             self._tags = tags
         self._tag_docu = tag_docu
+        self._db = None
 
     @property
     def name(self):
@@ -781,11 +783,52 @@ class Benchmark(object):
             os.chown(self.bench_dir, os.getuid(), group_id)
             os.chmod(self.bench_dir,
                      os.stat(self.bench_dir).st_mode | stat.S_ISGID)
+
+        self.add_benchmark_configuration_to_database(outpath="..")
         self.write_benchmark_configuration(
             os.path.join(self.bench_dir, jube.conf.CONFIGURATION_FILENAME),
             outpath="..")
         jube.util.util.update_timestamps(os.path.join(
             self.bench_dir, jube.conf.TIMESTAMPS_INFO), "start", "change")
+
+    def add_benchmark_configuration_to_database(self, outpath=None):
+        self._db = jube2.util.database_interface.Database_Interface(
+            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
+        self._db.connect()
+        self._db.create_database()
+
+        benchmark_data = {
+            "benchmark_id": self._id,
+            "version": jube2.conf.JUBE_VERSION,
+            "name": self._name,
+            "file_path_ref": os.path.relpath(self._file_path_ref, self.bench_dir)
+        }
+        if outpath is not None:
+            benchmark_data["outpath"] = outpath
+        if len(self._comment) > 0:
+            benchmark_data["comment"] = self._comment
+        self._db.insert("Benchmark", benchmark_data)
+
+        if len(self._tags) > 0:
+            for tag in self._tags:
+                self._db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+
+        for parameterset in self._parametersets.values():
+            parameterset.add_information_to_database(self._db, self._id)
+        for substituteset in self._substitutesets.values():
+            substituteset.add_information_to_database(self._db, self._id)
+        for fileset in self._filesets.values():
+            fileset.add_information_to_database(self._db, self._id)
+        for patternset in self._patternsets.values():
+            patternset.add_information_to_database(self._db, self._id)
+        for step in self._steps.values():
+            step.add_information_to_database(self._db, self._id)
+        for analyser in self._analyser.values():
+            analyser.add_information_to_database(self._db, self._id)
+        for result_name in self._results_order:
+            result = self._results[result_name]
+            result.add_information_to_database(self._db, self._id)
+        self._db.disconnect()
 
     def write_benchmark_configuration(self, filename, outpath=None):
         """The current benchmark configuration will be written to given file

@@ -143,6 +143,14 @@ class Table(KeyValuesResult):
             """Column width"""
             return self._colw
 
+        def add_information_to_database(self, db, table_name):
+            column_data = KeyValuesResult.DataKey.get_information_for_database(self)
+            column_data["column_name"] = column_data.pop("name")
+            column_data["table_name"] = table_name
+            if self._colw is not None:
+                column_data["colw"] = str(self._colw)
+            db.insert("ResultTableColumn", column_data)
+
         def etree_repr(self):
             """Return etree object representation"""
             column_etree = KeyValuesResult.DataKey.etree_repr(self)
@@ -190,6 +198,27 @@ class Table(KeyValuesResult):
         return Table.TableData(result_data,
                                style if style is not None else self._style,
                                self._separator, self._transpose)
+
+    def add_information_to_database(self, db, benchmark_id):
+        result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+        table_data = {
+            "table_name": self._name,
+            "result_id": result_id
+        }
+        if self._style != "csv":
+            table_data["style"] = self._style
+        if self._separator != jube2.conf.DEFAULT_SEPARATOR:
+            table_data["separator"] = self._separator
+        if self._transpose:
+            table_data["transpose"] = 1
+        if self._res_filter is not None:
+            table_data["filter"] = self._res_filter
+        if len(self._sort_names) > 0:
+            table_data["sort"] = \
+                jube2.conf.DEFAULT_SEPARATOR.join(self._sort_names)
+        db.insert("ResultTable", table_data)
+        for column in self._keys:
+            column.add_information_to_database(db, self._name)
 
     def etree_repr(self):
         """Return etree object representation"""

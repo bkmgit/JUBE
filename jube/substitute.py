@@ -137,6 +137,31 @@ class Substituteset(object):
                 if infile != outfile:
                     shutil.copymode(infile, outfile)
 
+    def add_information_to_database(self, db, benchmark_id):
+        set_data = {
+            "substituteset_name": self._name,
+            "benchmark_id": benchmark_id
+        }
+        db.insert("Substituteset", set_data)
+        for data in self._files:
+            file_data = {
+                "in_file": data[1],
+                "out_file": data[0],
+                "substituteset_name": self._name
+            }
+            if data[2] != "w":
+                file_data["out_mode"] = data[2]
+            db.insert("Substitutefile", file_data)
+        for name, sub in self._substitute_dict.items():
+            sub_data = {
+                "source": sub.source,
+                "dest": sub.dest,
+                "substituteset_name": self._name
+            }
+            if sub.mode != "text":
+                sub_data["mode"] = sub.mode
+            db.insert("Substitute", sub_data)
+
     def etree_repr(self):
         """Return etree object representation"""
         substituteset_etree = ET.Element("substituteset")

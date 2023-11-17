@@ -46,6 +46,15 @@ class Fileset(list):
         """Return fileset name"""
         return self._name
 
+    def add_information_to_database(self, db, benchmark_id):
+        set_data = {
+            "fileset_name": self._name,
+            "benchmark_id": benchmark_id
+        }
+        db.insert("Fileset", set_data)
+        for file_handle in self:
+            file_handle.add_information_to_database(db, self._name)
+
     def etree_repr(self):
         """Return etree object representation"""
         fileset_etree = ET.Element("fileset")
@@ -185,6 +194,10 @@ class File(object):
         """File access type specific creation"""
         raise NotImplementedError()
 
+    def add_information_to_database(self, db, fileset_name):
+        """Store file information in database"""
+        raise NotImplementedError()
+
     def etree_repr(self):
         """Return etree object representation"""
         raise NotImplementedError()
@@ -228,6 +241,26 @@ class Link(File):
         if not jube.conf.DEBUG_MODE and not os.path.exists(new_file_path):
             os.symlink(target_path, new_file_path)
 
+    def add_information_to_database(self, db, fileset_name):
+        file_data = {
+            "path": self._path,
+            "fileset_name": fileset_name,
+            "type": "Link",
+        }
+        if self._name is not None:
+            file_data["name"] = self._name
+        if self._active != "true":
+            file_data["active"] = self._active
+        if self._source_dir != "":
+            file_data["source_dir"] = self._source_dir
+        if self._target_dir != "":
+            file_data["target_dir"] = self._target_dir
+        if self._file_path_ref != "":
+            file_data["file_path_ref"] = self._file_path_ref
+        if self._is_internal_ref:
+            file_data["is_internal_ref"] = 1
+        return db.insert("File", file_data)
+
     def etree_repr(self):
         """Return etree object representation"""
         link_etree = ET.Element("link")
@@ -261,6 +294,26 @@ class Copy(File):
                 shutil.copytree(path, new_file_path, symlinks=True)
             else:
                 shutil.copy2(path, new_file_path)
+
+    def add_information_to_database(self, db, fileset_name):
+        file_data = {
+            "path": self._path,
+            "fileset_name": fileset_name,
+            "type": "Copy"
+        }
+        if self._name is not None:
+            file_data["name"] = self._name
+        if self._active != "true":
+            file_data["active"] = self._active
+        if self._source_dir != "":
+            file_data["source_dir"] = self._source_dir
+        if self._target_dir != "":
+            file_data["target_dir"] = self._target_dir
+        if self._file_path_ref != "":
+            file_data["file_path_ref"] = self._file_path_ref
+        if self._is_internal_ref:
+            file_data["is_internal_ref"] = 1
+        return db.insert("File", file_data)
 
     def etree_repr(self):
         """Return etree object representation"""
@@ -300,6 +353,21 @@ class Prepare(jube.step.Operation):
         jube.step.Operation.execute(
             self, parameter_dict=parameter_dict, work_dir=work_dir,
             only_check_pending=only_check_pending, environment=environment)
+
+    def add_information_to_database(self, db, fileset_name):
+        do_data = {
+            "do": self._do,
+            "fileset_name": fileset_name
+        }
+        if self._stdout_filename is not None:
+            do_data["stdout"] = self._stdout_filename
+        if self._stderr_filename is not None:
+            do_data["stderr"] = self._stderr_filename
+        if self._active != "true":
+            step_data["active"] = self._active
+        if self._work_dir is not None:
+            do_data["work_dir"] = self._work_dir
+        db.insert("Prepare", do_data)
 
     def etree_repr(self):
         """Return etree object representation"""

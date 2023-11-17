@@ -198,6 +198,25 @@ class Database(KeyValuesResult):
                                                          preserve_datatype=True)
         return Database.DatabaseData(result_data, self._primekeys, self._db_file)
 
+    def add_information_to_database(self, db, benchmark_id):
+        result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+        database_data = {
+            "database_name": self._name,
+            "result_id": result_id
+        }
+        if self._db_file is not None:
+            database_data["file"] = self._db_file
+        if self._res_filter is not None:
+            database_data["filter"] = self._res_filter
+        db.insert("ResultDatabase", database_data)
+        for key in self._keys:
+            key_data = key.get_information_for_database()
+            if key_data["name"] in self._primekeys:
+                key_data["is_primary"] = 1
+            key_data["databasekey_name"] = key_data.pop("name")
+            key_data["database_name"] = self._name
+            db.insert("ResultDatabaseKey", key_data)
+
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = Result.etree_repr(self)

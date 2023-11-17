@@ -140,6 +140,14 @@ class GenericResult(Result):
                 name += "[{0}]".format(self._unit)
             return name
 
+        def get_information_for_database(self):
+            key_data = {
+                "name": self._name
+            }
+            if self._title is not None:
+                key_data["title"] = self._title
+            return key_data
+
         def etree_repr(self):
             """Return etree object representation"""
             key_etree = ET.Element("key")

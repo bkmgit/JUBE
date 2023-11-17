@@ -139,6 +139,32 @@ class SysloggedResult(KeyValuesResult):
                                           self._syslog_host, self._syslog_port,
                                           self._syslog_fmt_string)
 
+    def add_information_to_database(self, db, benchmark_id):
+        result_id = Result.add_information_to_database(self, db, benchmark_id)
+        syslog_data = {
+            "syslog_name": self._name,
+            "result_id": result_id
+        }
+        if self._syslog_address is not None:
+            syslog_data["address"] = self._syslog_address
+        if self._syslog_host is not None:
+            syslog_data["host"] = self._syslog_host
+        if self._syslog_port is not None:
+            syslog_data["port"] = self._syslog_port
+        if self._syslog_fmt_string is not None:
+            syslog_data["format"] = self._syslog_fmt_string
+        if self._res_filter is not None:
+            syslog_data["filter"] = self._res_filter
+        if len(self._sort_names) > 0:
+            syslog_data["sort"] = \
+                jube2.conf.DEFAULT_SEPARATOR.join(self._sort_names)
+        db.insert("ResultSyslog", syslog_data)
+        for key in self._keys:
+            key_data = key.get_information_for_database()
+            key_data["syslogkey_name"] = key_data.pop("name")
+            key_data["syslog_name"] = self._name
+            db.insert("ResultSyslogKey", key_data)
+
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = Result.etree_repr(self)

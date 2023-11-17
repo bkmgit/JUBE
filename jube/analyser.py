@@ -72,6 +72,18 @@ class Analyser(object):
             """Get file path"""
             return self._path
 
+        def add_information_to_database(self, db, analyser_name):
+            file_data = {
+                "path": self._path,
+                "analyser_name": analyser_name
+            }
+            file_id = db.insert("AnalyseFile", file_data)
+            for use in self._use:
+                db.insert("AnalyseFilePattern", {"analysefile_id": file_id,
+                                                 "patternset_name": use})
+
+            return file_id
+
         def etree_repr(self):
             """Return etree object representation"""
             file_etree = ET.Element("file")
@@ -144,6 +156,23 @@ class Analyser(object):
     def reduce(self):
         """Get analyser reduce"""
         return self._reduce_iteration
+
+    def add_information_to_database(self, db, benchmark_id):
+        analyser_data = {
+            "analyser_name": self._name,
+            "benchmark_id": benchmark_id
+        }
+        if not self._reduce_iteration:
+            analyser_data["reduce"] = 0
+        db.insert("Analyser", analyser_data)
+        for use in self._use:
+            db.insert("AnalyserPattern", {"analyser_name": self._name,
+                                         "patternset_name": use})
+        for step_name in self._analyse:
+            for fileobj in self._analyse[step_name]:
+                analysefile_id = fileobj.add_information_to_database(db, self._name)
+                db.insert("AnalyseStep", {"step_name": step_name,
+                                          "analysefile_id": analysefile_id})
 
     def etree_repr(self):
         """Return etree object representation"""
