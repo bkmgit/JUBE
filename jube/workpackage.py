@@ -70,6 +70,10 @@ class Workpackage(object):
         self._workpackage_dir_cache = None
 
     def add_information_to_database(self, db):
+        row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
+        if row:
+            self.update_information_in_database(db)
+            return
         try:
             db.start_transaction()
             workpackage_data = {
@@ -79,41 +83,65 @@ class Workpackage(object):
                 "workpackage_id": self._id
             }
             db.insert("Workpackage", workpackage_data)
-
-            for parameter in self.local_parameterset.all_parameters:
-                parameter.add_selected_parameter_to_database(db, self._id)
-            for parent in self._parents:
-                db.insert("WorkpackageParents", {"workpackage_id": self._id,
-                                                 "parent_workpackage_id": parent.id})
-            for sibling in self._iteration_siblings:
-                db.insert("WorkpackageSibling", {"workpackage_id": self._id,
-                                                 "sibling_workpackage_id": sibling.id})
-            for env_name, value in self._env.items():
-                if (env_name not in ["PWD", "OLDPWD", "_"]) and \
-                   (env_name not in os.environ or os.environ[env_name] != value):
-                    env_data = {
-                        "environment_name": env_name,
-                        "value": repr(value),
-                        "env": 1
-                    }
-                    db.insert("Environment", env_data)
-                    db.insert("WorkpackageEnvironment", {"workpackage_id": self._id,
-                                                         "environment_name": env_name})
-            for env_name in os.environ:
-                if (env_name not in ["PWD", "OLDPWD", "_"]) and \
-                   (env_name not in self._env):
-                    env_data = {
-                        "environment_name": env_name,
-                        "env": 0
-                    }
-                    db.insert("Environment", env_data)
-                    db.insert("WorkpackageEnvironment", {"workpackage_id": self._id,
-                                                         "environment_name": env_name})
+            self.add_or_update_additional_information_to_database(db)
             db.commit_transaction()
         except Exception as e:
             db.rollback_transaction()
             db.disconnect()
             raise e
+
+    def update_information_in_database(self, db):
+        row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
+        if not row:
+            self.add_information_to_database(db)
+            return
+        try:
+            db.start_transaction()
+            workpackage_data = {
+                "iteration": self._iteration,
+                "cycle": self._cycle,
+                "step_name": self._step.name
+            }
+            db.update("Workpackage", workpackage_data, f"workpackage_id='{self._id}'")
+            self.add_or_update_additional_information_to_database(db)
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
+
+    def add_or_update_additional_information_to_database(self, db):
+        for parameter in self.local_parameterset.all_parameters:
+            parameter.add_selected_parameter_to_database(db, self._id)
+        for parent in self._parents:
+            db.insert("WorkpackageParents", {"workpackage_id": self._id,
+                      "parent_workpackage_id": parent.id}, addition="REPLACE")
+        for sibling in self._iteration_siblings:
+            # Only add relationship if sibling exists
+            if db.select("Workpackage", condition=f"workpackage_id='{sibling.id}'"):
+                db.insert("WorkpackageSibling", {"workpackage_id": self._id,
+                          "sibling_workpackage_id": sibling.id}, addition="REPLACE")
+        for env_name, value in self._env.items():
+            if (env_name not in ["PWD", "OLDPWD", "_"]) and \
+               (env_name not in os.environ or os.environ[env_name] != value):
+                env_data = {
+                    "environment_name": env_name,
+                    "value": repr(value),
+                    "env": 1
+                }
+                db.insert("Environment", env_data, addition="REPLACE")
+                db.insert("WorkpackageEnvironment", {"workpackage_id": self._id,
+                          "environment_name": env_name}, addition="REPLACE")
+        for env_name in os.environ:
+            if (env_name not in ["PWD", "OLDPWD", "_"]) and \
+               (env_name not in self._env):
+                env_data = {
+                    "environment_name": env_name,
+                    "env": 0
+                }
+                db.insert("Environment", env_data, addition="REPLACE")
+                db.insert("WorkpackageEnvironment", {"workpackage_id": self._id,
+                          "environment_name": env_name}, addition="REPLACE")
 
     def etree_repr(self):
         """Return etree object representation"""
@@ -960,6 +988,15 @@ class Workpackage(object):
             for p in parameterDeletionList:
                 self._parameterset.delete_parameter(p)
             parameterDeletionList = None
+
+        # Store workpackage information
+        db = jube2.util.database_interface.Database_Interface(
+                os.path.join(self.benchmark.bench_dir, jube2.conf.DATABASE_FILENAME))
+        db.connect()
+        self.update_information_in_database(db)
+        db.disconnect()
+        db = None
+
 
         return {"id": self._id, "step_name": self._step.name, "env": self._env,
                 "cycle": self._cycle, "parameterset": self._parameterset}

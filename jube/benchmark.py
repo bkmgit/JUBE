@@ -596,12 +596,7 @@ class Benchmark(object):
 
         # Store workpackage information
         LOGGER.debug("Store initial workpackage information")
-        self._db.connect()
-        for workpackages in self._workpackages.values():
-            for workpackage in workpackages:
-                workpackage.add_information_to_database(self._db)
-        self._db.disconnect()
-
+        self.add_workpackage_information_to_database()
         self.write_workpackage_information(
             os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
 
@@ -656,9 +651,7 @@ class Benchmark(object):
             def log_e(e):
                 """used to print error_callback from pool.apply_async"""
                 print(e)
-            # TODO
-            # writeXML position(y) - replace by database
-            # TODO END
+
             if not workpackage.done:
                 # execute wps in parallel which have the same name
                 if workpackage.step.procs > 1:
@@ -865,6 +858,24 @@ class Benchmark(object):
             result.add_information_to_database(self._db, self._id)
         self._db.disconnect()
 
+    def update_benchmark_comment_in_database(self):
+        self._db = jube2.util.database_interface.Database_Interface(
+            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
+        self._db.connect()
+        try:
+            db.start_transaction()
+            benchmark_data = {
+                "comment": self._comment
+            }
+            db.update("Benchmark", {"comment": self._comment},
+                             f"benchmark_id='{self._id}'")
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
+        db.disconnect()
+
     def write_benchmark_configuration(self, filename, outpath=None):
         """The current benchmark configuration will be written to given file
         using xml representation"""
@@ -903,6 +914,15 @@ class Benchmark(object):
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:
                 workpackage.done = False
+
+    def add_workpackage_information_to_database(self):
+        self._db = jube2.util.database_interface.Database_Interface(
+            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
+        self._db.connect()
+        for workpackages in self._workpackages.values():
+            for workpackage in workpackages:
+                workpackage.add_information_to_database(self._db)
+        self._db.disconnect()
 
     def write_workpackage_information(self, filename):
         """All workpackage information will be written to given file

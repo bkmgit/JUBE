@@ -791,6 +791,7 @@ def _manipulate_comment(benchmark_folder, args):
     else:
         comment = args.comment
     benchmark.comment = re.sub(r"\s+", " ", comment)
+    benchmark.update_benchmark_comment_in_database()
     benchmark.write_benchmark_configuration(
         os.path.join(benchmark_folder,
                      jube.conf.CONFIGURATION_FILENAME), outpath="..")

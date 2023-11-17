@@ -54,11 +54,14 @@ class Database_Interface(object):
             raise RuntimeError("Something went wrong when creating the "
                                "database: {0}".format(er))
 
-    def insert(self, table_name, data):
+    def insert(self, table_name, data, addition=None):
         columns = ", ".join(data.keys())
         values = tuple(data.values())
 
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ({', '.join(['?'] * len(data))})"
+        query = "INSERT"
+        if addition:
+            query += f" OR {addition}"
+        query += f" INTO {table_name} ({columns}) VALUES ({', '.join(['?'] * len(data))})"
 
         self._cursor.execute(query, values)
 
