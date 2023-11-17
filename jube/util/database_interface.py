@@ -37,6 +37,7 @@ class Database_Interface(object):
 
     def connect(self):
         self._connection = sqlite3.connect(self._name)
+        self._connection.isolation_level = None
         self._cursor = self._connection.cursor()
 
     def disconnect(self):

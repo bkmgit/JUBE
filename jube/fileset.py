@@ -47,13 +47,20 @@ class Fileset(list):
         return self._name
 
     def add_information_to_database(self, db, benchmark_id):
-        set_data = {
-            "fileset_name": self._name,
-            "benchmark_id": benchmark_id
-        }
-        db.insert("Fileset", set_data)
-        for file_handle in self:
-            file_handle.add_information_to_database(db, self._name)
+        try:
+            db.start_transaction()
+            set_data = {
+                "fileset_name": self._name,
+                "benchmark_id": benchmark_id
+            }
+            db.insert("Fileset", set_data)
+            for file_handle in self:
+                file_handle.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
 
     def etree_repr(self):
         """Return etree object representation"""

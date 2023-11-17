@@ -59,15 +59,22 @@ class Patternset(object):
         return self._derived_pattern
 
     def add_information_to_database(self, db, benchmark_id):
-        set_data = {
-            "patternset_name": self._name,
-            "benchmark_id": benchmark_id
-        }
-        db.insert("Patternset", set_data)
-        for pattern in self._pattern:
-            pattern.add_information_to_database(db, self._name)
-        for pattern in self._derived_pattern:
-            pattern.add_information_to_database(db, self._name)
+        try:
+            db.start_transaction()
+            set_data = {
+                "patternset_name": self._name,
+                "benchmark_id": benchmark_id
+            }
+            db.insert("Patternset", set_data)
+            for pattern in self._pattern:
+                pattern.add_information_to_database(db, self._name)
+            for pattern in self._derived_pattern:
+                pattern.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
 
     def etree_repr(self):
         """Return etree object representation"""

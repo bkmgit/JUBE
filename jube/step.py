@@ -60,59 +60,66 @@ class Step(object):
         self._do_log_file = do_log_file
 
     def add_information_to_database(self, db, benchmark_id):
-        step_data = {
-            "step_name": self._name,
-            "benchmark_id": benchmark_id
-        }
-        if len(self._depend) > 0:
-            step_data["depend"] = \
-                jube2.conf.DEFAULT_SEPARATOR.join(self._depend)
-        if self._export:
-            step_data["export"] = 1
-        if self._alt_work_dir is not None:
-            step_data["work_dir"] = self._alt_work_dir
-        if self._shared_name is not None:
-            step_data["shared"] = self._shared_name
-        if self._active != "true":
-            step_data["active"] = self._active
-        if self._suffix != "":
-            step_data["suffix"] = self._suffix
-        if self._max_wps != "0":
-            step_data["max_async"] = self._max_wps
-        if self._iterations > 1:
-            step_data["iterations"] = self._iterations
-        if self._cycles > 1:
-            step_data["cycles"] = self._cycles
-        if self._procs != 1:
-            step_data["procs"] = self._procs
-        if self._do_log_file is not None:
-            step_data["do_log_file"] = str(self._do_log_file)
-        db.insert("Step", step_data)
-        for use in self._use:
-            for set_name in use:
-                #Parameterset?
-                condition = f"parameterset_name='{set_name}'"
-                paramset = db.select('Parameterset', ['parameterset_name'], condition)
-                if len(paramset) > 0: 
-                    db.insert('UsedParameterset',{"parameterset_name": set_name,
-                                                  "step_name": self._name})
-                    continue
-                #Fileset?
-                condition = f"fileset_name='{set_name}'"
-                fileset = db.select('Fileset', ['fileset_name'], condition)
-                if len(fileset) > 0: 
-                    db.insert('UsedFileset',{"fileset_name": set_name,
-                                                  "step_name": self._name})
-                    continue
-                #Substituteset?
-                condition = f"substituteset_name='{set_name}'"
-                subset = db.select('Substituteset', ['substituteset_name'], condition)
-                if len(subset) > 0: 
-                    db.insert('UsedSubstituteset',{"substituteset_name": set_name,
-                                                  "step_name": self._name})
-                    continue
-        for operation in self._operations:
-            operation.add_information_to_database(db, self._name)
+        try:
+            db.start_transaction()
+            step_data = {
+                "step_name": self._name,
+                "benchmark_id": benchmark_id
+            }
+            if len(self._depend) > 0:
+                step_data["depend"] = \
+                    jube.conf.DEFAULT_SEPARATOR.join(self._depend)
+            if self._export:
+                step_data["export"] = 1
+            if self._alt_work_dir is not None:
+                step_data["work_dir"] = self._alt_work_dir
+            if self._shared_name is not None:
+                step_data["shared"] = self._shared_name
+            if self._active != "true":
+                step_data["active"] = self._active
+            if self._suffix != "":
+                step_data["suffix"] = self._suffix
+            if self._max_wps != "0":
+                step_data["max_async"] = self._max_wps
+            if self._iterations > 1:
+                step_data["iterations"] = self._iterations
+            if self._cycles > 1:
+                step_data["cycles"] = self._cycles
+            if self._procs != 1:
+                step_data["procs"] = self._procs
+            if self._do_log_file is not None:
+                step_data["do_log_file"] = str(self._do_log_file)
+            db.insert("Step", step_data)
+            for use in self._use:
+                for set_name in use:
+                    #Parameterset?
+                    condition = f"parameterset_name='{set_name}'"
+                    paramset = db.select('Parameterset', ['parameterset_name'], condition)
+                    if len(paramset) > 0:
+                        db.insert('UsedParameterset',{"parameterset_name": set_name,
+                                                      "step_name": self._name})
+                        continue
+                    #Fileset?
+                    condition = f"fileset_name='{set_name}'"
+                    fileset = db.select('Fileset', ['fileset_name'], condition)
+                    if len(fileset) > 0:
+                        db.insert('UsedFileset',{"fileset_name": set_name,
+                                                      "step_name": self._name})
+                        continue
+                    #Substituteset?
+                    condition = f"substituteset_name='{set_name}'"
+                    subset = db.select('Substituteset', ['substituteset_name'], condition)
+                    if len(subset) > 0:
+                        db.insert('UsedSubstituteset',{"substituteset_name": set_name,
+                                                      "step_name": self._name})
+                        continue
+            for operation in self._operations:
+                operation.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
 
     def etree_repr(self):
         """Return etree object representation"""

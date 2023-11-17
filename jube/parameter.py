@@ -315,16 +315,23 @@ class Parameterset(object):
             yield parameter
 
     def add_information_to_database(self, db, benchmark_id):
-        parameterset_data = {
-            "parameterset_name": self._name,
-            "benchmark_id": benchmark_id
-        }
-        if self._duplicate != "replace":
-            parameterset_data["duplicate"] = self._duplicate
-        db.insert("Parameterset", parameterset_data)
-        
-        for parameter in self._parameters.values():
-            parameter.add_information_to_database(db, self._name)
+        try:
+            db.start_transaction()
+            parameterset_data = {
+                "parameterset_name": self._name,
+                "benchmark_id": benchmark_id
+            }
+            if self._duplicate != "replace":
+                parameterset_data["duplicate"] = self._duplicate
+            db.insert("Parameterset", parameterset_data)
+
+            for parameter in self._parameters.values():
+                parameter.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
 
     def etree_repr(self, use_current_selection=False):
         """Return etree object representation"""

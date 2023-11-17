@@ -825,21 +825,28 @@ class Benchmark(object):
         self._db.connect()
         self._db.create_database()
 
-        benchmark_data = {
-            "benchmark_id": self._id,
-            "version": jube2.conf.JUBE_VERSION,
-            "name": self._name,
-            "file_path_ref": os.path.relpath(self._file_path_ref, self.bench_dir)
-        }
-        if outpath is not None:
-            benchmark_data["outpath"] = outpath
-        if len(self._comment) > 0:
-            benchmark_data["comment"] = self._comment
-        self._db.insert("Benchmark", benchmark_data)
+        try:
+            self._db.start_transaction()
+            benchmark_data = {
+                "benchmark_id": self._id,
+                "version": jube.conf.JUBE_VERSION,
+                "name": self._name,
+                "file_path_ref": os.path.relpath(self._file_path_ref, self.bench_dir)
+            }
+            if outpath is not None:
+                benchmark_data["outpath"] = outpath
+            if len(self._comment) > 0:
+                benchmark_data["comment"] = self._comment
+            self._db.insert("Benchmark", benchmark_data)
 
-        if len(self._tags) > 0:
-            for tag in self._tags:
-                self._db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+            if len(self._tags) > 0:
+                for tag in self._tags:
+                    self._db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+            self._db.commit_transaction()
+        except Exception as e:
+            self._db.rollback_transaction()
+            self._db.disconnect()
+            raise e
 
         for parameterset in self._parametersets.values():
             parameterset.add_information_to_database(self._db, self._id)
