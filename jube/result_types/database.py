@@ -198,10 +198,10 @@ class Database(KeyValuesResult):
                                                          preserve_datatype=True)
         return Database.DatabaseData(result_data, self._primekeys, self._db_file)
 
-    def add_information_to_database(self, db, benchmark_id):
+    def add_information_to_database(self, db, benchmark_id, update=False):
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id)
+            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
             database_data = {
                 "database_name": self._name,
                 "file": str(self._db_file),

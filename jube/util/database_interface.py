@@ -39,6 +39,8 @@ class Database_Interface(object):
         self._connection = sqlite3.connect(self._name)
         self._connection.isolation_level = None
         self._cursor = self._connection.cursor()
+        # Support foreign key for 'ON DELETE CASCADE'
+        self._cursor.execute("PRAGMA foreign_keys = ON")
 
     def disconnect(self):
         self._connection.close()

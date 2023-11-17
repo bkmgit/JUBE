@@ -199,10 +199,10 @@ class Table(KeyValuesResult):
                                style if style is not None else self._style,
                                self._separator, self._transpose)
 
-    def add_information_to_database(self, db, benchmark_id):
+    def add_information_to_database(self, db, benchmark_id, update=False):
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id)
+            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
             table_data = {
                 "table_name": self._name,
                 "result_id": result_id

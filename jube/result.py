@@ -246,7 +246,10 @@ class Result(object):
                     units[parameter.name] = parameter.unit
         return units
 
-    def add_information_to_database(self, db, benchmark_id):
+    def add_information_to_database(self, db, benchmark_id, update=False):
+        # Delete the previous results if an update is required
+        if update:
+            db.delete("Result", f"benchmark_id='{benchmark_id}'")
         result_data = {
             "benchmark_id": benchmark_id
         }

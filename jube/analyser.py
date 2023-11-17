@@ -157,9 +157,12 @@ class Analyser(object):
         """Get analyser reduce"""
         return self._reduce_iteration
 
-    def add_information_to_database(self, db, benchmark_id):
+    def add_information_to_database(self, db, benchmark_id, update=False):
         try:
             db.start_transaction()
+            # Delete the previous analysers if an update is required
+            if update:
+                db.delete("Analyser", f"benchmark_id='{benchmark_id}'")
             analyser_data = {
                 "analyser_name": self._name,
                 "benchmark_id": benchmark_id

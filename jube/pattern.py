@@ -58,9 +58,12 @@ class Patternset(object):
         """Return the derived pattern storage"""
         return self._derived_pattern
 
-    def add_information_to_database(self, db, benchmark_id):
+    def add_information_to_database(self, db, benchmark_id, update=False):
         try:
             db.start_transaction()
+            # Delete the previous patternsets if an update is required
+            if update:
+                db.delete("Patternset", f"benchmark_id='{benchmark_id}'")
             set_data = {
                 "patternset_name": self._name,
                 "benchmark_id": benchmark_id

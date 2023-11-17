@@ -438,6 +438,7 @@ class Benchmark(object):
                         os.path.join(new_cwd, result.result_dir)
             if ((not jube.conf.DEBUG_MODE) and
                     (os.access(self.bench_dir, os.W_OK))):
+                self.update_benchmark_configuration_in_database()
                 self.write_benchmark_configuration(
                     os.path.join(self.bench_dir,
                                  jube.conf.CONFIGURATION_FILENAME),
@@ -857,6 +858,22 @@ class Benchmark(object):
             result = self._results[result_name]
             result.add_information_to_database(self._db, self._id)
         self._db.disconnect()
+
+    def update_benchmark_configuration_in_database(self):
+        self._db = jube2.util.database_interface.Database_Interface(
+            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
+        self._db.connect()
+        # Update patternsets in database
+        for patternset in self._patternsets.values():
+            patternset.add_information_to_database(db, self._id, update=True)
+        # Update analyser in database
+        for analyser in self._analyser.values():
+            analyser.add_information_to_database(db, self._id, update=True)
+        # Update results in database
+        for result_name in self._results_order:
+            result = self._results[result_name]
+            result.add_information_to_database(db, self._id, update=True)
+        db.disconnect()
 
     def update_benchmark_comment_in_database(self):
         self._db = jube2.util.database_interface.Database_Interface(

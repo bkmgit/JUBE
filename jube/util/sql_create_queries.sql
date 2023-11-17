@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Parameter
     duplicate TEXT DEFAULT "none" NOT NULL,
     value TEXT NOT NULL,
     parameterset_name TEXT NOT NULL,
-    FOREIGN KEY (parameterset_name) REFERENCES Parameterset(parameterset_name)
+    FOREIGN KEY (parameterset_name) REFERENCES Parameterset(parameterset_name) ON DELETE CASCADE
 );
 
 -- Table Fileset
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS File
     is_internal_ref INTEGER DEFAULT 0 NOT NULL,
     target_dir TEXT DEFAULT "" NOT NULL,
     fileset_name TEXT NOT NULL,
-    FOREIGN KEY (fileset_name) REFERENCES Fileset(fileset_name)
+    FOREIGN KEY (fileset_name) REFERENCES Fileset(fileset_name) ON DELETE CASCADE
 );
 
 -- Table Substituteset
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS Substitutefile
     out_file TEXT NOT NULL,
     out_mode TEXT DEFAULT "w" NOT NULL,
     substituteset_name TEXT NOT NULL,
-    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name)
+    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name) ON DELETE CASCADE
 );
 
 -- Table Substitute
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Substitute
     dest TEXT NOT NULL,
     mode TEXT DEFAULT "text" NOT NULL,
     substituteset_name TEXT NOT NULL,
-    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name)
+    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name) ON DELETE CASCADE
 );
 
 -- Table Step
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS Operation
     shared INTEGER DEFAULT 0 NOT NULL,
     work_dir TEXT,
     step_name TEXT NOT NULL,
-    FOREIGN KEY (step_name) REFERENCES Step(step_name)
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 
 -- Table Prepare
@@ -155,8 +155,8 @@ CREATE TABLE IF NOT EXISTS UsedParameterset
     parameterset_name TEXT NOT NULL,
     step_name TEXT NOT NULL,
     PRIMARY KEY (parameterset_name, step_name),
-    FOREIGN KEY (parameterset_name) REFERENCES Parameterset(parameterset_name),
-    FOREIGN KEY (step_name) REFERENCES Step(step_name)
+    FOREIGN KEY (parameterset_name) REFERENCES Parameterset(parameterset_name) ON DELETE CASCADE,
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 
 -- Table UsedFileset
@@ -165,8 +165,8 @@ CREATE TABLE IF NOT EXISTS UsedFileset
     fileset_name TEXT NOT NULL,
     step_name TEXT NOT NULL,
     PRIMARY KEY (fileset_name, step_name),
-    FOREIGN KEY (fileset_name) REFERENCES Fileset(fileset_name),
-    FOREIGN KEY (step_name) REFERENCES Step(step_name)
+    FOREIGN KEY (fileset_name) REFERENCES Fileset(fileset_name) ON DELETE CASCADE,
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 
 -- Table UsedSubstituteset
@@ -175,8 +175,8 @@ CREATE TABLE IF NOT EXISTS UsedSubstituteset
     substituteset_name TEXT NOT NULL,
     step_name TEXT NOT NULL,
     PRIMARY KEY (substituteset_name, step_name),
-    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name),
-    FOREIGN KEY (step_name) REFERENCES Step(step_name)
+    FOREIGN KEY (substituteset_name) REFERENCES Substituteset(substituteset_name) ON DELETE CASCADE,
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 
 -- Table Workpackage
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS Workpackage
     iteration INTEGER NOT NULL,
     cycle INTEGER NOT NULL,
     step_name TEXT NOT NULL,
-    FOREIGN KEY (step_name) REFERENCES Step(step_name)
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 
 -- Table WorkpackageParents
@@ -195,8 +195,8 @@ CREATE TABLE IF NOT EXISTS WorkpackageParents
     workpackage_id INTEGER NOT NULL,
     parent_workpackage_id INTEGER NOT NULL,
     PRIMARY KEY (workpackage_id, parent_workpackage_id),
-    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id),
-    FOREIGN KEY (parent_workpackage_id) REFERENCES Workpackage(workpackage_id)
+    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE
 );
 
 -- Table WorkpackageSibling
@@ -205,8 +205,8 @@ CREATE TABLE IF NOT EXISTS WorkpackageSibling
     workpackage_id INTEGER NOT NULL,
     sibling_workpackage_id INTEGER NOT NULL,
     PRIMARY KEY (workpackage_id, sibling_workpackage_id),
-    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id),
-    FOREIGN KEY (sibling_workpackage_id) REFERENCES Workpackage(workpackage_id)
+    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE,
+    FOREIGN KEY (sibling_workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE
 );
 
 -- Table SelectedParameter
@@ -217,8 +217,8 @@ CREATE TABLE IF NOT EXISTS SelectedParameter
     selected TEXT NOT NULL,
     idx INTEGER,
     PRIMARY KEY (parameter_id, workpackage_id, idx),
-    FOREIGN KEY (parameter_id) REFERENCES Parameter(parameter_id),
-    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id)
+    FOREIGN KEY (parameter_id) REFERENCES Parameter(parameter_id) ON DELETE CASCADE,
+    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE
 );
 
 -- Table Environment
@@ -235,8 +235,8 @@ CREATE TABLE IF NOT EXISTS WorkpackageEnvironment
     environment_name TEXT NOT NULL,
     workpackage_id INTEGER NOT NULL,
     PRIMARY KEY (environment_name, workpackage_id),
-    FOREIGN KEY (environment_name) REFERENCES Environment(environment_name),
-    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id)
+    FOREIGN KEY (environment_name) REFERENCES Environment(environment_name) ON DELETE CASCADE,
+    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE
 );
 
 -- Table Patternset
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS Pattern
     pattern_default TEXT,
     value TEXT NOT NULL,
     patternset_name TEXT NOT NULL,
-    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name)
+    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name) ON DELETE CASCADE
 );
 
 -- Table Analyser
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS AnalyseFile
     analysefile_id INTEGER NOT NULL PRIMARY KEY,
     path TEXT NOT NULL,
     analyser_name TEXT NOT NULL,
-    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name)
+    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name) ON DELETE CASCADE
 );
 
 -- Table AnalyserPattern
@@ -285,8 +285,8 @@ CREATE TABLE IF NOT EXISTS AnalyserPattern
     patternset_name TEXT NOT NULL,
     analyser_name TEXT NOT NULL,
     PRIMARY KEY (patternset_name, analyser_name),
-    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name),
-    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name)
+    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name) ON DELETE CASCADE,
+    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name) ON DELETE CASCADE
 );
 
 -- Table AnalyseFilePattern
@@ -295,8 +295,8 @@ CREATE TABLE IF NOT EXISTS AnalyseFilePattern
     patternset_name TEXT NOT NULL,
     analysefile_id INTEGER NOT NULL,
     PRIMARY KEY (patternset_name, analysefile_id),
-    FOREIGN KEY (analysefile_id) REFERENCES AnalyseFile(analysefile_id),
-    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name)
+    FOREIGN KEY (analysefile_id) REFERENCES AnalyseFile(analysefile_id) ON DELETE CASCADE,
+    FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name) ON DELETE CASCADE
 );
 
 -- Table AnalyseStep
@@ -305,8 +305,8 @@ CREATE TABLE IF NOT EXISTS AnalyseStep
     step_name TEXT NOT NULL,
     analysefile_id INTEGER NOT NULL,
     PRIMARY KEY (step_name, analysefile_id),
-    FOREIGN KEY (step_name) REFERENCES Step(step_name),
-    FOREIGN KEY (analysefile_id) REFERENCES AnalyseFile(analysefile_id)
+    FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE,
+    FOREIGN KEY (analysefile_id) REFERENCES AnalyseFile(analysefile_id) ON DELETE CASCADE
 );
 
 -- Table Result
@@ -324,8 +324,8 @@ CREATE TABLE IF NOT EXISTS ResultAnalyser
     result_id INTEGER NOT NULL,
     analyser_name TEXT NOT NULL,
     PRIMARY KEY (result_id, analyser_name),
-    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name),
-    FOREIGN KEY (result_id) REFERENCES Result(result_id)
+    FOREIGN KEY (analyser_name) REFERENCES Analyser(analyser_name) ON DELETE CASCADE,
+    FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
 );
 
 -- Table ResultTable
@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS ResultTable
     transpose INTEGER DEFAULT 0 NOT NULL,
     sort TEXT,
     result_id INTEGER NOT NULL,
-    FOREIGN KEY (result_id) REFERENCES Result(result_id)
+    FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
 );
 
 -- Table ResultTableColumn
@@ -350,7 +350,7 @@ CREATE TABLE IF NOT EXISTS ResultTableColumn
     format TEXT,
     colw TEXT,
     table_name TEXT NOT NULL,
-    FOREIGN KEY (table_name) REFERENCES ResultTable(table_name)
+    FOREIGN KEY (table_name) REFERENCES ResultTable(table_name) ON DELETE CASCADE
 );
 
 -- Table ResultSyslog
@@ -364,7 +364,7 @@ CREATE TABLE IF NOT EXISTS ResultSyslog
     port INTEGER DEFAULT 541 NOT NULL,
     sort TEXT,
     result_id INTEGER NOT NULL,
-    FOREIGN KEY (result_id) REFERENCES Result(result_id)
+    FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
 );
 
 -- Table ResultSyslogKey
@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS ResultSyslogKey
     title TEXT,
     format TEXT,
     syslog_name TEXT NOT NULL,
-    FOREIGN KEY (syslog_name) REFERENCES ResultSyslog(syslog_name)
+    FOREIGN KEY (syslog_name) REFERENCES ResultSyslog(syslog_name) ON DELETE CASCADE
 );
 
 -- Table ResultDatabase
@@ -385,7 +385,7 @@ CREATE TABLE IF NOT EXISTS ResultDatabase
     filter TEXT,
     file TEXT,
     result_id INTEGER NOT NULL,
-    FOREIGN KEY (result_id) REFERENCES Result(result_id)
+    FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
 );
 
 -- Table ResultDatabaseKey
@@ -397,6 +397,5 @@ CREATE TABLE IF NOT EXISTS ResultDatabaseKey
     format TEXT,
     is_primary INTEGER DEFAULT 0 NOT NULL,
     database_name TEXT NOT NULL,
-    FOREIGN KEY (database_name) REFERENCES ResultDatabase(database_name)
+    FOREIGN KEY (database_name) REFERENCES ResultDatabase(database_name) ON DELETE CASCADE
 );
-
