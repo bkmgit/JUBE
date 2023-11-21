@@ -172,6 +172,23 @@ class Benchmark(object):
         if stepname in self._workpackages and \
                 workpackage_to_delete in self._workpackages[stepname]:
             self._workpackages[stepname].remove(workpackage_to_delete)
+            self._remove_workpackage_from_database(workpackage_to_delete)
+
+    def _remove_workpackage_from_database(self, workpackage_to_delete):
+        """Remove a specifc workpackage from database"""
+        # Get database instance and connect
+        db = self.db
+        db.connect()
+        try:
+            db.start_transaction()
+            #deletes workpackage and any depend data in other tables
+            db.delete("Workpackage", f"workpackage_id='{workpackage_to_delete.id}'")
+            db.commit_transaction()
+        except Exception as e:
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
+        db.disconnect()
 
     @property
     def work_stat(self):
