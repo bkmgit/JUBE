@@ -39,6 +39,7 @@ import jube.result_types.syslog
 import jube.result_types.table
 import jube.result_types.database
 import jube.util.yaml_converter
+import jube.util.database_interface
 import sys
 import re
 import copy
@@ -80,6 +81,60 @@ class Parser(object):
             return file_path_ref
         else:
             return "."
+
+    def load_benchmark_from_configuration(self, db, benchmark_folder, check_tags=True):
+        """Return a benchmark out of xml- or database- configuration"""
+        # Get benchmark out of xml configuration
+        if self._filename.endswith('xml'):
+            benchmark = self.benchmarks_from_xml(check_tags=True)[0]
+            if benchmark is not None:
+                # Only one single benchmark exist inside benchmarks
+                benchmark = list(benchmark.values())[0]
+            else:
+                return None
+            # Restore old benchmark id
+            benchmark.id = int(os.path.basename(benchmark_folder))
+            # Store benchmark information in database to delete xml-file
+            benchmark.add_benchmark_configuration_to_database(outpath="..")
+            benchmark.delete_xml_configuration()
+            return benchmark
+        # Get benchmark out of database configuration
+        elif self._filename.endswith('db'):
+            return self.benchmark_from_database(db)
+        else:
+            raise IOError("Configuration file \"{0}\" not valid."
+                          .format(self._filename))
+
+    def benchmark_from_database(self, db):
+        """Return a dict of benchmarks
+
+        Here parametersets are global and accessible to all benchmarks defined
+        in the corresponding Database file.
+        """
+        LOGGER.debug("Parsing {0}".format(self._filename))
+        
+        benchmark_id, name, comment, outpath, version, file_path_ref = \
+            db.select("Benchmark", None, "")[0]
+        tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
+        tags = set(tag for tag, in tags)
+        comment, outpath, file_path_ref = self._evaluate_benchmark_attributes(comment, outpath, file_path_ref)
+        
+        parametersets = self._extract_parametersets_from_database(db, benchmark_id)
+        substitutesets = self._extract_substitutesets_from_database(db, benchmark_id)
+        filesets = self._extract_filesets_from_database(db, benchmark_id)
+        patternsets = self._extract_patternsets_from_database(db, benchmark_id)
+        steps = self._extract_steps_from_database(db, benchmark_id)
+        analyser = self._extract_analysers_from_database(db, benchmark_id)
+        results, results_order = self._extract_results_from_database(db, benchmark_id)
+
+        benchmark = jube.benchmark.Benchmark(name.strip(), outpath,
+                                              parametersets, substitutesets,
+                                              filesets, patternsets, steps,
+                                              analyser, results, results_order,
+                                              comment, tags,
+                                              file_path_ref)
+        benchmark.id = benchmark_id
+        return benchmark
 
     def benchmarks_from_xml(self, check_tags=True):
         """Return a dict of benchmarks
@@ -394,6 +449,35 @@ class Parser(object):
         else:
             return found_set[0].tag
 
+    def load_benchmark_info(self, benchmark_id):
+        """Return benchmark info out of xml- or database- configuration"""
+        # Get benchmark out of xml configuration
+        if self._filename.endswith('xml'):
+            return self.benchmark_info_from_xml()
+        # Get benchmark out of database configuration
+        elif self._filename.endswith('db'):
+            return self.benchmark_info_from_database(benchmark_id)
+        else:
+            raise IOError("Configuration file \"{0}\" not valid."
+                          .format(self._filename))
+
+    def benchmark_info_from_database(self, benchmark_id, db=None):
+        """Return name, comment and available tags of first benchmark
+        found in database"""
+        if db is None:
+            db = jube.util.database_interface.Database_Interface(self._filename)
+        db.connect()
+        benchmarks = dict()
+
+        tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
+        tags = [tag for tag, in tags]
+
+        name, comment = db.select("Benchmark", ["name", "comment"], f"benchmark_id='{benchmark_id}'")[0]
+        comment = "" if comment is None else comment
+        comment = re.sub(r"\s+", " ", comment).strip()
+        db.disconnect()
+        return name, comment, tags
+
     def benchmark_info_from_xml(self):
         """Return name, comment and available tags of first benchmark
         found in file"""
@@ -467,6 +551,167 @@ class Parser(object):
                         analyse_result[analyser_name][step_name][
                             wp_id][pattern_name] = value
         return analyse_result
+
+    def load_workpackages_from_configuration(self, benchmark, db):
+        """Read existing workpackage data out of xml- or database- configuration"""
+        # Get workpackages out of xml configuration
+        if self._filename.endswith('xml'):
+            workpackages, work_stat = self.workpackages_from_xml(benchmark)
+            # Store workpackage information to delete xml-file
+            for step_name, step_workpackages in workpackages.items():
+                for workpackage in step_workpackages:
+                    workpackage.add_information_to_database(db)
+            benchmark.delete_xml_workpackages()
+            return workpackages, work_stat
+        # Get workpackages out of database configuration
+        elif self._filename.endswith('db'):
+            return self.workpackages_from_database(benchmark, db)
+        else:
+            raise IOError("Configuration file \"{0}\" not valid."
+                          .format(self._filename))
+
+    def workpackages_from_database(self, benchmark, db):
+        """Read existing workpackage data out of database"""
+        work_list = Queue()
+        tmp = dict()
+
+        # parents_tmp: Dict workpackage_id => list of parent_workpackage_ids
+        parents_tmp = dict()
+        iteration_siblings_tmp = dict()
+        found_workpackages = dict()
+        if not os.path.isfile(self._filename):
+            raise IOError("Workpackage database file not found: \"{0}\""
+                          .format(self._filename))
+        workpackages = db.select("Workpackage", None, "")
+        max_id = -1
+        for workpackage in workpackages:
+            workpackage_id, iteration, cycle, step_name = workpackage
+            max_id = max(max_id, workpackage_id)
+            
+            step = benchmark.steps[step_name]
+
+            parameterset = jube.parameter.Parameterset()
+            parameter_names = []
+            parameters = db.select("SelectedParameter", None, f"workpackage_id='{workpackage_id}'")
+            for parameter in parameters:
+                id, workpackage_id, selected, idx = parameter
+                id, name, type, export, unit, mode, separator, update_mode, \
+                    duplicate, value, parameterset_name = \
+                    db.select("Parameter", None, f"parameter_id='{id}'")[0]
+                parameter_names.append(name)
+                parameter = jube.parameter.Parameter.create_parameter(
+                    name, value, separator, type, selected,
+                    mode, export, update_mode=update_mode, idx=idx,
+                    eval_helper=None, fixed=False, duplicate=duplicate)
+                parameterset.add_parameter(parameter)
+
+            tmp[workpackage_id] = jube.workpackage.Workpackage(benchmark, step, \
+                                        parameter_names, parameterset, workpackage_id,
+                                        iteration, cycle)
+
+            parents = db.select("WorkpackageParents", ["parent_workpackage_id"], f"workpackage_id='{workpackage_id}'")
+            parents = [parent for parent, in parents]
+            parents_tmp[workpackage_id] = parents
+            if len(parents) == 0:
+                work_list.put(tmp[workpackage_id])
+
+            siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], f"workpackage_id='{workpackage_id}'")
+            siblings = [sibling for sibling, in siblings]
+            iteration_siblings_tmp[workpackage_id] = siblings
+
+            set_env, unset_env = self._extract_workpackage_env(db, workpackage_id)
+            tmp[workpackage_id].env.update(set_env)
+            for env_name in unset_env:
+                if env_name in tmp[workpackage_id].env:
+                    del tmp[workpackage_id].env[env_name]
+
+        # Set workpackage counter to current id number
+        jube.workpackage.Workpackage.id_counter = max_id + 1
+
+        # Rebuild graph structure
+        for workpackage_id in parents_tmp:
+            for parent_id in parents_tmp[workpackage_id]:
+                tmp[workpackage_id].add_parent(tmp[parent_id])
+                tmp[parent_id].add_children(tmp[workpackage_id])
+
+        # Rebuild sibling structure
+        for workpackage_id in iteration_siblings_tmp:
+            for sibling_id in iteration_siblings_tmp[workpackage_id]:
+                tmp[workpackage_id].iteration_siblings.add(tmp[sibling_id])
+
+        # Rebuild history
+        done_list = list()
+        while not work_list.empty():
+            workpackage = work_list.get_nowait()
+            history = jube.parameter.Parameterset()
+            if workpackage.id in parents_tmp:
+                for parent_id in parents_tmp[workpackage.id]:
+                    history.add_parameterset(tmp[parent_id].parameterset)
+            done_list.append(workpackage)
+            for child in workpackage.children:
+                all_done = True
+                for parent in child.parents:
+                    all_done = all_done and (parent in done_list)
+                if all_done and (child not in done_list):
+                    work_list.put(child)
+            history.add_parameterset(workpackage.parameterset)
+            workpackage.parameterset.add_parameterset(history)
+
+        for workpackage_id, workpackage in tmp.items():
+            # JUBE benchmark parameter
+            workpackage.parameterset.add_parameterset(
+                benchmark.get_jube_parameterset())
+            # JUBE step parameter
+            workpackage.parameterset.add_parameterset(
+                workpackage.step.get_jube_parameterset())
+            # JUBE workpackage parameter
+            workpackage.parameterset.add_parameterset(
+                workpackage.get_jube_parameterset())
+            # Enable work_dir caching
+            workpackage.allow_workpackage_dir_caching()
+            jube_parameter = workpackage.parameterset.get_updatable_parameter(
+                jube.parameter.JUBE_MODE)
+            jube_parameter.parameter_substitution(
+                additional_parametersets=[workpackage.parameterset],
+                final_sub=True)
+            workpackage.parameterset.update_parameterset(jube_parameter)
+
+        # Store workpackage data
+        work_stat = jube.util.util.WorkStat()
+        for step_name in benchmark.steps:
+            found_workpackages[step_name] = list()
+        # First put started wps inside the queue
+        for mode in ("only_started", "all"):
+            for workpackage in tmp.values():
+                if len(workpackage.parents) == 0:
+                    if (mode == "only_started" and workpackage.started) or \
+                       (mode == "all" and (not workpackage.queued)):
+                        workpackage.queued = True
+                        work_stat.put(workpackage)
+                if mode == "all":
+                    found_workpackages[workpackage.step.name].append(workpackage)
+
+        return found_workpackages, work_stat
+
+    def _extract_workpackage_env(self, db, workpackage_id):
+        """Extract workpackage env-information from database"""
+        set_env = dict()
+        unset_env = list()
+        env_names = db.select("WorkpackageEnvironment", ["environment_name"], f"workpackage_id='{workpackage_id}'")
+        env_names = [name for name, in env_names]
+        for env_name in env_names:
+            env_name, value, env = db.select("Environment", None, f"environment_name='{env_name}'")[0]
+            if env:
+                if value is not None:
+                    set_env[env_name] = value.strip()
+                    if (set_env[env_name][0] == "'") or \
+                                ((set_env[env_name][0] == "u") and
+                                 (set_env[env_name][1] == "'")) and \
+                               (set_env[env_name][-1] == "'"):
+                                set_env[env_name] = eval(set_env[env_name])
+            else:
+                unset_env.append(env_name)
+        return set_env, unset_env
 
     def workpackages_from_xml(self, benchmark):
         """Read existing workpackage data out of a xml-file"""
@@ -783,6 +1028,30 @@ class Parser(object):
 
         return tags
 
+    def _evaluate_benchmark_attributes(self, comment, outpath, file_path_ref):
+        """Add additionally context to variables"""
+        if comment is None:
+            comment = ""
+        comment = re.sub(r"\s+", " ", comment).strip()
+
+        outpath = os.path.expandvars(os.path.expanduser(outpath))
+        # Add position of user to outpath
+        outpath = os.path.normpath(os.path.join(self.file_path_ref, outpath))
+
+        # File path reference for relative file location
+        if file_path_ref is not None:
+            file_path_ref = file_path_ref.strip()
+            file_path_ref = \
+                os.path.expandvars(os.path.expanduser(file_path_ref))
+        else:
+            file_path_ref = "."
+
+        # Add position of user to file_path_ref
+        file_path_ref = \
+            os.path.normpath(os.path.join(self.file_path_ref, file_path_ref))
+
+        return comment, outpath, file_path_ref
+
     def _create_benchmark(self, benchmark_etree, global_parametersets,
                           global_substitutesets, global_filesets,
                           global_patternsets):
@@ -879,6 +1148,78 @@ class Parser(object):
                                                 set(local_sets))])))
         result_sets.update(local_sets)
         return result_sets
+
+    def _extract_steps_from_database(self, db, benchmark_id):
+        """Extract all steps from benchmark database
+
+        Return a dict of steps, e.g. {"compile": Step(...), ...}
+        """
+        steps = dict()
+        steps_attributes = db.select("Step", None, f"benchmark_id='{benchmark_id}'")
+        for step_attributes in steps_attributes:
+            name, iterations, cycles, depend, export, \
+                active, max_async, work_dir, suffix, \
+                procs, shared, do_log_file, benchmark_id = step_attributes
+            depend = set(val.strip() for val in
+                     depend.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
+            export = bool(export)
+            active = str(active).lower()
+            if do_log_file in ["None", "False", "false"]:
+                do_log_file = None
+            if do_log_file in ["True", "true"]:
+                do_log_file = jube.conf.DO_LOG_FILENAME
+            if shared is not None:
+                shared = shared.strip()
+                if shared == "":
+                    raise ValueError("Empty \"shared\" attribute in " +
+                                 "<step> found.")
+            step = jube.step.Step(name.strip(), depend, iterations, work_dir,
+                               shared, export, max_async, active, suffix,
+                               cycles, procs, do_log_file)
+            ops = self._extract_operation_from_database(db, name)
+            for op in ops:
+                step.add_operation(op)
+            uses = self._extract_uses_from_database(db, name)
+            if uses:
+                step.add_uses(uses)
+            steps[step.name] = step
+        return steps
+
+    def _extract_operation_from_database(self, db, step_name):
+        """Extract all operations from benchmark database
+
+        Return a list of operations
+        """
+        ops = []
+        ops_attributes = db.select("Operation", None, f"step_name='{step_name}'")
+        for op_attributes in ops_attributes:
+            id, do, error_fn, async_fn, stdout_fn, \
+                stderr_fn, break_fn, active, shared, \
+                work_dir, step_name = op_attributes
+            active = str(active).lower()
+            shared = bool(shared)
+            operation = jube.step.Operation(do, async_fn, stdout_fn, stderr_fn,
+                                             active, shared, work_dir, break_fn,
+                                             error_fn)
+            ops.append(operation)
+        return ops
+
+    def _extract_uses_from_database(self, db, step_name):
+        """Extract all used sets from benchmark database
+
+        Return a list of sets
+        """
+        sets = []
+        filesets = db.select("UsedFileset", None, f"step_name='{step_name}'")
+        for fileset in filesets:
+            sets.append(fileset[0])
+        paramsets = db.select("UsedParameterset", None, f"step_name='{step_name}'")
+        for paramset in paramsets:
+            sets.append(paramset[0])
+        subsets = db.select("UsedSubstituteset", None, f"step_name='{step_name}'")
+        for subset in subsets:
+            sets.append(subset[0])
+        return sets
 
     @staticmethod
     def _extract_steps(etree):
@@ -988,6 +1329,40 @@ class Parser(object):
                 step.add_uses(Parser._extract_use(element))
         return step
 
+    def _extract_analysers_from_database(self, db, benchmark_id):
+        """Extract all analyser from database"""
+        analysers = dict()
+        analyser_attributes = db.select("Analyser", None, f"benchmark_id='{benchmark_id}'")
+        for analyse_attributes in analyser_attributes:
+            name, reduce, benchmark_id = analyse_attributes
+            reduce = bool(reduce)
+            analyser = jube.analyser.Analyser(name, reduce)
+
+            patterns = db.select("AnalyserPattern", ["patternset_name"], f"analyser_name='{name}'")
+            patterns = [pattern for pattern, in patterns]
+            analyser.add_uses(patterns)
+            file_objects = self._extract_analyser_files_from_database(db, name)
+            for file_object in file_objects:
+                file, step = file_object
+                analyser.add_analyse(step, file)
+
+            analysers[analyser.name] = analyser
+        return analysers
+
+    def _extract_analyser_files_from_database(self, db, analyser_name):
+        """Extract all analyser files from database"""
+        file_objects = []
+        files = db.select("AnalyseFile", ["analysefile_id", "path"], f"analyser_name='{analyser_name}'")
+        for file in files:
+            id, path = file
+            file_obj = jube.analyser.Analyser.AnalyseFile(path)
+            uses = db.select("AnalyseFilePattern", ["patternset_name"], f"analysefile_id='{id}'")
+            uses = [use for use, in uses]
+            file_obj.add_uses(uses)
+            steps = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{id}'")[0][0]
+            file_objects.append((file_obj, steps))
+        return file_objects
+
     @staticmethod
     def _extract_analysers(etree):
         """Extract all analyser from etree"""
@@ -1040,6 +1415,59 @@ class Parser(object):
             elif element.tag == "use":
                 analyser.add_uses(Parser._extract_use(element))
         return analyser
+
+    def _extract_results_from_database(self, db, benchmark_id):
+        """Extract all results from database"""
+        results = dict()
+        results_order = list()
+        results_attributes = db.select("Result", ["result_id", "result_dir"], f"benchmark_id='{benchmark_id}'")
+        for result_attributes in results_attributes:
+            id, result_dir = result_attributes
+            result = self._extract_subresult_from_database(db, id, result_dir)
+            uses = db.select("ResultAnalyser", ["analyser_name"], f"result_id='{id}'")
+            uses = [use for use, in uses]
+            result.add_uses(uses)
+            results[result.name] = result
+            results_order.append(result.name)
+        return results, results_order
+
+    def _extract_subresult_from_database(self, db, result_id, result_dir):
+        """Extract all tables, databases and syslogs from database"""
+        tables = db.select("ResultTable", None, f"result_id='{result_id}'")
+        for table in tables:
+            name, style, separator, filter, transpose, sort, result_id = table
+            transpose = bool(transpose)
+            result = jube.result_types.table.Table(name, style, separator,
+                                                   sort, transpose, filter)
+            result.result_dir = result_dir
+            columns = db.select("ResultTableColumn", None, f"table_name='{name}'")
+            for column in columns:
+                id, column_name, title, format, colw, name = column
+                result.add_column(column_name, colw, format, title)
+            return result
+        databases = db.select("ResultDatabase", None, f"result_id='{result_id}'")
+        for database in databases:
+            name, filter, file, result_id = database
+            primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
+                                  f"database_name='{name} AND is_primary=1'")
+            primekeys = [key for key, in primekeys]
+            result = jube.result_types.database.Database(name, filter, primekeys, file)
+            result.result_dir = result_dir
+            keys = db.select("ResultDatabaseKey", None, f"database_name='{name}'")
+            for key in keys:
+                id, key_name, title, format, is_primary, name = key
+                result.add_key(key_name, format, title)
+            return result
+        syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
+        for syslog in syslogs:
+            name, address, format, filter, host, port, sort, result_id = syslog
+            result = jube.result_types.syslog.SysloggedResult(
+                name, address, host, port, format, sort, filter)
+            keys = db.select("ResultSyslogKey", None, f"syslog_name='{name}'")
+            for key in keys:
+                id, key_name, format, title, syslog_name = key
+                result.add_key(key_name, format, title)
+            return result
 
     @staticmethod
     def _extract_results(etree):
@@ -1348,6 +1776,34 @@ class Parser(object):
             raise ValueError("\"{0}\" not found in \"{1}\""
                              .format(name, file_path))
 
+    def _extract_parametersets_from_database(self, db, benchmark_id):
+        """Extract all parametersets from database"""
+        parametersets = dict()
+        paramsets = db.select("Parameterset", None, f"benchmark_id='{benchmark_id}'")
+        for paramset in paramsets: 
+            name, duplicate, benchmark_id = paramset
+            parameterset = jube.parameter.Parameterset(name, duplicate)
+            for parameter in self._extract_parameters_from_database(db, name):
+                parameterset.add_parameter(parameter)
+            parametersets[parameterset.name] = parameterset
+        return parametersets
+
+    def _extract_parameters_from_database(self, db, parameterset_name):
+        """Extract all parameters from parameterset from database"""
+        parameters = list()
+        params = db.select("Parameter", None, f"parameterset_name='{parameterset_name}'")
+        for param in params:
+            id, name, type, export, unit, mode, separator, \
+                update_mode, duplicate, value, parameterset_name = param
+            export = bool(export)
+            parameter = \
+                jube.parameter.Parameter.create_parameter(
+                    name, value, separator, type, None,
+                    mode, unit, export, update_mode=update_mode,
+                    eval_helper=None, fixed=False, duplicate=duplicate)
+            parameters.append(parameter)
+        return parameters
+
     def _extract_parametersets(self, etree):
         """Return parametersets from etree"""
 
@@ -1460,6 +1916,31 @@ class Parser(object):
             parameters.append(parameter)
         return parameters
 
+    def _extract_patternsets_from_database(self, db, benchmark_id):
+        """Return patternset from database"""
+        patternsets = dict()
+        pattsets = db.select("Patternset", None, f"benchmark_id='{benchmark_id}'")
+        for pattset in pattsets:
+            name, benchmark_id = pattset
+            patternset = jube.pattern.Patternset(name)
+            for pattern in self._extract_pattern_from_database(db, name):
+                patternset.add_pattern(pattern)
+            patternsets[patternset.name] = patternset
+        return patternsets
+
+    def _extract_pattern_from_database(self, db, patternset_name):
+        """Extract pattern from patternset from database"""
+        patternlist = list()
+        patterns = db.select("Pattern", None, f"patternset_name='{patternset_name}'")
+        for pattern in patterns:
+            name, type, unit, mode, dotall, \
+                default, value, patternset_name = pattern
+            dotall = bool(dotall)
+            patternlist.append(jube.pattern.Pattern(name, value, mode,
+                                                     type, unit,
+                                                     default, dotall))
+        return patternlist
+
     def _extract_patternsets(self, etree):
         """Return patternset from etree"""
         patternsets = dict()
@@ -1526,6 +2007,45 @@ class Parser(object):
                                                      content_type, unit,
                                                      default, dotall))
         return patternlist
+
+    def _extract_filesets_from_database(self, db, benchmark_id):
+        """Extract filesets from database"""
+        filesets = dict()
+        sets = db.select("Fileset", None, f"benchmark_id='{benchmark_id}'")
+        for fileset in sets:
+            name, benchmark_id = fileset
+            filesets[name] = jube.fileset.Fileset(name)
+            filelist = self._extract_files_from_database(db, name)
+            filesets[name] += filelist
+        return filesets
+
+    def _extract_files_from_database(self, db, fileset_name):
+        """Extract files from database"""
+        filelist = list()
+        files = db.select("File", None, f"fileset_name='{fileset_name}'")
+        for file in files:
+            id, type, path, source_dir, name, file_path_ref, \
+                active, is_internal_ref, target_dir, fileset_name = file
+            is_internal_ref = bool(is_internal_ref)
+            active = str(active).lower()
+            if type == "Copy":
+                file_obj = jube.fileset.Copy(path, name, is_internal_ref, \
+                                              active, source_dir, target_dir)
+            elif type == "Link":
+                file_obj = jube.fileset.Link(path, name, is_internal_ref, \
+                                              active, source_dir, target_dir)
+            filelist.append(file_obj)
+        prepares = db.select("Prepare", None, f"fileset_name='{fileset_name}'")
+        for prepare in prepares:
+            id, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare
+            if work_dir is not None:
+                work_dir = work_dir.strip()
+            active = str(active).lower()
+
+            prepare_obj = jube.fileset.Prepare(do.strip(), stdout_fn.strip(),
+                                                stderr_fn.strip(),work_dir, active)
+            filelist.append(prepare_obj)
+        return filelist
 
     def _extract_filesets(self, etree):
         """Return filesets from etree"""
@@ -1634,6 +2154,31 @@ class Parser(object):
                                                     alt_work_dir, active)
                 filelist.append(prepare_obj)
         return filelist
+
+    def _extract_substitutesets_from_database(self, db, benchmark_id):
+        """Extract substitutesets from database"""
+        substitutesets = dict()
+        subsets = db.select("Substituteset", None, f"benchmark_id='{benchmark_id}'")
+        for subset in subsets:
+            name, benchmark_id = subset
+            files, sub_dict = self._extract_subs_from_database(db, name)
+            substitutesets[name] = \
+                    jube.substitute.Substituteset(name, files, sub_dict)
+        return substitutesets
+
+    def _extract_subs_from_database(self, db, substituteset_name):
+        """Extract substitutes from database"""
+        files = list()
+        sub_dict = dict()
+        file_rows = db.select("SubstituteFile", None, f"substituteset_name='{substituteset_name}'")
+        for file in file_rows:
+            id, in_file, out_file, out_mode, substituteset_name = file
+            files.append((out_file, in_file, out_mode))
+        sub_rows = db.select("Substitute", None, f"substituteset_name='{substituteset_name}'")
+        for sub in sub_rows:
+            id, source, dest, mode, substituteset_name = sub
+            sub_dict[source] = jube.substitute.Sub(source, mode, dest)
+        return files, sub_dict
 
     def _extract_substitutesets(self, etree):
         """Extract substitutesets from benchmark

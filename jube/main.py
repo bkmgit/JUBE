@@ -362,37 +362,41 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
         os.path.basename(sys.argv[0]), " ".join(sys.argv[1:])))
     LOGGER.debug("Version: {0}".format(jube.conf.JUBE_VERSION))
 
+    # Connection to database
+    db_file = os.path.join(benchmark_folder, jube.conf.DATABASE_FILENAME)
+    db = jube.util.database_interface.Database_Interface(db_file)
+    db.connect()
+
+    found_configuration = _configuration_exists(benchmark_folder)
     # Read existing benchmark configuration
-    try:
-        parser = jube.jubeio.Parser(os.path.join(
-            benchmark_folder, jube.conf.CONFIGURATION_FILENAME),
-            force=args.force, strict=args.strict)
-        benchmarks = parser.benchmarks_from_xml()[0]
-    except IOError as exeption:
-        LOGGER.warning(str(exeption))
-        return None
-
-    # benchmarks can be None if version conflict was blocked
-    if benchmarks is not None:
-        # Only one single benchmark exist inside benchmarks
-        benchmark = list(benchmarks.values())[0]
+    if found_configuration:
+        try:
+            parser = jube.jubeio.Parser(found_configuration, force=args.force,
+                                         strict=args.strict)
+            benchmark = parser.load_benchmark_from_configuration(db, benchmark_folder)
+        except IOError as exeption:
+            LOGGER.warning(str(exeption))
+            return None
     else:
-        return None
+        raise IOError("Benchmark configuration file not found in \"{0}\""
+                      .format(benchmark_folder))
 
-    # Restore old benchmark id
-    benchmark.id = int(os.path.basename(benchmark_folder))
-
-    if restore_workpackages:
+    found_workpackage = _workpackage_exists(benchmark_folder)
+    if found_workpackage and restore_workpackages:
         # Read existing workpackage information
         try:
-            parser = jube.jubeio.Parser(os.path.join(
-                benchmark_folder, jube.conf.WORKPACKAGES_FILENAME),
-                force=args.force, strict=args.strict)
-            workpackages, work_stat = parser.workpackages_from_xml(benchmark)
+            parser = jube.jubeio.Parser(found_workpackage, force=args.force,
+                                         strict=args.strict)
+            workpackages, work_stat = parser.load_workpackages_from_configuration(benchmark, db)
         except IOError as exeption:
             LOGGER.warning(str(exeption))
             return None
         benchmark.set_workpackage_information(workpackages, work_stat)
+    elif not found_workpackage and restore_workpackages:
+        raise IOError("Workpackage configuration file not found in \"{0}\""
+                      .format(benchmark_folder))
+
+    db.disconnect()
 
     if load_analyse and os.path.isfile(os.path.join(
             benchmark_folder, jube.conf.ANALYSE_FILENAME)):
@@ -438,17 +442,20 @@ def search_for_benchmarks(args):
                 benchmark_id = int(
                     os.path.basename(all_benchmarks[benchmark_id]))
             benchmark_folder = jube.util.util.id_dir(args.dir, benchmark_id)
+            found_configuration = _configuration_exists(benchmark_folder)
             if not os.path.isdir(benchmark_folder):
                 raise OSError("Benchmark directory not found: \"{0}\""
                               .format(benchmark_folder))
-            if not os.path.isfile(os.path.join(
-                    benchmark_folder, jube.conf.CONFIGURATION_FILENAME)):
-                LOGGER.warning(("Configuration file \"{0}\" not found in " +
-                                "\"{1}\" or directory not readable.")
+            if not found_configuration:
+                LOGGER.warning(("Configuration file \"{0}\" or \"{1}\" not "
+                                "found in \"{2}\" or directory not readable.")
                                .format(jube.conf.CONFIGURATION_FILENAME,
+                                       jube.conf.DATABASE_FILENAME,
                                        benchmark_folder))
-            if benchmark_folder not in found_benchmarks:
-                found_benchmarks.append(benchmark_folder)
+            else:
+                if benchmark_folder not in found_benchmarks:
+                    found_benchmarks.append(benchmark_folder)
+
     else:
         if (args.id is not None) and ("all" in args.id):
             # Add all available benchmark folder
@@ -457,16 +464,13 @@ def search_for_benchmarks(args):
             # Get highest benchmark id and build benchmark_folder
             benchmark_id = jube.util.util.get_current_id(args.dir)
             benchmark_folder = jube.util.util.id_dir(args.dir, benchmark_id)
-            if os.path.isdir(benchmark_folder):
-                found_benchmarks.append(benchmark_folder)
+            found_configuration = _configuration_exists(benchmark_folder)
+            if os.path.isdir(benchmark_folder) and found_configuration:
+                if benchmark_folder not in found_benchmarks:
+                    found_benchmarks.append(benchmark_folder)
             else:
                 raise OSError("No benchmark directory found in \"{0}\""
                               .format(args.dir))
-
-    found_benchmarks = \
-        [benchmark_folder for benchmark_folder in found_benchmarks if
-         os.path.isfile(os.path.join(benchmark_folder,
-                                     jube.conf.CONFIGURATION_FILENAME))]
 
     found_benchmarks.sort()
     return found_benchmarks
@@ -795,6 +799,32 @@ def _manipulate_comment(benchmark_folder, args):
     benchmark.write_benchmark_configuration(
         os.path.join(benchmark_folder,
                      jube.conf.CONFIGURATION_FILENAME), outpath="..")
+
+
+@staticmethod
+def _configuration_exists(benchmark_folder):
+    """Search for configuration file and returns found file"""
+    xml_config = os.path.join(benchmark_folder,
+                              jube.conf.CONFIGURATION_FILENAME)
+    if os.path.isfile(xml_config): return xml_config
+    database_config = os.path.join(benchmark_folder,
+                                   jube.conf.DATABASE_FILENAME)
+    if os.path.isfile(database_config): return database_config
+    # No configuration file found
+    return False
+
+
+@staticmethod
+def _workpackage_exists(benchmark_folder):
+    """Search for configuration file and returns found file"""
+    xml_workpackage = os.path.join(benchmark_folder,
+                                   jube.conf.WORKPACKAGES_FILENAME)
+    if os.path.isfile(xml_workpackage): return xml_workpackage
+    database_workpackage = os.path.join(benchmark_folder,
+                                        jube.conf.DATABASE_FILENAME)
+    if os.path.isfile(database_workpackage): return database_workpackage
+    # No configuration file found
+    return False
 
 
 def gen_parser_conf():

@@ -188,6 +188,18 @@ class Benchmark(object):
         if os.path.exists(self.bench_dir):
             shutil.rmtree(self.bench_dir, ignore_errors=True)
 
+    def delete_xml_configuration(self):
+        """Delete configuration.xml"""
+        xml_configuration = os.path.join(self.bench_dir, jube.conf.CONFIGURATION_FILENAME)
+        if os.path.exists(xml_configuration):
+            os.remove(xml_configuration)
+
+    def delete_xml_workpackages(self):
+        """Delete workpackages.xml"""
+        xml_workpackages = os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME)
+        if os.path.exists(xml_workpackages):
+            os.remove(xml_workpackages)
+
     @property
     def steps(self):
         """Return steps"""
