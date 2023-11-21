@@ -60,6 +60,7 @@ class Step(object):
         self._do_log_file = do_log_file
 
     def add_information_to_database(self, db, benchmark_id):
+        """Store step information in database"""
         try:
             db.start_transaction()
             step_data = {
@@ -798,6 +799,7 @@ class Operation(object):
         return continue_op, continue_cycle
 
     def add_information_to_database(self, db, step_name):
+        """Store operation information in database"""
         do_data = {
             "do": self._do,
             "step_name": step_name

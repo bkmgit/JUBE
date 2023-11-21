@@ -138,6 +138,7 @@ class Substituteset(object):
                     shutil.copymode(infile, outfile)
 
     def add_information_to_database(self, db, benchmark_id):
+        """Store substitute information in database"""
         try:
             db.start_transaction()
             set_data = {

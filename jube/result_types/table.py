@@ -144,6 +144,7 @@ class Table(KeyValuesResult):
             return self._colw
 
         def add_information_to_database(self, db, table_name):
+            """Store column information in database"""
             column_data = KeyValuesResult.DataKey.get_information_for_database(self)
             column_data["column_name"] = column_data.pop("name")
             column_data["table_name"] = table_name
@@ -200,6 +201,7 @@ class Table(KeyValuesResult):
                                self._separator, self._transpose)
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store table information in database"""
         try:
             db.start_transaction()
             result_id = Result.add_information_to_database(self, db, benchmark_id, update)

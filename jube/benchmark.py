@@ -154,6 +154,14 @@ class Benchmark(object):
                 pass
             self._db = None
 
+    @property
+    def db(self):
+        """Return database instance"""
+        if not self._db:
+            self._db = jube.util.database_interface.Database_Interface(
+                os.path.join(self.bench_dir, jube.conf.DATABASE_FILENAME))
+        return self._db
+
     def add_tags(self, other_tags):
         if other_tags is not None:
             self._tags = self._tags.union(set(other_tags))
@@ -177,18 +185,17 @@ class Benchmark(object):
     def _remove_workpackage_from_database(self, workpackage_to_delete):
         """Remove a specifc workpackage from database"""
         # Get database instance and connect
-        db = self.db
-        db.connect()
+        self.db.connect()
         try:
-            db.start_transaction()
+            self.db.start_transaction()
             #deletes workpackage and any depend data in other tables
-            db.delete("Workpackage", f"workpackage_id='{workpackage_to_delete.id}'")
-            db.commit_transaction()
+            self.db.delete("Workpackage", f"workpackage_id='{workpackage_to_delete.id}'")
+            self.db.commit_transaction()
         except Exception as e:
-            db.rollback_transaction()
-            db.disconnect()
+            self.db.rollback_transaction()
+            self.db.disconnect()
             raise e
-        db.disconnect()
+        self.db.disconnect()
 
     @property
     def work_stat(self):
@@ -739,7 +746,7 @@ class Benchmark(object):
             self.write_workpackage_information(
                 os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
 
-        db = self._db
+        db = self.db
         db.connect()
         # Add new workpackages that have not yet been executed (open)
         for workpackages in self.workpackages.values():
@@ -843,13 +850,12 @@ class Benchmark(object):
             self.bench_dir, jube.conf.TIMESTAMPS_INFO), "start", "change")
 
     def add_benchmark_configuration_to_database(self, outpath=None):
-        self._db = jube2.util.database_interface.Database_Interface(
-            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
-        self._db.connect()
-        self._db.create_database()
+        """Store benchmark configuration in database"""
+        self.db.connect()
+        self.db.create_database()
 
         try:
-            self._db.start_transaction()
+            self.db.start_transaction()
             benchmark_data = {
                 "benchmark_id": self._id,
                 "version": jube.conf.JUBE_VERSION,
@@ -860,67 +866,65 @@ class Benchmark(object):
                 benchmark_data["outpath"] = outpath
             if len(self._comment) > 0:
                 benchmark_data["comment"] = self._comment
-            self._db.insert("Benchmark", benchmark_data)
+            self.db.insert("Benchmark", benchmark_data)
 
             if len(self._tags) > 0:
                 for tag in self._tags:
-                    self._db.insert("Tag", {"value": tag, "benchmark_id": self._id})
-            self._db.commit_transaction()
+                    self.db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+            self.db.commit_transaction()
         except Exception as e:
-            self._db.rollback_transaction()
-            self._db.disconnect()
+            self.db.rollback_transaction()
+            self.db.disconnect()
             raise e
 
         for parameterset in self._parametersets.values():
-            parameterset.add_information_to_database(self._db, self._id)
+            parameterset.add_information_to_database(self.db, self._id)
         for substituteset in self._substitutesets.values():
-            substituteset.add_information_to_database(self._db, self._id)
+            substituteset.add_information_to_database(self.db, self._id)
         for fileset in self._filesets.values():
-            fileset.add_information_to_database(self._db, self._id)
+            fileset.add_information_to_database(self.db, self._id)
         for patternset in self._patternsets.values():
-            patternset.add_information_to_database(self._db, self._id)
+            patternset.add_information_to_database(self.db, self._id)
         for step in self._steps.values():
-            step.add_information_to_database(self._db, self._id)
+            step.add_information_to_database(self.db, self._id)
         for analyser in self._analyser.values():
-            analyser.add_information_to_database(self._db, self._id)
+            analyser.add_information_to_database(self.db, self._id)
         for result_name in self._results_order:
             result = self._results[result_name]
-            result.add_information_to_database(self._db, self._id)
-        self._db.disconnect()
+            result.add_information_to_database(self.db, self._id)
+        self.db.disconnect()
 
     def update_benchmark_configuration_in_database(self):
-        self._db = jube2.util.database_interface.Database_Interface(
-            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
-        self._db.connect()
+        """Update benchmark configuration in database"""
+        self.db.connect()
         # Update patternsets in database
         for patternset in self._patternsets.values():
-            patternset.add_information_to_database(db, self._id, update=True)
+            patternset.add_information_to_database(self.db, self._id, update=True)
         # Update analyser in database
         for analyser in self._analyser.values():
-            analyser.add_information_to_database(db, self._id, update=True)
+            analyser.add_information_to_database(self.db, self._id, update=True)
         # Update results in database
         for result_name in self._results_order:
             result = self._results[result_name]
-            result.add_information_to_database(db, self._id, update=True)
-        db.disconnect()
+            result.add_information_to_database(self.db, self._id, update=True)
+        self.db.disconnect()
 
     def update_benchmark_comment_in_database(self):
-        self._db = jube2.util.database_interface.Database_Interface(
-            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
-        self._db.connect()
+        """Update benchmark comment in database"""
+        self.db.connect()
         try:
-            db.start_transaction()
+            self.db.start_transaction()
             benchmark_data = {
                 "comment": self._comment
             }
-            db.update("Benchmark", {"comment": self._comment},
+            self.db.update("Benchmark", {"comment": self._comment},
                              f"benchmark_id='{self._id}'")
-            db.commit_transaction()
+            self.db.commit_transaction()
         except Exception as e:
-            db.rollback_transaction()
-            db.disconnect()
+            self.db.rollback_transaction()
+            self.db.disconnect()
             raise e
-        db.disconnect()
+        self.db.disconnect()
 
     def write_benchmark_configuration(self, filename, outpath=None):
         """The current benchmark configuration will be written to given file
@@ -962,13 +966,11 @@ class Benchmark(object):
                 workpackage.done = False
 
     def add_workpackage_information_to_database(self):
-        self._db = jube2.util.database_interface.Database_Interface(
-            os.path.join(self.bench_dir, jube2.conf.DATABASE_FILENAME))
-        self._db.connect()
+        self.db.connect()
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:
-                workpackage.add_information_to_database(self._db)
-        self._db.disconnect()
+                workpackage.add_information_to_database(self.db)
+        self.db.disconnect()
 
     def write_workpackage_information(self, filename):
         """All workpackage information will be written to given file

@@ -47,6 +47,7 @@ class Fileset(list):
         return self._name
 
     def add_information_to_database(self, db, benchmark_id):
+        """Store fileset information in database"""
         try:
             db.start_transaction()
             set_data = {
@@ -249,6 +250,7 @@ class Link(File):
             os.symlink(target_path, new_file_path)
 
     def add_information_to_database(self, db, fileset_name):
+        """Store link information in database"""
         file_data = {
             "path": self._path,
             "fileset_name": fileset_name,
@@ -303,6 +305,7 @@ class Copy(File):
                 shutil.copy2(path, new_file_path)
 
     def add_information_to_database(self, db, fileset_name):
+        """Store copy information in database"""
         file_data = {
             "path": self._path,
             "fileset_name": fileset_name,
@@ -362,6 +365,7 @@ class Prepare(jube.step.Operation):
             only_check_pending=only_check_pending, environment=environment)
 
     def add_information_to_database(self, db, fileset_name):
+        """Store prepare information in database"""
         do_data = {
             "do": self._do,
             "fileset_name": fileset_name

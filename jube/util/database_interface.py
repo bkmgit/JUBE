@@ -33,9 +33,11 @@ class Database_Interface(object):
     """Interface to run all database options"""
 
     def __init__(self, name='database.db'):
+        """Initialize the database object with given name"""
         self._name = name
 
     def connect(self):
+        """Create the database connection to execute querys"""
         self._connection = sqlite3.connect(self._name)
         self._connection.isolation_level = None
         self._cursor = self._connection.cursor()
@@ -43,9 +45,11 @@ class Database_Interface(object):
         self._cursor.execute("PRAGMA foreign_keys = ON")
 
     def disconnect(self):
+        """Close the database connection"""
         self._connection.close()
 
     def create_database(self):
+        """Running queries to create all tables in the database"""
         path = os.path.join(jube.util.__path__[0], "sql_create_queries.sql")
         with open(path, 'r') as sql_file:
             sql_queries = sql_file.read()
@@ -57,6 +61,7 @@ class Database_Interface(object):
                                "database: {0}".format(er))
 
     def insert(self, table_name, data, addition=None):
+        """Execute a query to add data to the table with the given name"""
         columns = ", ".join(data.keys())
         values = tuple(data.values())
 
@@ -70,6 +75,7 @@ class Database_Interface(object):
         return self._cursor.lastrowid
 
     def select(self, table_name, columns=None, condition=None):
+        """Execute a query to get data from the column of the table with the given name"""
         if columns is None:
             columns = "*"
         else:
@@ -86,6 +92,7 @@ class Database_Interface(object):
         return rows
 
     def update(self, table_name, data, condition):
+        """Execute a query to update data for the given condition in the given table"""
         columns = ", ".join(f"{column} = ?" for column in data.keys())
         values = tuple(data.values())
 
@@ -94,6 +101,7 @@ class Database_Interface(object):
         self._cursor.execute(query, values)
 
     def delete(self, table_name, condition):
+        """Execute a query to delete the data for the given condition in the given table"""
         query = f"DELETE FROM {table_name}"
         if condition is not None:
             query +=  f" WHERE {condition}"
@@ -101,10 +109,13 @@ class Database_Interface(object):
         self._cursor.execute(query)
 
     def start_transaction(self):
+        """Start the transaction"""
         self._connection.execute('BEGIN')
 
     def commit_transaction(self):
+        """Finish the transaction and submit the changes"""
         self._connection.commit()
 
     def rollback_transaction(self):
+        """Finish the transaction and undo the changes"""
         self._connection.rollback()

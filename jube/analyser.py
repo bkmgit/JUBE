@@ -73,6 +73,7 @@ class Analyser(object):
             return self._path
 
         def add_information_to_database(self, db, analyser_name):
+            """Store file information in database"""
             file_data = {
                 "path": self._path,
                 "analyser_name": analyser_name
@@ -158,6 +159,7 @@ class Analyser(object):
         return self._reduce_iteration
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store analyser information in database"""
         try:
             db.start_transaction()
             # Delete the previous analysers if an update is required

@@ -70,6 +70,7 @@ class Workpackage(object):
         self._workpackage_dir_cache = None
 
     def add_information_to_database(self, db):
+        """Store workpackage information in database"""
         row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
         if row:
             self.update_information_in_database(db)
@@ -91,6 +92,7 @@ class Workpackage(object):
             raise e
 
     def update_information_in_database(self, db):
+        """Update workpackage information in database"""
         row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
         if not row:
             self.add_information_to_database(db)
@@ -111,6 +113,7 @@ class Workpackage(object):
             raise e
 
     def add_or_update_additional_information_to_database(self, db):
+        """Add or update workpackage information that can be updated in the database"""
         for parameter in self.local_parameterset.all_parameters:
             parameter.add_selected_parameter_to_database(db, self._id)
         for parent in self._parents:
@@ -990,13 +993,12 @@ class Workpackage(object):
             parameterDeletionList = None
 
         # Store workpackage information
-        db = jube2.util.database_interface.Database_Interface(
-                os.path.join(self.benchmark.bench_dir, jube2.conf.DATABASE_FILENAME))
+        db = self.benchmark.db
         db.connect()
         self.update_information_in_database(db)
         db.disconnect()
         db = None
-
+        self.benchmark.deinitialize_db()
 
         return {"id": self._id, "step_name": self._step.name, "env": self._env,
                 "cycle": self._cycle, "parameterset": self._parameterset}

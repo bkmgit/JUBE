@@ -199,6 +199,7 @@ class Database(KeyValuesResult):
         return Database.DatabaseData(result_data, self._primekeys, self._db_file)
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store database information in database"""
         try:
             db.start_transaction()
             result_id = Result.add_information_to_database(self, db, benchmark_id, update)

@@ -141,6 +141,7 @@ class GenericResult(Result):
             return name
 
         def get_information_for_database(self):
+            """Return result information for database"""
             key_data = {
                 "name": self._name
             }

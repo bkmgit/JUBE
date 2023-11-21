@@ -59,6 +59,7 @@ class Patternset(object):
         return self._derived_pattern
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store patternset information in database"""
         try:
             db.start_transaction()
             # Delete the previous patternsets if an update is required
@@ -286,6 +287,7 @@ class Pattern(jube.parameter.StaticParameter):
         return pattern, changed
 
     def add_information_to_database(self, db, patternset_name):
+        """Store pattern information in database"""
         pattern_data = {
             "pattern_name": self._name,
             "value": self.value,

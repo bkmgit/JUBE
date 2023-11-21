@@ -315,6 +315,7 @@ class Parameterset(object):
             yield parameter
 
     def add_information_to_database(self, db, benchmark_id):
+        """Store parameterset information in database"""
         try:
             db.start_transaction()
             parameterset_data = {
@@ -672,6 +673,7 @@ class Parameter(object):
         return result
 
     def add_information_to_database(self, db, parameterset_name):
+        """Store parameter information in database"""
         parameter_data = {
             "parameter_name": self._name,
             "value": self.based_on_value,
@@ -695,6 +697,7 @@ class Parameter(object):
         self._id = db.insert("Parameter", parameter_data)
 
     def add_selected_parameter_to_database(self, db, workpackage_id):
+        """Select parameter value and store in database"""
         if not self._id:
             condition = f"parameter_name='{self._name}' AND"
             condition += f" value='{self.based_on_value}'"

@@ -140,6 +140,7 @@ class SysloggedResult(KeyValuesResult):
                                           self._syslog_fmt_string)
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store syslog information in database"""
         try:
             db.start_transaction()
             result_id = Result.add_information_to_database(self, db, benchmark_id, update)

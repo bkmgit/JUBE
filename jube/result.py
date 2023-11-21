@@ -247,6 +247,7 @@ class Result(object):
         return units
 
     def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store result information in database"""
         # Delete the previous results if an update is required
         if update:
             db.delete("Result", f"benchmark_id='{benchmark_id}'")
