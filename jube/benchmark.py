@@ -192,6 +192,7 @@ class Benchmark(object):
             self.db.delete("Workpackage", f"workpackage_id='{workpackage_to_delete.id}'")
             self.db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             self.db.rollback_transaction()
             self.db.disconnect()
             raise e
@@ -873,6 +874,7 @@ class Benchmark(object):
                     self.db.insert("Tag", {"value": tag, "benchmark_id": self._id})
             self.db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             self.db.rollback_transaction()
             self.db.disconnect()
             raise e
@@ -921,6 +923,7 @@ class Benchmark(object):
                              f"benchmark_id='{self._id}'")
             self.db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             self.db.rollback_transaction()
             self.db.disconnect()
             raise e

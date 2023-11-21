@@ -182,6 +182,7 @@ class Analyser(object):
                                               "analysefile_id": analysefile_id})
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e

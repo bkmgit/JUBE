@@ -87,6 +87,7 @@ class Workpackage(object):
             self.add_or_update_additional_information_to_database(db)
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e
@@ -108,6 +109,7 @@ class Workpackage(object):
             self.add_or_update_additional_information_to_database(db)
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e

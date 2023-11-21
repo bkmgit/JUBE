@@ -166,6 +166,7 @@ class Substituteset(object):
                 db.insert("Substitute", sub_data)
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e

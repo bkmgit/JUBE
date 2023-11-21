@@ -250,6 +250,9 @@ tests:conf_tests:
 tests:substitute_tests:
     <<: *run_test
 
+tests:database_interface_tests:
+    <<: *run_test
+
 deploy:dist_package:
     stage: deploy
     <<: *clone_repo

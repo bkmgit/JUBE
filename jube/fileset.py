@@ -59,6 +59,7 @@ class Fileset(list):
                 file_handle.add_information_to_database(db, self._name)
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e

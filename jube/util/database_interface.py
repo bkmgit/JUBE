@@ -57,6 +57,7 @@ class Database_Interface(object):
         try:
             self._cursor.executescript(sql_queries)
         except sqlite3.Error as er:
+            LOGGER.warning(str(er))
             raise RuntimeError("Something went wrong when creating the "
                                "database: {0}".format(er))
 

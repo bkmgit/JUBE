@@ -222,6 +222,7 @@ class Database(KeyValuesResult):
                 db.insert("ResultDatabaseKey", key_data)
             db.commit_transaction()
         except Exception as e:
+            LOGGER.warning(str(e))
             db.rollback_transaction()
             db.disconnect()
             raise e
