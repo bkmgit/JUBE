@@ -997,6 +997,8 @@ class Workpackage(object):
         # Store workpackage information
         db = self.benchmark.db
         db.connect()
+        # Adding used sets that need to be substituted
+        self.step.add_used_sets_to_database(db, self.benchmark, parameter)
         self.update_information_in_database(db)
         db.disconnect()
         db = None

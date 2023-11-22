@@ -91,31 +91,37 @@ class Step(object):
             if self._do_log_file is not None:
                 step_data["do_log_file"] = str(self._do_log_file)
             db.insert("Step", step_data)
-            for use in self._use:
-                for set_name in use:
-                    #Parameterset?
-                    condition = f"parameterset_name='{set_name}'"
-                    paramset = db.select('Parameterset', ['parameterset_name'], condition)
-                    if len(paramset) > 0:
-                        db.insert('UsedParameterset',{"parameterset_name": set_name,
-                                                      "step_name": self._name})
-                        continue
-                    #Fileset?
-                    condition = f"fileset_name='{set_name}'"
-                    fileset = db.select('Fileset', ['fileset_name'], condition)
-                    if len(fileset) > 0:
-                        db.insert('UsedFileset',{"fileset_name": set_name,
-                                                      "step_name": self._name})
-                        continue
-                    #Substituteset?
-                    condition = f"substituteset_name='{set_name}'"
-                    subset = db.select('Substituteset', ['substituteset_name'], condition)
-                    if len(subset) > 0:
-                        db.insert('UsedSubstituteset',{"substituteset_name": set_name,
-                                                      "step_name": self._name})
-                        continue
             for operation in self._operations:
                 operation.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            LOGGER.warning(str(e))
+            db.rollback_transaction()
+            db.disconnect()
+            raise e
+
+    def add_used_sets_to_database(self, db, benchmark, parameter_dict):
+        """Substitute used set names and store used sets in database"""
+        try:
+            db.start_transaction()
+            # Get fileset names and add to database
+            fileset_names = self.get_used_sets(benchmark.filesets,
+                                               parameter_dict)
+            for fileset in fileset_names:
+                db.insert('UsedFileset',{"fileset_name": fileset,
+                          "step_name": self._name}, addition="REPLACE")
+            # Get substituteset names and add to database
+            subset_names = self.get_used_sets(benchmark.substitutesets,
+                                              parameter_dict)
+            for subset in subset_names:
+                db.insert('UsedSubstituteset',{"substituteset_name": subset,
+                          "step_name": self._name}, addition="REPLACE")
+            # Get parameterset names and add to database
+            paramset_names = self.get_used_sets(benchmark.parametersets,
+                                                parameter_dict)
+            for paramset in paramset_names:
+                db.insert('UsedParameterset',{"parameterset_name": paramset,
+                          "step_name": self._name}, addition="REPLACE")
             db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))

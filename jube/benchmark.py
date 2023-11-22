@@ -889,6 +889,7 @@ class Benchmark(object):
             patternset.add_information_to_database(self.db, self._id)
         for step in self._steps.values():
             step.add_information_to_database(self.db, self._id)
+            step.add_used_sets_to_database(self.db, self, {})
         for analyser in self._analyser.values():
             analyser.add_information_to_database(self.db, self._id)
         for result_name in self._results_order:

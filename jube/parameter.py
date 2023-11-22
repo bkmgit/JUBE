@@ -107,6 +107,9 @@ class Parameterset(object):
         """Overwrite existing parameters. Do not add new parameters"""
         for parameter in parameterset:
             if parameter.name in self:
+                #Restore parameter id for database
+                if parameter.id is None:
+                    parameter.id = self._parameters[parameter.name].id
                 self._parameters[parameter.name] = parameter.copy()
 
     def concat_parameter(self, parameter):
@@ -533,6 +536,16 @@ class Parameter(object):
     def name(self):
         """Returns the Parameter name"""
         return self._name
+
+    @property
+    def id(self):
+        """Return parameter id"""
+        return self._id
+
+    @id.setter
+    def id(self, new_id):
+        """Sets a new parameter id"""
+        self._id = new_id
 
     @property
     def idx(self):
