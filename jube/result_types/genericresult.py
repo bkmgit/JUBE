@@ -23,7 +23,6 @@ from __future__ import (print_function,
 
 from jube.result import Result
 import jube.log
-import xml.etree.ElementTree as ET
 import operator
 import jube.util.util
 import jube.util.output
@@ -148,14 +147,6 @@ class GenericResult(Result):
             if self._title is not None:
                 key_data["title"] = self._title
             return key_data
-
-        def etree_repr(self):
-            """Return etree object representation"""
-            key_etree = ET.Element("key")
-            key_etree.text = self._name
-            if self._title is not None:
-                key_etree.attrib["title"] = self._title
-            return key_etree
 
         def __eq__(self, other):
             return self.resulting_name == other.resulting_name

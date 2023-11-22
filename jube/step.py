@@ -25,7 +25,6 @@ import subprocess
 import os
 import re
 import time
-import xml.etree.ElementTree as ET
 import jube.util.util
 import jube.conf
 import jube.log
@@ -128,40 +127,6 @@ class Step(object):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        step_etree = ET.Element("step")
-        step_etree.attrib["name"] = self._name
-        if len(self._depend) > 0:
-            step_etree.attrib["depend"] = \
-                jube.conf.DEFAULT_SEPARATOR.join(self._depend)
-        if self._alt_work_dir is not None:
-            step_etree.attrib["work_dir"] = self._alt_work_dir
-        if self._shared_name is not None:
-            step_etree.attrib["shared"] = self._shared_name
-        if self._active != "true":
-            step_etree.attrib["active"] = self._active
-        if self._suffix != "":
-            step_etree.attrib["suffix"] = self._suffix
-        if self._export:
-            step_etree.attrib["export"] = "true"
-        if self._max_wps != "0":
-            step_etree.attrib["max_async"] = self._max_wps
-        if self._iterations > 1:
-            step_etree.attrib["iterations"] = str(self._iterations)
-        if self._cycles > 1:
-            step_etree.attrib["cycles"] = str(self._cycles)
-        if self._procs != 1:
-            step_etree.attrib["procs"] = str(self._procs)
-        if self._do_log_file != None:
-            step_etree.attrib["do_log_file"] = str(self._do_log_file)
-        for use in self._use:
-            use_etree = ET.SubElement(step_etree, "use")
-            use_etree.text = jube.conf.DEFAULT_SEPARATOR.join(use)
-        for operation in self._operations:
-            step_etree.append(operation.etree_repr())
-        return step_etree
 
     def __repr__(self):
         return "{0}".format(vars(self))
@@ -828,28 +793,6 @@ class Operation(object):
         if self._shared:
             do_data["shared"] = 1
         db.insert("Operation", do_data)
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        do_etree = ET.Element("do")
-        do_etree.text = self._do
-        if self._async_filename is not None:
-            do_etree.attrib["done_file"] = self._async_filename
-        if self._error_filename is not None:
-            do_etree.attrib["error_file"] = self._error_filename
-        if self._break_filename is not None:
-            do_etree.attrib["break_file"] = self._break_filename
-        if self._stdout_filename is not None:
-            do_etree.attrib["stdout"] = self._stdout_filename
-        if self._stderr_filename is not None:
-            do_etree.attrib["stderr"] = self._stderr_filename
-        if self._active != "true":
-            do_etree.attrib["active"] = self._active
-        if self._shared:
-            do_etree.attrib["shared"] = "true"
-        if self._work_dir is not None:
-            do_etree.attrib["work_dir"] = self._work_dir
-        return do_etree
 
     def __repr__(self):
         return self._do

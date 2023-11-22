@@ -331,41 +331,6 @@ class Benchmark(object):
 
         return parameterset
 
-    def etree_repr(self, new_cwd=None):
-        """Return etree object representation"""
-        benchmark_etree = ET.Element("benchmark")
-        if len(self._comment) > 0:
-            comment_element = ET.SubElement(benchmark_etree, "comment")
-            comment_element.text = self._comment
-        benchmark_etree.attrib["name"] = self._name
-        # Modify file_path_ref and outpath to be relativly correct towards
-        # new configuration file position
-        if new_cwd is not None:
-            benchmark_etree.attrib["file_path_ref"] = \
-                os.path.relpath(self._file_path_ref, new_cwd)
-            if not os.path.isabs(self._outpath):
-                benchmark_etree.attrib["outpath"] = \
-                    os.path.relpath(self._outpath, new_cwd)
-            else:
-                benchmark_etree.attrib["outpath"] = self._outpath
-
-        for parameterset in self._parametersets.values():
-            benchmark_etree.append(parameterset.etree_repr())
-        for substituteset in self._substitutesets.values():
-            benchmark_etree.append(substituteset.etree_repr())
-        for fileset in self._filesets.values():
-            benchmark_etree.append(fileset.etree_repr())
-        for patternset in self._patternsets.values():
-            benchmark_etree.append(patternset.etree_repr())
-        for step in self._steps.values():
-            benchmark_etree.append(step.etree_repr())
-        for analyser in self._analyser.values():
-            benchmark_etree.append(analyser.etree_repr())
-        for result_name in self._results_order:
-            result = self._results[result_name]
-            benchmark_etree.append(result.etree_repr())
-        return benchmark_etree
-
     def __repr__(self):
         return pprint.pformat(self.__dict__)
 
@@ -476,10 +441,6 @@ class Benchmark(object):
             if ((not jube.conf.DEBUG_MODE) and
                     (os.access(self.bench_dir, os.W_OK))):
                 self.update_benchmark_configuration_in_database()
-                self.write_benchmark_configuration(
-                    os.path.join(self.bench_dir,
-                                 jube.conf.CONFIGURATION_FILENAME),
-                    outpath="..")
 
     def write_analyse_data(self, filename):
         """All analyse data will be written to given file
@@ -635,8 +596,6 @@ class Benchmark(object):
         # Store workpackage information
         LOGGER.debug("Store initial workpackage information")
         self.add_workpackage_information_to_database()
-        self.write_workpackage_information(
-            os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
 
         LOGGER.debug("Start benchmark run")
 
@@ -743,10 +702,6 @@ class Benchmark(object):
             else:
                 self.wp_post_run_config(workpackage)
 
-            # Store workpackage information
-            self.write_workpackage_information(
-                os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME))
-
         db = self.db
         db.connect()
         # Add new workpackages that have not yet been executed (open)
@@ -844,9 +799,6 @@ class Benchmark(object):
                      os.stat(self.bench_dir).st_mode | stat.S_ISGID)
 
         self.add_benchmark_configuration_to_database(outpath="..")
-        self.write_benchmark_configuration(
-            os.path.join(self.bench_dir, jube.conf.CONFIGURATION_FILENAME),
-            outpath="..")
         jube.util.util.update_timestamps(os.path.join(
             self.bench_dir, jube.conf.TIMESTAMPS_INFO), "start", "change")
 
@@ -930,39 +882,6 @@ class Benchmark(object):
             raise e
         self.db.disconnect()
 
-    def write_benchmark_configuration(self, filename, outpath=None):
-        """The current benchmark configuration will be written to given file
-        using xml representation"""
-        # Create root-tag and append single benchmark
-        benchmarks_etree = ET.Element("jube")
-        benchmarks_etree.attrib["version"] = jube.conf.JUBE_VERSION
-        # Store tag information
-        if len(self._tags) > 0:
-            selection_etree = ET.SubElement(benchmarks_etree, "selection")
-            for tag in self._tags:
-                tag_etree = ET.SubElement(selection_etree, "tag")
-                tag_etree.text = tag
-        # Store tag documentation
-        if len(self._tag_docu) > 0:
-            tags_etree = ET.SubElement(benchmarks_etree, "tags")
-            for tag, docu in self._tag_docu.items():
-                tag_etree = ET.SubElement(tags_etree, "tag")
-                tag_etree.attrib["name"] = tag
-                tag_etree.text = docu
-
-        benchmark_etree = self.etree_repr(new_cwd=self.bench_dir)
-        if outpath is not None:
-            benchmark_etree.attrib["outpath"] = outpath
-
-        benchmarks_etree.append(benchmark_etree)
-        xml = jube.util.output.element_tree_tostring(
-            benchmarks_etree, encoding="UTF-8")
-        # Using dom for pretty-print
-        dom = DOM.parseString(xml.encode('UTF-8'))
-        fout = open(filename, "wb")
-        fout.write(dom.toprettyxml(indent="  ", encoding="UTF-8"))
-        fout.close()
-
     def reset_all_workpackages(self):
         """Reset workpackage state"""
         for workpackages in self._workpackages.values():
@@ -975,22 +894,6 @@ class Benchmark(object):
             for workpackage in workpackages:
                 workpackage.add_information_to_database(self.db)
         self.db.disconnect()
-
-    def write_workpackage_information(self, filename):
-        """All workpackage information will be written to given file
-        using xml representation"""
-        # Create root-tag and append workpackages
-        workpackages_etree = ET.Element("workpackages")
-        for workpackages in self._workpackages.values():
-            for workpackage in workpackages:
-                workpackages_etree.append(workpackage.etree_repr())
-        xml = jube.util.output.element_tree_tostring(
-            workpackages_etree, encoding="UTF-8")
-        # Using dom for pretty-print
-        dom = DOM.parseString(xml.encode("UTF-8"))
-        fout = open(filename, "wb")
-        fout.write(dom.toprettyxml(indent="  ", encoding="UTF-8"))
-        fout.close()
 
     def set_workpackage_information(self, workpackages, work_stat):
         """Set new workpackage information"""

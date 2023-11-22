@@ -113,25 +113,6 @@ class TestParameter(unittest.TestCase):
         self.assertRaises(RuntimeError,
                           self.para_error.substitute_and_evaluate, [])
 
-    def test_etree_repr(self):
-        """Test Etree repr"""
-        etree = self.para_temp.etree_repr()
-        self.assertEqual(etree.tag, "parameter")
-        self.assertEqual(etree.get("separator"), ",")
-        self.assertEqual(etree.get("type"), "string")
-        self.assertEqual(etree.text, "2,3,4")
-
-        static_par = list(self.para_temp.expand())[2]
-        etree = static_par.etree_repr(use_current_selection=True)
-        self.assertEqual(etree.find("value").text, "2,3,4")
-        self.assertEqual(etree.find("selection").text, "4")
-
-        # Export check
-        self.assertTrue(self.para_export.export)
-        self.assertFalse(self.para_cons.export)
-        etree = self.para_export.etree_repr()
-        self.assertEqual(etree.get("export"), "true")
-
     def test_search_method(self):
         """ Test the searching of method method """
         self.assertEqual(self.para_search_method_1.search_method(
@@ -303,12 +284,6 @@ class TestParameterSet(unittest.TestCase):
                          self.para_export.value)
         self.assertEqual(parameterset2[self.para_sub.name].value,
                          self.para_sub.value)
-
-    def test_etree_repr(self):
-        """Etree repr check"""
-        etree = self.parameterset.etree_repr()
-        self.assertEqual(etree.tag, "parameterset")
-        self.assertEqual(len(etree.findall("parameter")), 2)
 
     def test_concat_parameter(self):
         """Test concat_parameter"""

@@ -23,7 +23,6 @@ from __future__ import (print_function,
 
 from jube.result_types.keyvaluesresult import KeyValuesResult
 from jube.result import Result
-import xml.etree.ElementTree as ET
 import jube.log
 import jube.conf
 import logging.handlers
@@ -173,25 +172,3 @@ class SysloggedResult(KeyValuesResult):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        result_etree = Result.etree_repr(self)
-        syslog_etree = ET.SubElement(result_etree, "syslog")
-        syslog_etree.attrib["name"] = self._name
-        if self._syslog_address is not None:
-            syslog_etree.attrib["address"] = self._syslog_address
-        if self._syslog_host is not None:
-            syslog_etree.attrib["host"] = self._syslog_host
-        if self._syslog_port is not None:
-            syslog_etree.attrib["port"] = self._syslog_port
-        if self._syslog_fmt_string is not None:
-            syslog_etree.attrib["format"] = self._syslog_fmt_string
-        if self._res_filter is not None:
-            syslog_etree.attrib["filter"] = self._res_filter
-        if len(self._sort_names) > 0:
-            syslog_etree.attrib["sort"] = \
-                jube.conf.DEFAULT_SEPARATOR.join(self._sort_names)
-        for key in self._keys:
-            syslog_etree.append(key.etree_repr())
-        return result_etree

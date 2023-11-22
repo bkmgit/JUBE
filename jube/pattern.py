@@ -22,7 +22,6 @@ from __future__ import (print_function,
                         division)
 
 import jube.parameter
-import xml.etree.ElementTree as ET
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -80,18 +79,6 @@ class Patternset(object):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        patternset_etree = ET.Element('patternset')
-        patternset_etree.attrib["name"] = self._name
-        for pattern in self._pattern:
-            patternset_etree.append(
-                pattern.etree_repr())
-        for pattern in self._derived_pattern:
-            patternset_etree.append(
-                pattern.etree_repr())
-        return patternset_etree
 
     def add_patternset(self, patternset):
         """Add all pattern from given patternset to the current one"""
@@ -305,24 +292,6 @@ class Pattern(jube.parameter.StaticParameter):
         if self._unit != "":
             pattern_data["unit"] = self._unit
         db.insert("Pattern", pattern_data)
-
-    def etree_repr(self, use_current_selection=False):
-        """Return etree object representation"""
-        pattern_etree = ET.Element('pattern')
-        pattern_etree.attrib["name"] = self._name
-        pattern_etree.attrib["type"] = self._type
-        pattern_etree.attrib["dotall"] = str(self._dotall)
-        if self._default is not None:
-            pattern_etree.attrib["default"] = self._default
-        if not self._derived:
-            pattern_etree.attrib["mode"] = "pattern"
-        else:
-            pattern_etree.attrib["mode"] = self._mode
-
-        if self._unit != "":
-            pattern_etree.attrib["unit"] = self._unit
-        pattern_etree.text = self.value
-        return pattern_etree
 
     def __repr__(self):
         return "Pattern({0})".format(self.__dict__)

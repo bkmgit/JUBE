@@ -26,7 +26,6 @@ import re
 import jube.util.util
 import jube.util.output
 import jube.conf
-import xml.etree.ElementTree as ET
 import jube.log
 import shutil
 import codecs
@@ -170,22 +169,6 @@ class Substituteset(object):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        substituteset_etree = ET.Element("substituteset")
-        substituteset_etree.attrib["name"] = self._name
-        for data in self._files:
-            iofile_etree = ET.SubElement(substituteset_etree, "iofile")
-            iofile_etree.attrib["in"] = data[1]
-            iofile_etree.attrib["out"] = data[0]
-            iofile_etree.attrib["out_mode"] = data[2]
-        for name, sub in self._substitute_dict.items():
-            sub_etree = ET.SubElement(substituteset_etree, "sub")
-            sub_etree.attrib["source"] = sub.source
-            sub_etree.attrib["mode"] = sub.mode
-            sub_etree.text = sub.dest
-        return substituteset_etree
 
     def __repr__(self):
         return "Substitute({0})".format(self.__dict__)

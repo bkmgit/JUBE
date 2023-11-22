@@ -26,7 +26,6 @@ import os
 
 from jube.result_types.keyvaluesresult import KeyValuesResult
 from jube.result import Result
-import xml.etree.ElementTree as ET
 import jube.log
 
 LOGGER = jube.log.get_logger(__name__)
@@ -226,16 +225,3 @@ class Database(KeyValuesResult):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        result_etree = Result.etree_repr(self)
-        database_etree = ET.SubElement(result_etree, "database")
-        database_etree.attrib["name"] = self._name
-        if self._res_filter is not None:
-            database_etree.attrib["filter"] = self._res_filter
-        for key in self._keys:
-            database_etree.append(key.etree_repr())
-        database_etree.attrib["primekeys"] = str(self._primekeys)
-        database_etree.attrib["file"] = str(self._db_file)
-        return result_etree

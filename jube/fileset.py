@@ -23,7 +23,6 @@ from __future__ import (print_function,
 
 import os
 import shutil
-import xml.etree.ElementTree as ET
 import jube.util.util
 import jube.conf
 import jube.step
@@ -63,14 +62,6 @@ class Fileset(list):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        fileset_etree = ET.Element("fileset")
-        fileset_etree.attrib["name"] = self._name
-        for file_handle in self:
-            fileset_etree.append(file_handle.etree_repr())
-        return fileset_etree
 
     def create(self, work_dir, parameter_dict, alt_work_dir=None,
                environment=None, file_path_ref=""):
@@ -207,10 +198,6 @@ class File(object):
         """Store file information in database"""
         raise NotImplementedError()
 
-    def etree_repr(self):
-        """Return etree object representation"""
-        raise NotImplementedError()
-
     @property
     def path(self):
         """Return filepath"""
@@ -271,24 +258,6 @@ class Link(File):
             file_data["is_internal_ref"] = 1
         return db.insert("File", file_data)
 
-    def etree_repr(self):
-        """Return etree object representation"""
-        link_etree = ET.Element("link")
-        link_etree.text = self._path
-        if self._name is not None:
-            link_etree.attrib["name"] = self._name
-        if self._active != "true":
-            link_etree.attrib["active"] = self._active
-        if self._source_dir != "":
-            link_etree.attrib["source_dir"] = self._source_dir
-        if self._target_dir != "":
-            link_etree.attrib["target_dir"] = self._target_dir
-        if self._is_internal_ref:
-            link_etree.attrib["rel_path_ref"] = "internal"
-        if self._file_path_ref != "":
-            link_etree.attrib["file_path_ref"] = self._file_path_ref
-        return link_etree
-
 
 class Copy(File):
 
@@ -326,24 +295,6 @@ class Copy(File):
             file_data["is_internal_ref"] = 1
         return db.insert("File", file_data)
 
-    def etree_repr(self):
-        """Return etree object representation"""
-        copy_etree = ET.Element("copy")
-        copy_etree.text = self._path
-        if self._name is not None:
-            copy_etree.attrib["name"] = self._name
-        if self._active != "true":
-            copy_etree.attrib["active"] = self._active
-        if self._source_dir != "":
-            copy_etree.attrib["source_dir"] = self._source_dir
-        if self._target_dir != "":
-            copy_etree.attrib["target_dir"] = self._target_dir
-        if self._is_internal_ref:
-            copy_etree.attrib["rel_path_ref"] = "internal"
-        if self._file_path_ref != "":
-            copy_etree.attrib["file_path_ref"] = self._file_path_ref
-        return copy_etree
-
 
 class Prepare(jube.step.Operation):
 
@@ -380,17 +331,3 @@ class Prepare(jube.step.Operation):
         if self._work_dir is not None:
             do_data["work_dir"] = self._work_dir
         db.insert("Prepare", do_data)
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        do_etree = ET.Element("prepare")
-        do_etree.text = self._do
-        if self._stdout_filename is not None:
-            do_etree.attrib["stdout"] = self._stdout_filename
-        if self._stderr_filename is not None:
-            do_etree.attrib["stderr"] = self._stderr_filename
-        if self._active != "true":
-            do_etree.attrib["active"] = self._active
-        if self._work_dir is not None:
-            do_etree.attrib["work_dir"] = self._work_dir
-        return do_etree

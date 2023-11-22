@@ -22,7 +22,6 @@ from __future__ import (print_function,
                         division)
 
 import jube.util.util
-import xml.etree.ElementTree as ET
 import re
 import jube.log
 
@@ -262,13 +261,3 @@ class Result(object):
                                          "analyser_name": use})
 
         return result_id
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        result_etree = ET.Element("result")
-        if self._result_dir is not None:
-            result_etree.attrib["result_dir"] = self._result_dir
-        for use in self._use:
-            use_etree = ET.SubElement(result_etree, "use")
-            use_etree.text = use
-        return result_etree

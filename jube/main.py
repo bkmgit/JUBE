@@ -775,9 +775,6 @@ def _remove_workpackage(workpackage, args):
             remove = inp.startswith("y")
         if remove:
             workpackage.remove()
-            workpackage.benchmark.write_workpackage_information(
-                os.path.join(workpackage.benchmark.bench_dir,
-                             jube.conf.WORKPACKAGES_FILENAME))
 
 
 def _manipulate_comment(benchmark_folder, args):
@@ -796,9 +793,6 @@ def _manipulate_comment(benchmark_folder, args):
         comment = args.comment
     benchmark.comment = re.sub(r"\s+", " ", comment)
     benchmark.update_benchmark_comment_in_database()
-    benchmark.write_benchmark_configuration(
-        os.path.join(benchmark_folder,
-                     jube.conf.CONFIGURATION_FILENAME), outpath="..")
 
 
 @staticmethod

@@ -22,7 +22,6 @@ from __future__ import (print_function,
                         division)
 
 import multiprocessing as mp
-import xml.etree.ElementTree as ET
 import jube.util.util
 import jube.util.output
 import jube.conf
@@ -147,42 +146,6 @@ class Workpackage(object):
                 db.insert("Environment", env_data, addition="REPLACE")
                 db.insert("WorkpackageEnvironment", {"workpackage_id": self._id,
                           "environment_name": env_name}, addition="REPLACE")
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        workpackage_etree = ET.Element("workpackage")
-        workpackage_etree.attrib["id"] = str(self._id)
-        step_etree = ET.SubElement(workpackage_etree, "step")
-        step_etree.attrib["iteration"] = str(self._iteration)
-        step_etree.attrib["cycle"] = str(self._cycle)
-        step_etree.text = self._step.name
-        if len(self._local_parameter_names) > 0:
-            workpackage_etree.append(
-                self.local_parameterset.etree_repr(use_current_selection=True))
-        if len(self._parents) > 0:
-            parents_etree = ET.SubElement(workpackage_etree, "parents")
-            parents_etree.text = ",".join(
-                [str(parent.id) for parent in self._parents])
-        if len(self._iteration_siblings) > 0:
-            sibling_etree = ET.SubElement(workpackage_etree,
-                                          "iteration_siblings")
-            sibling_etree.text = ",".join(
-                [str(sibling.id) for sibling in self._iteration_siblings])
-        environment_etree = ET.SubElement(workpackage_etree, "environment")
-        for env_name, value in self._env.items():
-            if (env_name not in ["PWD", "OLDPWD", "_"]) and \
-                    (env_name not in os.environ or
-                     os.environ[env_name] != value):
-                env_etree = ET.SubElement(environment_etree, "env")
-                env_etree.attrib["name"] = env_name
-                # use string repr to avoid special characters
-                env_etree.text = repr(value)
-        for env_name in os.environ:
-            if (env_name not in ["PWD", "OLDPWD", "_"]) and \
-                    (env_name not in self._env):
-                env_etree = ET.SubElement(environment_etree, "nonenv")
-                env_etree.attrib["name"] = env_name
-        return workpackage_etree
 
     def __repr__(self):
         return (("Workpackage(Id:{0:2d}; Step:{1}; ParentIDs:{2}; " +

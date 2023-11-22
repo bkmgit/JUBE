@@ -23,7 +23,6 @@ from __future__ import (print_function,
 
 from jube.result_types.keyvaluesresult import KeyValuesResult
 from jube.result import Result
-import xml.etree.ElementTree as ET
 import jube.log
 import jube.util.output
 
@@ -152,14 +151,6 @@ class Table(KeyValuesResult):
                 column_data["colw"] = str(self._colw)
             db.insert("ResultTableColumn", column_data)
 
-        def etree_repr(self):
-            """Return etree object representation"""
-            column_etree = KeyValuesResult.DataKey.etree_repr(self)
-            column_etree.tag = "column"
-            if self._colw is not None:
-                column_etree.attrib["colw"] = str(self._colw)
-            return column_etree
-
     def __init__(self, name, style="csv",
                  separator=jube.conf.DEFAULT_SEPARATOR,
                  sort_names=None,
@@ -229,21 +220,3 @@ class Table(KeyValuesResult):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        result_etree = Result.etree_repr(self)
-        table_etree = ET.SubElement(result_etree, "table")
-        table_etree.attrib["name"] = self._name
-        table_etree.attrib["style"] = self._style
-        if self._separator is not None:
-            table_etree.attrib["separator"] = self._separator
-        if self._res_filter is not None:
-            table_etree.attrib["filter"] = self._res_filter
-        table_etree.attrib["transpose"] = str(self._transpose)
-        if len(self._sort_names) > 0:
-            table_etree.attrib["sort"] = \
-                jube.conf.DEFAULT_SEPARATOR.join(self._sort_names)
-        for column in self._keys:
-            table_etree.append(column.etree_repr())
-        return result_etree

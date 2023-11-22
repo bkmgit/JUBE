@@ -85,15 +85,6 @@ class Analyser(object):
 
             return file_id
 
-        def etree_repr(self):
-            """Return etree object representation"""
-            file_etree = ET.Element("file")
-            file_etree.text = self._path
-            if len(self._use) > 0:
-                file_etree.attrib["use"] = \
-                    jube.conf.DEFAULT_SEPARATOR.join(self._use)
-            return file_etree
-
     def __init__(self, name, reduce_iteration=True):
         self._name = name
         self._use = set()
@@ -186,21 +177,6 @@ class Analyser(object):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        analyser_etree = ET.Element("analyser")
-        analyser_etree.attrib["name"] = self._name
-        analyser_etree.attrib["reduce"] = str(self._reduce_iteration)
-        for use in self._use:
-            use_etree = ET.SubElement(analyser_etree, "use")
-            use_etree.text = use
-        for step_name in self._analyse:
-            analyse_etree = ET.SubElement(analyser_etree, "analyse")
-            analyse_etree.attrib["step"] = step_name
-            for fileobj in self._analyse[step_name]:
-                analyse_etree.append(fileobj.etree_repr())
-        return analyser_etree
 
     def _combine_and_check_patternsets(self, patternset, uses):
         """Combine patternsets given by uses and check compatibility"""

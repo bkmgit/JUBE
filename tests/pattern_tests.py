@@ -81,16 +81,6 @@ class TestPattern(unittest.TestCase):
         self.assertTrue(changed)
         self.assertEqual(result_pattern.value, "100*200")
 
-    def test_etree_repr(self):
-        """check etree repr"""
-        etree = self.std_pattern.etree_repr()
-        self.assertEqual(etree.tag, "pattern")
-        self.assertEqual(etree.get("type"), "string")
-        self.assertEqual(etree.get("mode"), "pattern")
-        self.assertEqual(etree.text, ".*")
-        etree = self.calculate_pattern.etree_repr()
-        self.assertEqual(etree.get("mode"), "python")
-
     def test_jube_pattern(self):
         """Test JUBE internal pattern"""
         patterns = {

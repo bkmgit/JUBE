@@ -23,7 +23,6 @@ from __future__ import (print_function,
 
 import itertools
 import os
-import xml.etree.ElementTree as ET
 import copy
 import jube.util.util
 import jube.conf
@@ -337,17 +336,6 @@ class Parameterset(object):
             db.rollback_transaction()
             db.disconnect()
             raise e
-
-    def etree_repr(self, use_current_selection=False):
-        """Return etree object representation"""
-        parameterset_etree = ET.Element('parameterset')
-        if len(self._name) > 0:
-            parameterset_etree.attrib["name"] = self._name
-            parameterset_etree.attrib["duplicate"] = self._duplicate
-        for parameter in self._parameters.values():
-            parameterset_etree.append(
-                parameter.etree_repr(use_current_selection))
-        return parameterset_etree
 
     def __len__(self):
         return len(self._parameters)
@@ -736,37 +724,6 @@ class Parameter(object):
 
         #Update mode in Parameter
         db.update("Parameter", {"mode": self.based_on_mode}, f"parameter_id='{self._id}'")
-
-    def etree_repr(self, use_current_selection=False):
-        """Return etree object representation"""
-        parameter_etree = ET.Element('parameter')
-        parameter_etree.attrib["name"] = self._name
-
-        parameter_etree.attrib["type"] = self._type
-        parameter_etree.attrib["separator"] = self._separator
-        parameter_etree.attrib["duplicate"] = self._duplicate
-        based_on = self.based_on_value
-        if use_current_selection:
-            content_etree = ET.SubElement(parameter_etree, "value")
-            content_etree.text = based_on
-        else:
-            parameter_etree.text = based_on
-        if self._update_mode != NEVER_MODE:
-            parameter_etree.attrib["update_mode"] = self._update_mode
-        if use_current_selection and (based_on != self.value):
-            parameter_etree.attrib["mode"] = self.based_on_mode
-            selection_etree = ET.SubElement(parameter_etree, "selection")
-            selection_etree.text = self.value
-            if (self._idx != -1):
-                selection_etree.attrib["idx"] = str(self._idx)
-        else:
-            parameter_etree.attrib["mode"] = self._mode
-        if self._export:
-            parameter_etree.attrib["export"] = "true"
-        if self._unit != "":
-            parameter_etree.attrib["unit"] = self._unit
-
-        return parameter_etree
 
     def __repr__(self):
         return "Parameter({0})".format(self.__dict__)
