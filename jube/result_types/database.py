@@ -27,6 +27,7 @@ import os
 from jube.result_types.keyvaluesresult import KeyValuesResult
 from jube.result import Result
 import jube.log
+import jube.util.database_interface
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -83,72 +84,63 @@ class Database(KeyValuesResult):
                 return None
 
             # create database and insert the data
-            con = sqlite3.connect(db_file)
-            cur = con.cursor()
+            db = jube.util.database_interface.Database_Interface(
+                os.path.join(db_file))
+            db.connect()
 
-            # create a string of keys and their data type to create the database table
-            key_dtypes = {keys[i]: type(self.data[0][i]).__name__.replace(
-                'str', 'text') for i in range(len(self.keys))}
-            db_col_insert_types = str(key_dtypes).replace(
-                '{', '(').replace('}', ')').replace("'", '').replace(':', '')
+            try:
+                db.start_transaction()
+                # create a dictionary of keys and their data type to create the database table
+                key_dtypes = {keys[i]: type(self.data[0][i]).__name__.replace(
+                              'str', 'text') for i in range(len(self.keys))}
 
-            # Add key with primekey=true to primekeys and use set to remove duplicates
-            self._primekeys = list(set(self._primekeys + [k.resulting_name for k in self._keys if k.primekey]))
+                # Add key with primekey=true to primekeys and use set to remove duplicates
+                self._primekeys = list(set(self._primekeys + [k.resulting_name for k in self._keys if k.primekey]))
 
-            if len(self._primekeys) > 0:
-                db_col_insert_types = db_col_insert_types[:-1] + \
-                    ", PRIMARY KEY ({}))".format(', '.join(map(repr, self._primekeys)))
-                LOGGER.warning("The `primekeys` attribute of the `<database>`-tag is deprecated. "
-                               "Instead, use the new `primekey` attribute of the `<key>`-tag. "
-                               "(<key primekey=\"true\"|\"false\">..</key>)")
-            # create new table with a name of stored in variable self.name if it does not exists
-            LOGGER.debug("CREATE TABLE IF NOT EXISTS {} {};".format(
-                self.name, db_col_insert_types))
-            cur.execute("CREATE TABLE IF NOT EXISTS {} {};".format(
-                self.name, db_col_insert_types))
+                if len(self._primekeys) > 0:
+                    LOGGER.warning("The `primekeys` attribute of the `<database>`-tag is deprecated. "
+                                   "Instead, use the new `primekey` attribute of the `<key>`-tag. "
+                                   "(<key primekey=\"true\"|\"false\">..</key>)")
 
-            # check for primary keys in database table
-            cur.execute('PRAGMA TABLE_INFO({})'.format(self.name))
-            db_primary_keys = [i[1] for i in cur.fetchall() if i[5] != 0]
-            if not set(self._primekeys) == set(db_primary_keys):
-                raise ValueError("Modification of primary values is not supported. " +
-                                 "Primary keys of table {} are {}".format(self.name, db_primary_keys))
+                # create new table with a name of stored in variable self.name if it does not exists
+                db.create_database_table(self.name, key_dtypes, self._primekeys)
 
-            # compare self._keys with columns in db and add new column in the database if it does not exist
-            cur.execute("SELECT * FROM {}".format(self.name))
-            db_col_names = [tup[0] for tup in cur.description]
+                # check for primary keys in database table
+                db_pragma = db.pragma("table_info", self.name)
+                db_primary_keys = [i[1] for i in db_pragma if i[5] != 0]
+                if not set(self._primekeys) == set(db_primary_keys):
+                    raise ValueError("Modification of primary values is not "
+                                     "supported. Primary keys of table {} are "
+                                     "{}".format(self.name, db_primary_keys))
 
-            # delete columns, which were removed as keys in this execution
-            diff_col_list = list(set(db_col_names).difference(keys))
-            if len(diff_col_list) != 0:
-                for col in diff_col_list:
-                    LOGGER.debug(
-                        "ALTER TABLE {} DROP COLUMN {}".format(self.name, col))
-                    cur.execute(
-                        "ALTER TABLE {} DROP COLUMN {}".format(self.name, col))
+                # compare self._keys with columns in db and add new column in the database if it does not exist
+                db_col_names = [i[1] for i in db_pragma]
 
-            # add columns, which were added as keys in this execution
-            diff_col_list = list(set(keys).difference(db_col_names))
-            if len(diff_col_list) != 0:
-                for col in diff_col_list:
-                    LOGGER.debug("ALTER TABLE {} ADD COLUMN {} {}".format(
-                        self.name, col, type(col).__name__.replace('str', 'text')))
-                    cur.execute("ALTER TABLE {} ADD COLUMN {} {}".format(
-                        self.name, col, type(col).__name__.replace('str', 'text')))
+                # delete columns, which were removed as keys in this execution
+                diff_col_list = list(set(db_col_names).difference(keys))
+                if len(diff_col_list) != 0:
+                    db.alter_table("DROP", self.name, diff_col_list)
 
-            # insert or replace self.data in database
-            replace_query = "REPLACE INTO {} {} VALUES (".format(
-                self.name, tuple(keys)) + "{}".format('?,'*len(keys))[:-1] + ");"
-            LOGGER.debug(replace_query)
-            cur.executemany(
-                replace_query, [d for d in self.data])
+                # add columns, which were added as keys in this execution
+                diff_col_list = list(set(keys).difference(db_col_names))
+                if len(diff_col_list) != 0:
+                    db.alter_table("ADD", self.name, diff_col_list)
 
-            con.commit()
-            con.close()
+                # insert or replace self.data in database
+                for value in self.data:
+                    data = {keys[i]: value[i] for i in range(len(keys))}
+                    db.insert(self.name, data, "REPLACE")
 
-            # Print database location to screen and result.log
-            LOGGER.info("Database location of id {}: {}".format(
-                self._benchmark_ids[0], db_file))
+                db.commit_transaction()
+
+                # Print database location to screen and result.log
+                LOGGER.info("Database location of id {}: {}".format(
+                    self._benchmark_ids[0], db_file))
+            except Exception as e:
+                db.rollback_transaction()
+                db.disconnect()
+                raise e
+            db.disconnect()
 
     class Column(KeyValuesResult.DataKey):
 
@@ -163,13 +155,6 @@ class Database(KeyValuesResult):
         def primekey(self):
             """Column width"""
             return self._primekey
-
-        def etree_repr(self):
-            """Return etree object representation"""
-            column_etree = KeyValuesResult.DataKey.etree_repr(self)
-            if self._primekey:
-                column_etree.attrib["primekey"] = str(self._primekey).lower()
-            return column_etree
 
     def __init__(self, name, res_filter=None, primekeys=None, db_file=None):
         KeyValuesResult.__init__(self, name, None, res_filter)
@@ -214,7 +199,7 @@ class Database(KeyValuesResult):
             db.insert("ResultDatabase", database_data)
             for key in self._keys:
                 key_data = key.get_information_for_database()
-                if key_data["name"] in self._primekeys:
+                if key_data["name"] in self._primekeys or key.primekey:
                     key_data["is_primary"] = 1
                 key_data["databasekey_name"] = key_data.pop("name")
                 key_data["database_name"] = self._name

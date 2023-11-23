@@ -61,6 +61,25 @@ class Database_Interface(object):
             raise RuntimeError("Something went wrong when creating the "
                                "database: {0}".format(er))
 
+    def create_database_table(self, name, data, primekeys):
+        """Create database table and fill with given data"""
+        # Create execute query
+        columns = ', '.join([f'{k} {t}' for k, t in data.items()])
+        primary_key = ', '.join(primekeys)
+        query = f"CREATE TABLE IF NOT EXISTS {name} ({columns}"
+        if primary_key:
+            query += f", PRIMARY KEY ({primary_key})"
+        query += ")"
+
+        # Create result database
+        self._cursor.execute(query)
+
+    def pragma(self, statement, table_name):
+        self._cursor.execute(f"PRAGMA {statement}('{table_name}')")
+        rows = self._cursor.fetchall()
+
+        return rows
+
     def insert(self, table_name, data, addition=None):
         """Execute a query to add data to the table with the given name"""
         columns = ", ".join(data.keys())
@@ -106,6 +125,13 @@ class Database_Interface(object):
         query = f"DELETE FROM {table_name}"
         if condition is not None:
             query +=  f" WHERE {condition}"
+
+        self._cursor.execute(query)
+
+    def alter_table(self, statement, table_name, column):
+        """Execute a query to delete the given column in the given table"""
+        query = f"ALTER TABLE {table_name} {statement}"
+        query +=  f" COLUMN {', '.join(column)}"
 
         self._cursor.execute(query)
 
