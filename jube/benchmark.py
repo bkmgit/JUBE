@@ -702,15 +702,7 @@ class Benchmark(object):
             else:
                 self.wp_post_run_config(workpackage)
 
-        db = self.db
-        db.connect()
-        # Add new workpackages that have not yet been executed (open)
-        for workpackages in self.workpackages.values():
-            for workpackage in workpackages:
-                row = db.select("Workpackage", condition=f"workpackage_id='{workpackage.id}'")
-                if not row:
-                    workpackage.add_information_to_database(db)
-        db.disconnect()
+        self.add_workpackage_information_to_database()
 
         print("\n")
         status_data = [("stepname", "all", "open", "wait", "error", "done")]
@@ -889,10 +881,13 @@ class Benchmark(object):
                 workpackage.done = False
 
     def add_workpackage_information_to_database(self):
+        """Store initial worpackage information in database"""
         self.db.connect()
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:
-                workpackage.add_information_to_database(self.db)
+                row = self.db.select("Workpackage", condition=f"workpackage_id='{workpackage.id}'")
+                if not row:
+                    workpackage.add_information_to_database(self.db)
         self.db.disconnect()
 
     def set_workpackage_information(self, workpackages, work_stat):

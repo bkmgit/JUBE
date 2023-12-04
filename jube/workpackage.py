@@ -68,12 +68,18 @@ class Workpackage(object):
         self._workpackage_dir_caching_enabled = False
         self._workpackage_dir_cache = None
 
+
+    def update_information_in_database(self):
+        """Update worpackage information after run in database"""
+        db = self._benchmark.db
+        db.connect()
+        # Adding used sets that need to be substituted
+        self.step.add_used_sets_to_database(db, self._benchmark, self.parameter_dict)
+        self.add_information_to_database(db)
+        self._benchmark.deinitialize_db()
+
     def add_information_to_database(self, db):
         """Store workpackage information in database"""
-        row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
-        if row:
-            self.update_information_in_database(db)
-            return
         try:
             db.start_transaction()
             workpackage_data = {
@@ -82,29 +88,7 @@ class Workpackage(object):
                 "step_name": self._step.name,
                 "workpackage_id": self._id
             }
-            db.insert("Workpackage", workpackage_data)
-            self.add_or_update_additional_information_to_database(db)
-            db.commit_transaction()
-        except Exception as e:
-            LOGGER.warning(str(e))
-            db.rollback_transaction()
-            db.disconnect()
-            raise e
-
-    def update_information_in_database(self, db):
-        """Update workpackage information in database"""
-        row = db.select("Workpackage", condition=f"workpackage_id='{self.id}'")
-        if not row:
-            self.add_information_to_database(db)
-            return
-        try:
-            db.start_transaction()
-            workpackage_data = {
-                "iteration": self._iteration,
-                "cycle": self._cycle,
-                "step_name": self._step.name
-            }
-            db.update("Workpackage", workpackage_data, f"workpackage_id='{self._id}'")
+            db.insert("Workpackage", workpackage_data, addition="REPLACE")
             self.add_or_update_additional_information_to_database(db)
             db.commit_transaction()
         except Exception as e:
@@ -957,15 +941,7 @@ class Workpackage(object):
                 self._parameterset.delete_parameter(p)
             parameterDeletionList = None
 
-        # Store workpackage information
-        db = self.benchmark.db
-        db.connect()
-        # Adding used sets that need to be substituted
-        self.step.add_used_sets_to_database(db, self.benchmark, parameter)
-        self.update_information_in_database(db)
-        db.disconnect()
-        db = None
-        self.benchmark.deinitialize_db()
+        self.update_information_in_database()
 
         return {"id": self._id, "step_name": self._step.name, "env": self._env,
                 "cycle": self._cycle, "parameterset": self._parameterset}
