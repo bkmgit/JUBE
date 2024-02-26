@@ -1591,7 +1591,7 @@ class Parser(object):
         """Extract all results from etree"""
         results = dict()
         results_order = list()
-        valid_tags = ["use", "table", "syslog", "database"]
+        valid_tags = ["use", "table", "syslog", "database", "figure"]
         for result_etree in etree.findall("result"):
             result_dir = result_etree.get("result_dir")
             if result_dir is not None:
@@ -1611,7 +1611,10 @@ class Parser(object):
                 elif element.tag == "database":
                     result = Parser._extract_database(element)
                     result.result_dir = result_dir
-                if element.tag in ["table", "syslog", "database"]:
+                elif element.tag == "figure":
+                    result = Parser._extract_figure(element)
+                    result.result_dir = result_dir
+                if element.tag in ["table", "syslog", "database", "figure"]:
                     if result.name in sub_results:
                         raise ValueError(
                             ("Result name \"{0}\" is used " +
@@ -1711,6 +1714,38 @@ class Parser(object):
                 primekey = False
             database.add_key(key_name, format_string, title, primekey)
         return database
+
+    @staticmethod
+    def _extract_figure(etree_figure):
+        """Extract a figure from etree"""
+        def get_elem_name(elem):
+            """Get name of elem"""
+            name = elem.text
+            if name is None:
+                name = ""
+            name = name.strip()
+            return name
+
+        savefig = Parser._attribute_from_element(etree_figure, "savefig").strip()
+        title = etree_figure.get("title", "").strip()
+        figure = jube.result_types.figure.Figure(savefig, title)
+        for element in etree_figure:
+            Parser._check_tag(element, ["plot"])
+            plot_type = element.get("type", "line").strip()
+            x_element = element.findall("x")
+            if len(x_element) is not 1:
+                raise ValueError("Empty <x> not allowed")
+            else:
+                x = get_elem_name(x_element[0])
+            y_elements = element.findall("y")
+            if len(y_elements) < 1:
+                raise ValueError("Empty <y> not allowed")
+            else:
+                y = [get_elem_name(elem) for elem in y_elements]
+            for key in [x] + y:
+                figure.add_key(key, None, None)
+            figure.add_plot(plot_type, x, y)
+        return figure
 
     @staticmethod
     def _extract_syslog(etree_syslog):

@@ -59,12 +59,13 @@ class YAML_Converter(object):
          "benchmark": ["parameterset", "comment", "step", "fileset",
                        "substituteset", "analyser", "result", "patternset"],
          "analyse": ["file"], "analyser": ["use", "analyse"],
-         "fileset": ["link", "copy", "prepare"],
-         "include-path": ["path"], "parameterset": ["parameter"],
-         "patternset": ["pattern"], "result": ["use", "table", "syslog", "database"],
+         "fileset": ["link", "copy", "prepare"], "include-path": ["path"],
+         "parameterset": ["parameter"], "patternset": ["pattern"],
+         "result": ["use", "table", "syslog", "database", "figure"],
          "selection": ["not", "only", "tag"], "step": ["use", "do"],
          "substituteset": ["iofile", "sub"], "syslog": ["key"],
-         "table": ["column"], "tags": ["check_tags", "tag"], "database": ["key"]}
+         "table": ["column"], "database": ["key"], "figure": ["plot"],
+         "plot": ["x", "y"], "tags": ["check_tags", "tag"]}
 
     def __init__(self, path, include_path=None, tags=None):
         self._path = path
