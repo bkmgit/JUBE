@@ -589,7 +589,7 @@ class Parser(object):
         workpackages = db.select("Workpackage", None, "")
         max_id = -1
         for workpackage in workpackages:
-            workpackage_id, iteration, cycle, step_name = workpackage
+            workpackage_id, iteration, cycle, step_name, status = workpackage
             max_id = max(max_id, workpackage_id)
             
             step = benchmark.steps[step_name]
@@ -612,7 +612,7 @@ class Parser(object):
 
             tmp[workpackage_id] = jube.workpackage.Workpackage(benchmark, step, \
                                         parameter_names, parameterset, workpackage_id,
-                                        iteration, cycle)
+                                        iteration, cycle, status)
 
             # Extract workpackage parents
             parents = db.select("WorkpackageParents", ["parent_workpackage_id"], f"workpackage_id='{workpackage_id}'")
@@ -848,6 +848,31 @@ class Parser(object):
                 update_parameter.parameter_substitution(
                     [fixed_parameterset], final_sub=True)
                 workpackage.parameterset.update_parameterset(update_parameter)
+
+        # Rebuild status of workpackage and operation for database
+        for workpackage in tmp.values():
+            # Check workpackage status for database
+            # Check if done file exist (status = done)
+            done_file = os.path.join(workpackage.workpackage_dir,
+                                     jube.conf.WORKPACKAGE_DONE_FILENAME)
+            if os.path.exists(done_file):
+                if workpackage.status != "done":
+                    workpackage.status = "done"
+                os.remove(done_file)
+            if jube.conf.DEBUG_MODE and os.path.exists(done_file + "_DEBUG"):
+                if workpackage.status != "done_debug":
+                    workpackage.status = "done_debug"
+                os.remove(done_file + "_DEBUG")
+            # Check if error file exist (status = error)
+            error_file = os.path.join(workpackage.workpackage_dir,
+                                      jube.conf.WORKPACKAGE_ERROR_FILENAME)
+            if os.path.exists(error_file):
+                if workpackage.status != "error":
+                    workpackage.status = "error"
+            # Check if workpackage directory exist (status = wait)
+            if os.path.exists(workpackage.workpackage_dir):
+                if workpackage.status == "open":
+                    workpackage.status = "wait"
 
         # Store workpackage data
         work_stat = jube.util.util.WorkStat()

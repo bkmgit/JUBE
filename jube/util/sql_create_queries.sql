@@ -186,6 +186,7 @@ CREATE TABLE IF NOT EXISTS Workpackage
     iteration INTEGER NOT NULL,
     cycle INTEGER NOT NULL,
     step_name TEXT NOT NULL,
+    status TEXT DEFAULT "open" NOT NULL ,
     FOREIGN KEY (step_name) REFERENCES Step(step_name) ON DELETE CASCADE
 );
 

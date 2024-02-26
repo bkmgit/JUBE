@@ -46,7 +46,7 @@ class Workpackage(object):
     id_counter = 0
 
     def __init__(self, benchmark, step, local_parameter_names, parameterset,
-                 workpackage_id=None, iteration=0, cycle=0):
+                 workpackage_id=None, iteration=0, cycle=0, status="open"):
         # set id
         if workpackage_id is None:
             self._id = Workpackage.id_counter
@@ -65,6 +65,7 @@ class Workpackage(object):
         self._queued = False
         self._env = dict(os.environ)
         self._cycle = cycle
+        self._status = status
         self._workpackage_dir_caching_enabled = False
         self._workpackage_dir_cache = None
 
@@ -86,6 +87,7 @@ class Workpackage(object):
                 "iteration": self._iteration,
                 "cycle": self._cycle,
                 "step_name": self._step.name,
+                "status": self._status,
                 "workpackage_id": self._id
             }
             db.insert("Workpackage", workpackage_data, addition="REPLACE")
