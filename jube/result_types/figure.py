@@ -28,7 +28,6 @@ from jube.result_types.genericresult import GenericResult
 from jube.result import Result
 import xml.etree.ElementTree as ET
 import jube.log
-import matplotlib.pyplot as plt
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -41,7 +40,7 @@ class Figure(GenericResult):
 
         """Figure data"""
 
-        def __init__(self, name_or_other, plots, title):
+        def __init__(self, name_or_other, plots, savefig, title, showfig):
             if type(name_or_other) is GenericResult.KeyValuesData:
                 self._name = name_or_other.name
                 #self._keys = name_or_other.keys
@@ -50,10 +49,14 @@ class Figure(GenericResult):
             else:
                 GenericResult.KeyValuesData.__init__(self, name_or_other)
             self._plots = plots
+            self._savefig = savefig
             self._title = title
+            self._showfig = showfig
 
         def create_result(self, show=True, filename=None, **kwargs):
             """Place for the magic: generate the figures"""
+
+            import matplotlib.pyplot as plt
 
             table_data = {v.name:k for v,k in self._data.items()}
 
@@ -65,11 +68,21 @@ class Figure(GenericResult):
                         ax.plot(table_data[plot.x], table_data[y])
                     elif plot.type == "scatter":
                         ax.scatter(table_data[plot.x], table_data[y])
-            plt.show()
-            fig.savefig(filename[:-4]) # without .dat extension
-            # Print Figure location to screen and result.log
-            LOGGER.info("Figure location of id {}: {}".format(
-                self._benchmark_ids[0], filename[:-4]))
+
+            if self._savefig not in [None, ""]:
+                fig.savefig(self._savefig)
+                # Print Figure location to screen and result.log
+                LOGGER.info("Figure location of id {}: {}".format(
+                    self._benchmark_ids[0], self._savefig))
+            elif filename is not None:
+                fig.savefig(filename.replace(".dat", ".png"))
+                # Print Figure location to screen and result.log
+                LOGGER.info("Figure location of id {}: {}".format(
+                    self._benchmark_ids[0], filename.replace(".dat", ".png")))
+
+            if self._showfig == "True":
+                plt.show()
+            plt.close()
 
     class Plot(GenericResult.DataKey):
         """A Plot type"""
@@ -127,10 +140,11 @@ class Figure(GenericResult):
                 y_elem.text = y
             return plot_etree
 
-    def __init__(self, savefig, title=None, res_filter=None):
-        GenericResult.__init__(self, savefig, res_filter)
-        # HINT: self._name = savefig
+    def __init__(self, name, savefig=None, title=None, showfig=None, res_filter=None):
+        GenericResult.__init__(self, name, res_filter)
+        self._savefig = savefig
         self._title = title
+        self._showfig = showfig
         self._plots = list()
 
     def add_key(self, name, title=None, unit=None):
@@ -145,7 +159,8 @@ class Figure(GenericResult):
     def create_result_data(self, style=None, select=None, exclude=None):
         """Create result data"""
         result_data = GenericResult.create_result_data(self, select, exclude)
-        return Figure.FigureData(result_data, self._plots, self._title)
+        return Figure.FigureData(result_data, self._plots, self._savefig, 
+                                 self._title, self._showfig)
 
     def etree_repr(self):
         """Return etree object representation"""
