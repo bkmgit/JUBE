@@ -42,8 +42,10 @@ analyser:
 result:
   use: analyse #use existing analyser
   figure:
-    - title: my_fig
+    - name: 1_fig
+      title: FIG Title
       savefig: first_fig.png
+      showfig: False
       plot:
         - x: x_pat
           y: 
@@ -54,7 +56,7 @@ result:
           y: 
             - y_pat
             - y3_pat
-    - savefig: sec_fig.png
+    - name: 2_fig
       plot:
         type: scatter
         x: x_pat

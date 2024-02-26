@@ -1726,14 +1726,16 @@ class Parser(object):
             name = name.strip()
             return name
 
-        savefig = Parser._attribute_from_element(etree_figure, "savefig").strip()
+        name = Parser._attribute_from_element(etree_figure, "name").strip()
+        savefig = etree_figure.get("savefig", "").strip()
         title = etree_figure.get("title", "").strip()
-        figure = jube2.result_types.figure.Figure(savefig, title)
+        showfig = etree_figure.get("showfig", "True").strip()
+        figure = jube2.result_types.figure.Figure(name, savefig, title, showfig)
         for element in etree_figure:
             Parser._check_tag(element, ["plot"])
             plot_type = element.get("type", "line").strip()
             x_element = element.findall("x")
-            if len(x_element) is not 1:
+            if len(x_element) != 1:
                 raise ValueError("Empty <x> not allowed")
             else:
                 x = get_elem_name(x_element[0])
