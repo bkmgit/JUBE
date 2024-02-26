@@ -1718,47 +1718,33 @@ class Parser(object):
     @staticmethod
     def _extract_figure(etree_figure):
         """Extract a figure from etree"""
-        name = Parser._attribute_from_element(etree_figure, "name").strip()
-        savefig = etree_figure.get("savefig", "").strip()
+        def get_elem_name(elem):
+            """Get name of elem"""
+            name = elem.text
+            if name is None:
+                name = ""
+            name = name.strip()
+            return name
+
+        savefig = Parser._attribute_from_element(etree_figure, "savefig").strip()
         title = etree_figure.get("title", "").strip()
-        showfig = etree_figure.get("showfig", "True").strip()
-        if showfig not in ["True", "False"]:
-            raise ValueError("Supported values for <figure showfig>: True, False")
-
-        figure = jube.result_types.figure.Figure(name, savefig, title, showfig)
-
-        for etree_plot in etree_figure:
-            Parser._check_tag(etree_plot, ["plot"])
-            legend = etree_plot.get("legend", "False").strip()
-            if legend not in ["True", "False"]:
-                raise ValueError("Supported values for <figure legend>: True, False")
-            xlabel = etree_plot.get("xlabel", "").strip()
-            ylabel = etree_plot.get("ylabel", "").strip()
-
-            plot_data = list()
-            for etree_data in etree_plot:
-                x = Parser._attribute_from_element(etree_data, "x").strip()
-                y = Parser._attribute_from_element(etree_data, "y").strip()
-                type = etree_data.get("type", "line").strip()
-                if type not in ["line", "scatter", "bar", "stem", "step"]:
-                    raise ValueError("Supported values for <data type>: line, scatter, bar, stem, step")
-                label = etree_data.get("label", "").strip()
-                xscale = etree_data.get("xscale", "").strip()
-                if xscale not in ["linear", "log", "logit", "symlog", ""]:
-                    raise ValueError("Supported values for <data xscale>: linear, log, logit, symlog")
-                yscale = etree_data.get("yscale", "").strip()
-                if yscale not in ["linear", "log", "logit", "symlog", ""]:
-                    raise ValueError("Supported values for <data yscale>: linear, log, logit, symlog")
-                color = etree_data.get("color", "").strip()
-                marker = etree_data.get("marker", "").strip()
-                linestyle = etree_data.get("linestyle", "").strip()
-                figure.add_key(x, None, None)
-                figure.add_key(y, None, None)
-                plot_data.append({'x': x, 'y': y, 'type': type, 'label': label,
-                                  'xscale': xscale, 'yscale': yscale,
-                                  'color': color, 'marker': marker,
-                                  'linestyle': linestyle})
-            figure.add_plot(legend, xlabel, ylabel, plot_data)
+        figure = jube2.result_types.figure.Figure(savefig, title)
+        for element in etree_figure:
+            Parser._check_tag(element, ["plot"])
+            plot_type = element.get("type", "line").strip()
+            x_element = element.findall("x")
+            if len(x_element) is not 1:
+                raise ValueError("Empty <x> not allowed")
+            else:
+                x = get_elem_name(x_element[0])
+            y_elements = element.findall("y")
+            if len(y_elements) < 1:
+                raise ValueError("Empty <y> not allowed")
+            else:
+                y = [get_elem_name(elem) for elem in y_elements]
+            for key in [x] + y:
+                figure.add_key(key, None, None)
+            figure.add_plot(plot_type, x, y)
         return figure
 
     @staticmethod
