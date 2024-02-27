@@ -45,7 +45,7 @@ result:
     - name: 1_fig
       title: FIG Title
       savefig: first_fig.png
-      showfig: False
+      showfig: True
       plot:
         - x: x_pat
           y: 
@@ -53,9 +53,16 @@ result:
             - y2_pat
         - type: scatter
           x: x2_pat
-          y: 
-            - y_pat
+          y:
+            - y2_pat
+        - type: step
+          x: x2_pat
+          y:
             - y3_pat
+        - type: bar
+          x: x2_pat
+          y:
+            - y_pat
     - name: 2_fig
       plot:
         type: scatter
