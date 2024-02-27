@@ -20,9 +20,8 @@
 from __future__ import (print_function,
                         unicode_literals,
                         division)
-import sqlite3
-import ast
 import os
+from pathlib import Path
 
 from jube.result_types.genericresult import GenericResult
 from jube.result import Result
@@ -66,20 +65,32 @@ class Figure(GenericResult):
                 for y in plot.y:
                     if plot.type == "line":
                         ax.plot(table_data[plot.x], table_data[y])
-                    elif plot.type == "scatter":
-                        ax.scatter(table_data[plot.x], table_data[y])
+                    else:
+                        # dynamically create plot function call (e.g. ax.scatter())
+                        plot_func = getattr(ax, plot.type)
+                        plot_func(table_data[plot.x], table_data[y])
 
+            # save figure in "savefig" file or
+            # if not given in filename (benchmark id result directory)
             if self._savefig not in [None, ""]:
-                fig.savefig(self._savefig)
+                file_path_ind = self._savefig.rfind('/')
+                if file_path_ind != -1:
+                    # create full directory path if it doesn't exist
+                    Path(os.path.expanduser(
+                        self._savefig[:file_path_ind])).mkdir(
+                            parents=True, exist_ok=True)
+                fig.savefig(os.path.expanduser(self._savefig))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
-                    self._benchmark_ids[0], self._savefig))
+                    self._benchmark_ids[0], os.path.expanduser(self._savefig)))
             elif filename is not None:
                 fig.savefig(filename.replace(".dat", ".png"))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
-                    self._benchmark_ids[0], filename.replace(".dat", ".png")))
+                    self._benchmark_ids[0], os.path.expanduser(
+                        filename.replace(".dat", ".png"))))
 
+            # show figure if "showfig" attribute isn't set to False
             if self._showfig == "True":
                 plt.show()
             plt.close()
