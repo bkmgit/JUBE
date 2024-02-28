@@ -28,6 +28,7 @@ import os
 import shutil
 import jube.substitute
 import jube.main
+import jube.conf
 
 PATH_PREFIX = os.path.join(os.path.dirname(__file__))
 
@@ -90,7 +91,15 @@ class TestSubstitute(unittest.TestCase):
         jube.main.main(('run -e '+ self._input_path).split())
         # Test for done file
         done_file = os.path.join(self._wp_path, 'done')
-        self.assertTrue(os.path.exists(done_file), "Failed to successfully "
+        exist = os.path.exists(done_file)
+        status = ""
+        database_path = os.path.join(self._run_path, jube.conf.DATABASE_FILENAME)
+        if os.path.exists(database_path):
+            db = jube.util.database_interface.Database_Interface(database_path)
+            db.connect()
+            status = db.select("Workpackage", ["status"], "workpackage_id=0")[0][0]
+            db.disconnect()
+        self.assertTrue((exist or status == "done"), "Failed to successfully "
                         "complete workpackage with id 0: Missing done file in "
                         "workpackage directory {0}".format(self._wp_path))
         # Test for error file

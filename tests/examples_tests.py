@@ -26,6 +26,8 @@ import unittest
 import shutil
 import os
 import jube.main
+import jube.conf
+import jube.util.database_interface
 import examples_tests
 
 EXAMPLES_PREFIX = os.path.join(os.path.dirname(__file__), "../examples")
@@ -74,19 +76,19 @@ class TestCase:
             #Save run arguments for result test
             cls._run_args = run_args
 
-        def test_for_status_files_in_wp_folders(self):
+        def test_for_wp_status(self):
             '''
-            Checks that there is a done file and
+            Checks that there is a done file or done status and
             no error files in the workpackage directories.
             '''
             for run_path, command_wps in self._wp_paths.items():
                 for wp_id, wp_path in command_wps.items():
-                    self.assertTrue(self._existing_done_file(wp_path),
+                    self.assertTrue(self._is_status_done(run_path, wp_id, wp_path),
                                     "Failed to successfully complete "
                                     "workpackage with id {0}: Missing "
                                     "done file in workpackage directory {1}"
                                     .format(wp_id, wp_path))
-                    self.assertFalse(self._existing_error_file(wp_path),
+                    self.assertFalse(self._is_status_error(run_path, wp_id, wp_path),
                                     "Failed to successfully complete "
                                     "workpackage with id {0}: Missing "
                                     "done file in workpackage  directory {1}"
@@ -162,15 +164,38 @@ class TestCase:
             '''Checks if the file exists in the given path'''
             return os.path.exists(file_path)
 
-        def _existing_done_file(self, file_path):
-            '''Checks if the done file exists in the given path'''
+        def _is_status_done(self, run_path, wp_id, file_path):
+            '''
+            Checks if the done file exists in the given path or
+            the workpackage status in database is done
+            '''
+            #check for done file (old version)
             done_file_path = os.path.join(file_path, 'done')
-            return self._existing_file(done_file_path)
+            exist = self._existing_file(done_file_path)
+            status = ""
+            database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
+            if os.path.exists(database_path):
+                db = jube.util.database_interface.Database_Interface(database_path)
+                db.connect()
+                status = db.select("Workpackage", ["status"], f"workpackage_id={wp_id}")[0][0]
+                db.disconnect()
+            return (exist or status == "done")
 
-        def _existing_error_file(self, file_path):
-            '''Checks if the error file exists in the given path'''
+        def _is_status_error(self, run_path, wp_id, file_path):
+            '''
+            Checks if the error file exists in the given path or
+            the workpackage status in database is done
+            '''
             error_file_path = os.path.join(file_path, 'error')
-            return self._existing_file(error_file_path)
+            exist = self._existing_file(error_file_path)
+            status = ""
+            database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
+            if os.path.exists(database_path):
+                db = jube.util.database_interface.Database_Interface(database_path)
+                db.connect()
+                status = db.select("Workpackage", ["status"], f"workpackage_id={wp_id}")[0][0]
+                db.disconnect()
+            return (exist or status == "error")
 
         def _content_of_file(self, file_path):
             '''Returns the contents of the given file'''
