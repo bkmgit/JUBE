@@ -242,14 +242,13 @@ class Benchmark(object):
                                      "done": 0}
             for workpackage in self._workpackages[stepname]:
                 result_dict[stepname]["all"] += 1
-                if workpackage.done:
-                    result_dict[stepname]["done"] += 1
-                elif workpackage.error:
-                    result_dict[stepname]["error"] += 1
-                elif workpackage.started:
-                    result_dict[stepname]["wait"] += 1
+                if workpackage.status == "done_debug":
+                    if jube.conf.DEBUG_MODE:
+                        result_dict[stepname]["done"] += 1
+                    else:
+                        result_dict[stepname]["open"] += 1
                 else:
-                    result_dict[stepname]["open"] += 1
+                    result_dict[stepname][workpackage.status] += 1
         return result_dict
 
     @property
@@ -642,6 +641,7 @@ class Benchmark(object):
                                     val["parameterset"].add_parameter(p)
                             wp.parameterset = val["parameterset"]
                             wp.cycle = val["cycle"]
+                            wp.status = val["status"]
                         self.wp_post_run_config(wp)
                         break
 

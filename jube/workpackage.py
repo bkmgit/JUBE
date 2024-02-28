@@ -201,45 +201,39 @@ class Workpackage(object):
     @property
     def done(self):
         """Workpackage done?"""
-        done_file = os.path.join(self.workpackage_dir,
-                                 jube.conf.WORKPACKAGE_DONE_FILENAME)
-        exist = os.path.exists(done_file)
+        done = self.status == "done"
         if jube.conf.DEBUG_MODE:
-            exist = exist or os.path.exists(done_file + "_DEBUG")
-        return exist
+            done = done or self.status == "done_debug"
+        return done
 
     @done.setter
     def done(self, set_done):
         """Set/reset Workpackage done"""
-        done_file = os.path.join(self.workpackage_dir,
-                                 jube.conf.WORKPACKAGE_DONE_FILENAME)
-        if jube.conf.DEBUG_MODE:
-            done_file = done_file + "_DEBUG"
         if set_done:
-            fout = open(done_file, "w")
-            fout.write(jube.util.util.now_str())
-            fout.close()
             self._remove_operation_info_files()
+            if jube.conf.DEBUG_MODE:
+                self.status = "done_debug"
+            else:
+                self.status = "done"
         else:
-            if os.path.exists(done_file):
-                os.remove(done_file)
+            self.status = "wait"
 
     @property
     def error(self):
         """Workpackage error?"""
-        error_file = os.path.join(self.workpackage_dir,
-                                  jube.conf.WORKPACKAGE_ERROR_FILENAME)
-        return os.path.exists(error_file)
+        return self.status == "error"
 
     def set_error(self, set_error, msg=""):
         """Set/reset Workpackage error"""
         error_file = os.path.join(self.workpackage_dir,
                                   jube.conf.WORKPACKAGE_ERROR_FILENAME)
         if set_error:
+            self.status = "error"
             fout = open(error_file, "w")
             fout.write(msg)
             fout.close()
         else:
+            self.status = "wait"
             if os.path.exists(error_file):
                 os.remove(error_file)
 
@@ -256,7 +250,7 @@ class Workpackage(object):
     @property
     def started(self):
         """Workpackage started?"""
-        return os.path.exists(self.workpackage_dir)
+        return self.status != "open"
 
     def operation_done_but_pending(self, operation_number):
         """Check if an operation was executed, but the result is still
@@ -322,6 +316,7 @@ class Workpackage(object):
         for children in self.children:
             children.remove(remove_config_from_benchmark=True)
         shutil.rmtree(self.workpackage_dir, ignore_errors=True)
+        self.status = "open"
 
         # Remove shared folder if all workpackages of the current step were
         # removed
@@ -416,15 +411,19 @@ class Workpackage(object):
     def step(self):
         """Return Step data"""
         return self._step
-    
+
+    @property
     def status(self):
-        """return FINISHED, RUNNING or DONE dependign on the workpackage status"""
-        if self.done:
-            return "DONE"
-        elif self.error:
-            return "ERROR"
+        """return done, error, wait or open dependign on the workpackage status"""
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        """return done, error, wait or open dependign on the workpackage status"""
+        if status in ["done", "done_debug", "error", "wait", "open"]:
+            self._status = status
         else:
-            return "RUNNING"
+            raise TypeError("No valid value for the status")
 
     def update_status(self):
         """Update status in jube parameter"""
@@ -432,7 +431,7 @@ class Workpackage(object):
 
         parameterset.add_parameter(
             jube.parameter.Parameter.
-            create_parameter("jube_wp_status", self.status(),
+            create_parameter("jube_wp_status", self.status,
                              parameter_type="string",
                              update_mode=jube.parameter.JUBE_MODE))
 
@@ -482,7 +481,7 @@ class Workpackage(object):
         # workpackage status
         parameterset.add_parameter(
             jube.parameter.Parameter.
-            create_parameter("jube_wp_status", self.status(),
+            create_parameter("jube_wp_status", self.status,
                              parameter_type="string",
                              update_mode=jube.parameter.JUBE_MODE))
 
@@ -563,6 +562,8 @@ class Workpackage(object):
             parent_path = os.path.relpath(parent.work_dir, self.work_dir)
             if not os.path.exists(link_path):
                 os.symlink(parent_path, link_path)
+        # Set workpackage status to wait
+        self.status = "wait"
 
     def create_shared_folder_link(self, parameter_dict=None):
         """Create shared folder connection"""
@@ -950,7 +951,8 @@ class Workpackage(object):
         self.update_information_in_database()
 
         return {"id": self._id, "step_name": self._step.name, "env": self._env,
-                "cycle": self._cycle, "parameterset": self._parameterset}
+                "cycle": self._cycle, "parameterset": self._parameterset,
+                "status": self.status}
 
     @staticmethod
     def reduce_workpackage_id_counter():
