@@ -51,7 +51,7 @@
           <data x='x2_pat' y='y3_pat' label='STEP' type='step' />
         </plot>
         <plot>
-          <data x='x2_pat' y='y_pat' label='BAR' type='bar' />
+          <data x='x2_pat' y='y_pat' label='BAR' type='bar' xscale='symlog' yscale='log'/>
         </plot>
       </figure>
       <figure name='2_fig'>

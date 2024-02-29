@@ -1740,12 +1740,19 @@ class Parser(object):
                 x = Parser._attribute_from_element(etree_data, "x").strip()
                 y = Parser._attribute_from_element(etree_data, "y").strip()
                 type = etree_data.get("type", "line").strip()
-                label = etree_data.get("label", "").strip()
                 if type not in ["line", "scatter", "bar", "stem", "step"]:
-                    raise ValueError("Supported values for <plot type>: line, scatter, bar, stem, step")
+                    raise ValueError("Supported values for <data type>: line, scatter, bar, stem, step")
+                label = etree_data.get("label", "").strip()
+                xscale = etree_data.get("xscale", "").strip()
+                if xscale not in ["linear", "log", "logit", "symlog", ""]:
+                    raise ValueError("Supported values for <data xscale>: linear, log, logit, symlog")
+                yscale = etree_data.get("yscale", "").strip()
+                if yscale not in ["linear", "log", "logit", "symlog", ""]:
+                    raise ValueError("Supported values for <data yscale>: linear, log, logit, symlog")
                 figure.add_key(x, None, None)
                 figure.add_key(y, None, None)
-                plot_data.append({'x': x, 'y': y, 'type': type, 'label': label})
+                plot_data.append({'x': x, 'y': y, 'type': type, 'label': label,
+                                  'xscale': xscale, 'yscale': yscale})
             figure.add_plot(legend, xlabel, ylabel, plot_data)
         return figure
 

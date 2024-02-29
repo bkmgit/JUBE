@@ -73,7 +73,8 @@ class Figure(GenericResult):
                         plot_func = getattr(ax, data.type)
                         plot_func(table_data[data.x], table_data[data.y],
                                   label=data.label)
-
+                    if data.xscale not in [None, ""]: ax.set_xscale(data.xscale)
+                    if data.yscale not in [None, ""]: ax.set_yscale(data.yscale)
                 if plot._legend == "True":
                     ax.legend()
 
@@ -107,11 +108,13 @@ class Figure(GenericResult):
 
         class Data():
             """Plot data"""
-            def __init__(self, x, y, type, label):
+            def __init__(self, x, y, type, label, xscale, yscale):
                 self._x = x
                 self._y = y
                 self._type = type
                 self._label = label
+                self._xscale = xscale
+                self._yscale = yscale
 
             @property
             def x(self):
@@ -133,8 +136,20 @@ class Figure(GenericResult):
                 """Get 'label'"""
                 return self._label
 
+            @property
+            def xscale(self):
+                """Get 'xscale'"""
+                return self._xscale
+
+            @property
+            def yscale(self):
+                """Get 'yscale'"""
+                return self._yscale
+
             def __str__(self):
-                return f"Data: x: {self._x}; y: {self._y}; type: {self._type}, label: {self._label}"
+                return f"Data: x: {self._x}; y: {self._y}; type: {self._type}, "\
+                    f"label: {self._label}, xscale: {self._xscale}, " \
+                    f"yscale: {self._yscale}"
 
             def etree_repr(self):
                 """Return etree object representation"""
@@ -145,14 +160,20 @@ class Figure(GenericResult):
                     data_etree.attrib["type"] = self._type
                 if self._label not in [None, ""]:
                     data_etree.attrib["label"] = self._label
+                if self._xscale not in [None, ""]:
+                    data_etree.attrib["xscale"] = self._xscale
+                if self._yscale not in [None, ""]:
+                    data_etree.attrib["yscale"] = self._yscale
                 return data_etree
 
-        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, name=None, title=None, unit=None):
+        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None,
+                     name=None, title=None, unit=None):
             GenericResult.DataKey.__init__(self, name, title, unit)
             self._plot_data = list()
             for data in plot_data:
-                self._plot_data.append(Figure.Plot.Data(data['x'], data['y'],
-                                                        data['type'], data['label']))
+                self._plot_data.append(
+                    Figure.Plot.Data(data['x'], data['y'], data['type'],
+                                     data['label'], data['xscale'], data['yscale']))
             self._legend = legend
             if self._legend is None: self._legend = ""
             self._xlabel = xlabel
