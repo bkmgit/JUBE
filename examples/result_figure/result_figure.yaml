@@ -51,7 +51,7 @@ result:
           ylabel: My y label
           legend: True
           data:
-            - {x: x_pat, y: y_pat, label: NO LINE, xscale: symlog, yscale: log}
+            - {x: x_pat, y: y_pat, label: NO LINE, xscale: symlog, yscale: log, color: green, marker: ^, linestyle: dashed}
             - {x: x_pat, y: y2_pat, label: NO LINE2}
         - legend: True
           data:

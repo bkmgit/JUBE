@@ -65,14 +65,28 @@ class Figure(GenericResult):
                 ax.set_xlabel(plot._xlabel)
                 ax.set_ylabel(plot._ylabel)
                 for data in plot.plot_data:
+                    # plot function calls are created dynamically because certain
+                    # arguments are not mandatory and would cause an error
                     if data.type == "line":
-                        ax.plot(table_data[data.x], table_data[data.y],
-                                label=data.label)
-                    else:
-                        # dynamically create plot function call (e.g. ax.scatter())
+                        func_args = "table_data[data.x], table_data[data.y], label=data.label"
+                        for attr in ['color', 'marker', 'linestyle']:
+                            attr_val = getattr(data, attr)
+                            if attr_val not in [None, ""]:
+                                func_args += f", {attr}=data.{attr}"
+                        eval(f'ax.plot({func_args})')
+                    elif data.type in ["bar", "stem"]:
                         plot_func = getattr(ax, data.type)
                         plot_func(table_data[data.x], table_data[data.y],
                                   label=data.label)
+                    else:
+                        # dynamically create plot function call (e.g. ax.scatter())
+                        plot_func = getattr(ax, data.type)
+                        func_args = "table_data[data.x], table_data[data.y], label=data.label"
+                        for attr in ['color', 'marker', 'linestyle']:
+                            attr_val = getattr(data, attr)
+                            if attr_val not in [None, ""]:
+                                func_args += f", {attr}=data.{attr}"
+                        eval(f'ax.{data.type}({func_args})')
                     if data.xscale not in [None, ""]: ax.set_xscale(data.xscale)
                     if data.yscale not in [None, ""]: ax.set_yscale(data.yscale)
                 if plot._legend == "True":
@@ -108,13 +122,17 @@ class Figure(GenericResult):
 
         class Data():
             """Plot data"""
-            def __init__(self, x, y, type, label, xscale, yscale):
+            def __init__(self, x, y, type, label, xscale, yscale, color,
+                         marker, linestyle):
                 self._x = x
                 self._y = y
                 self._type = type
                 self._label = label
                 self._xscale = xscale
                 self._yscale = yscale
+                self._color = color
+                self._marker = marker
+                self._linestyle = linestyle
 
             @property
             def x(self):
@@ -146,10 +164,26 @@ class Figure(GenericResult):
                 """Get 'yscale'"""
                 return self._yscale
 
+            @property
+            def color(self):
+                """Get 'color'"""
+                return self._color
+
+            @property
+            def marker(self):
+                """Get 'marker'"""
+                return self._marker
+
+            @property
+            def linestyle(self):
+                """Get 'linestyle'"""
+                return self._linestyle
+
             def __str__(self):
                 return f"Data: x: {self._x}; y: {self._y}; type: {self._type}, "\
                     f"label: {self._label}, xscale: {self._xscale}, " \
-                    f"yscale: {self._yscale}"
+                    f"yscale: {self._yscale}, color: {self._color}, " \
+                    f"marker: {self._marker}, linestyle: {self._linestyle}"
 
             def etree_repr(self):
                 """Return etree object representation"""
@@ -164,6 +198,9 @@ class Figure(GenericResult):
                     data_etree.attrib["xscale"] = self._xscale
                 if self._yscale not in [None, ""]:
                     data_etree.attrib["yscale"] = self._yscale
+                data_etree.attrib["color"] = self._color
+                data_etree.attrib["marker"] = self._marker
+                data_etree.attrib["linestyle"] = self._linestyle
                 return data_etree
 
         def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None,
@@ -173,7 +210,8 @@ class Figure(GenericResult):
             for data in plot_data:
                 self._plot_data.append(
                     Figure.Plot.Data(data['x'], data['y'], data['type'],
-                                     data['label'], data['xscale'], data['yscale']))
+                                     data['label'], data['xscale'], data['yscale'],
+                                     data['color'], data['marker'], data['linestyle']))
             self._legend = legend
             if self._legend is None: self._legend = ""
             self._xlabel = xlabel

@@ -1749,10 +1749,15 @@ class Parser(object):
                 yscale = etree_data.get("yscale", "").strip()
                 if yscale not in ["linear", "log", "logit", "symlog", ""]:
                     raise ValueError("Supported values for <data yscale>: linear, log, logit, symlog")
+                color = etree_data.get("color", "").strip()
+                marker = etree_data.get("marker", "").strip()
+                linestyle = etree_data.get("linestyle", "").strip()
                 figure.add_key(x, None, None)
                 figure.add_key(y, None, None)
                 plot_data.append({'x': x, 'y': y, 'type': type, 'label': label,
-                                  'xscale': xscale, 'yscale': yscale})
+                                  'xscale': xscale, 'yscale': yscale,
+                                  'color': color, 'marker': marker,
+                                  'linestyle': linestyle})
             figure.add_plot(legend, xlabel, ylabel, plot_data)
         return figure
 
