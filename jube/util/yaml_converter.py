@@ -65,7 +65,7 @@ class YAML_Converter(object):
          "selection": ["not", "only", "tag"], "step": ["use", "do"],
          "substituteset": ["iofile", "sub"], "syslog": ["key"],
          "table": ["column"], "database": ["key"], "figure": ["plot"],
-         "plot": ["x", "y"], "tags": ["check_tags", "tag"]}
+         "plot": ["data"], "tags": ["check_tags", "tag"]}
 
     def __init__(self, path, include_path=None, tags=None):
         self._path = path

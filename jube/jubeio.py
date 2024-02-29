@@ -1718,39 +1718,35 @@ class Parser(object):
     @staticmethod
     def _extract_figure(etree_figure):
         """Extract a figure from etree"""
-        def get_elem_name(elem):
-            """Get name of elem"""
-            name = elem.text
-            if name is None:
-                name = ""
-            name = name.strip()
-            return name
-
         name = Parser._attribute_from_element(etree_figure, "name").strip()
         savefig = etree_figure.get("savefig", "").strip()
         title = etree_figure.get("title", "").strip()
         showfig = etree_figure.get("showfig", "True").strip()
         if showfig not in ["True", "False"]:
             raise ValueError("Supported values for <figure showfig>: True, False")
+
         figure = jube2.result_types.figure.Figure(name, savefig, title, showfig)
-        for element in etree_figure:
-            Parser._check_tag(element, ["plot"])
-            plot_type = element.get("type", "line").strip()
-            if plot_type not in ["line", "scatter", "bar", "stem", "step"]:
-                raise ValueError("Supported values for <plot type>: line, scatter, bar")
-            x_element = element.findall("x")
-            if len(x_element) != 1:
-                raise ValueError("Empty <plot> <x> not allowed")
-            else:
-                x = get_elem_name(x_element[0])
-            y_elements = element.findall("y")
-            if len(y_elements) < 1:
-                raise ValueError("Empty <plot> <y> not allowed")
-            else:
-                y = [get_elem_name(elem) for elem in y_elements]
-            for key in [x] + y:
-                figure.add_key(key, None, None)
-            figure.add_plot(plot_type, x, y)
+
+        for etree_plot in etree_figure:
+            Parser._check_tag(etree_plot, ["plot"])
+            legend = etree_plot.get("legend", "False").strip()
+            if legend not in ["True", "False"]:
+                raise ValueError("Supported values for <figure legend>: True, False")
+            xlabel = etree_plot.get("xlabel", "").strip()
+            ylabel = etree_plot.get("ylabel", "").strip()
+
+            plot_data = list()
+            for etree_data in etree_plot:
+                x = Parser._attribute_from_element(etree_data, "x").strip()
+                y = Parser._attribute_from_element(etree_data, "y").strip()
+                type = etree_data.get("type", "line").strip()
+                label = etree_data.get("label", "").strip()
+                if type not in ["line", "scatter", "bar", "stem", "step"]:
+                    raise ValueError("Supported values for <plot type>: line, scatter, bar, stem, step")
+                figure.add_key(x, None, None)
+                figure.add_key(y, None, None)
+                plot_data.append({'x': x, 'y': y, 'type': type, 'label': label})
+            figure.add_plot(legend, xlabel, ylabel, plot_data)
         return figure
 
     @staticmethod

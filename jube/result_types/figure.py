@@ -60,15 +60,22 @@ class Figure(GenericResult):
             table_data = {v.name:k for v,k in self._data.items()}
 
             fig, ax = plt.subplots()
-            ax.set_title(self._title)
+            fig.suptitle(self._title)
             for plot in self._plots:
-                for y in plot.y:
-                    if plot.type == "line":
-                        ax.plot(table_data[plot.x], table_data[y])
+                ax.set_xlabel(plot._xlabel)
+                ax.set_ylabel(plot._ylabel)
+                for data in plot.plot_data:
+                    if data.type == "line":
+                        ax.plot(table_data[data.x], table_data[data.y],
+                                label=data.label)
                     else:
                         # dynamically create plot function call (e.g. ax.scatter())
-                        plot_func = getattr(ax, plot.type)
-                        plot_func(table_data[plot.x], table_data[y])
+                        plot_func = getattr(ax, data.type)
+                        plot_func(table_data[data.x], table_data[data.y],
+                                  label=data.label)
+
+                if plot._legend == "True":
+                    ax.legend()
 
             # save figure in "savefig" file or
             # if not given in filename (benchmark id result directory)
@@ -98,57 +105,97 @@ class Figure(GenericResult):
     class Plot(GenericResult.DataKey):
         """A Plot type"""
 
-        def __init__(self, type, x=None, y=None, name=None, title=None, unit=None):
-            GenericResult.DataKey.__init__(self, name, title, unit)
-            self._type = type
-            self._x = x
-            if y is None:
-                self._y = [] 
-            elif isinstance(y, list):
+        class Data():
+            """Plot data"""
+            def __init__(self, x, y, type, label):
+                self._x = x
                 self._y = y
-            else:
-                raise TypeError("Plot.y has to be a list or None!")
-        
-        @property
-        def type(self):
-            """Get 'type'"""
-            return self._type
+                self._type = type
+                self._label = label
+
+            @property
+            def x(self):
+                """Get 'x'"""
+                return self._x
+
+            @property
+            def y(self):
+                """Get 'y'"""
+                return self._y
+
+            @property
+            def type(self):
+                """Get 'type'"""
+                return self._type
+
+            @property
+            def label(self):
+                """Get 'label'"""
+                return self._label
+
+            def __str__(self):
+                return f"Data: x: {self._x}; y: {self._y}; type: {self._type}, label: {self._label}"
+
+            def etree_repr(self):
+                """Return etree object representation"""
+                data_etree = ET.Element("data")
+                data_etree.attrib["x"] = self._x
+                data_etree.attrib["y"] = self._y
+                if self._type not in [None, ""]:
+                    data_etree.attrib["type"] = self._type
+                if self._label not in [None, ""]:
+                    data_etree.attrib["label"] = self._label
+                return data_etree
+
+        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, name=None, title=None, unit=None):
+            GenericResult.DataKey.__init__(self, name, title, unit)
+            self._plot_data = list()
+            for data in plot_data:
+                self._plot_data.append(Figure.Plot.Data(data['x'], data['y'],
+                                                        data['type'], data['label']))
+            self._legend = legend
+            if self._legend is None: self._legend = ""
+            self._xlabel = xlabel
+            if self._xlabel is None: self._xlabel = ""
+            self._ylabel = ylabel
+            if self._ylabel is None: self._ylabel = ""
 
         @property
-        def x(self):
-            """Get 'x'"""
-            return self._x
-        
-        @x.setter
-        def x(self, x):
-            """Set 'x'"""
-            self._x = x
+        def legend(self):
+            """Get 'legend'"""
+            return self._legend
 
         @property
-        def y(self):
-            """Get 'y'"""
-            return self._y
+        def xlabel(self):
+            """Get 'xlabel'"""
+            return self._xlabel
         
         @property
-        def keys(self):
-            """Get 'type'"""
-            return [self._x] + self._y
+        def ylabel(self):
+            """Get 'ylabel'"""
+            return self._ylabel
+        
+        @property
+        def plot_data(self):
+            """Get 'plot_data'"""
+            return self._plot_data
         
         def __str__(self):
-            return f"IN PLOT: type: {self._type}; x: {self._x}; y: {self._y}"
+            return f"""IN PLOT: legend: {self._legend}; xlabel: {self._xlabel};
+                    y: {self._ylabel}, data: {self._plot_data}"""
         
         def etree_repr(self):
             """Return etree object representation"""
             plot_etree = GenericResult.DataKey.etree_repr(self)
             plot_etree.tag = "plot"
-            if self._type is not None:
-                plot_etree.attrib["type"] = str(self._type)
-
-            x_elem = ET.SubElement(plot_etree, 'x')
-            x_elem.text = self._x
-            for y in self._y:
-                y_elem = ET.SubElement(plot_etree, 'y')
-                y_elem.text = y
+            if self._legend not in [None, ""]:
+                plot_etree.attrib["legend"] = self._legend
+            if self._xlabel not in [None, ""]:
+                plot_etree.attrib["xlabel"] = self._xlabel
+            if self._ylabel not in [None, ""]:
+                plot_etree.attrib["ylabel"] = self._ylabel
+            for data in self._plot_data:
+                plot_etree.append(data.etree_repr())
             return plot_etree
 
     def __init__(self, name, savefig=None, title=None, showfig=None, res_filter=None):
@@ -163,22 +210,27 @@ class Figure(GenericResult):
         if name not in [key.name for key in self._keys]:
             self._keys.append(GenericResult.DataKey(name, title, unit))
 
-    def add_plot(self, type, x, y):
+    def add_plot(self, legend, xlabel, ylabel, plot_data):
         """Add an additional plot to the dataset"""
-        self._plots.append(Figure.Plot(type, x, y))
+        self._plots.append(Figure.Plot(plot_data, legend, xlabel, ylabel))
 
     def create_result_data(self, style=None, select=None, exclude=None):
         """Create result data"""
         result_data = GenericResult.create_result_data(self, select, exclude)
-        return Figure.FigureData(result_data, self._plots, self._savefig, 
+        return Figure.FigureData(result_data, self._plots, self._savefig,
                                  self._title, self._showfig)
 
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = Result.etree_repr(self)
         figure_etree = ET.SubElement(result_etree, "Figure")
-        if self._name not in [None, ""]:
-            figure_etree.attrib["title"] = self._name
+        figure_etree.attrib["name"] = self._name
+        if self._title not in [None, ""]:
+            figure_etree.attrib["title"] = self._title
+        if self._savefig not in [None, ""]:
+            figure_etree.attrib["savefig"] = self._savefig
+        if self._showfig not in [None, ""]:
+            figure_etree.attrib["showfig"] = self._showfig
         if self._res_filter not in [None, ""]:
             figure_etree.attrib["filter"] = self._res_filter
         for plot in self._plots:
