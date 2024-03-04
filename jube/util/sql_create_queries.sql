@@ -210,6 +210,17 @@ CREATE TABLE IF NOT EXISTS WorkpackageSibling
     FOREIGN KEY (sibling_workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE
 );
 
+-- Table OperationStatus
+CREATE TABLE IF NOT EXISTS OperationStatus
+(
+    workpackage_id INTEGER NOT NULL,
+    operation_id INTEGER NOT NULL,
+    status TEXT DEFAULT "open" NOT NULL,
+    PRIMARY KEY (workpackage_id, operation_id),
+    FOREIGN KEY (workpackage_id) REFERENCES Workpackage(workpackage_id) ON DELETE CASCADE,
+    FOREIGN KEY (operation_id) REFERENCES Operation(operation_id) ON DELETE CASCADE
+);
+
 -- Table SelectedParameter
 CREATE TABLE IF NOT EXISTS SelectedParameter
 (

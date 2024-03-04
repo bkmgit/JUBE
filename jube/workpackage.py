@@ -68,6 +68,7 @@ class Workpackage(object):
         self._status = status
         self._workpackage_dir_caching_enabled = False
         self._workpackage_dir_cache = None
+        self._operation_status = {}
 
 
     def update_information_in_database(self):
@@ -114,6 +115,14 @@ class Workpackage(object):
             if db.select("Workpackage", condition=f"workpackage_id='{sibling.id}'"):
                 db.insert("WorkpackageSibling", {"workpackage_id": self._id,
                           "sibling_workpackage_id": sibling.id}, addition="REPLACE")
+
+        # Add operation status to database
+        for op_number, op in enumerate(self._step.operations):
+            db.insert("OperationStatus", {"workpackage_id": self._id,
+                                          "operation_id": op._database_id,
+                                          "status": self.operation_status(op_number)},
+                                           addition="REPLACE")
+
         # Add environment variables to database
         for env_name, value in self._env.items():
             if (env_name not in ["PWD", "OLDPWD", "_"]) and \
@@ -251,6 +260,17 @@ class Workpackage(object):
     def started(self):
         """Workpackage started?"""
         return self.status != "open"
+
+    def operation_status(self, operation_number):
+        """Get operation status"""
+        if operation_number in self._operation_status.keys():
+            return self._operation_status[operation_number]
+        else:
+            return "open"
+
+    def set_operation_status(self, operation_number, set_status):
+        """Set operation status"""
+        self._operation_status[operation_number] = set_status
 
     def operation_done_but_pending(self, operation_number):
         """Check if an operation was executed, but the result is still

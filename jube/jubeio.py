@@ -626,6 +626,11 @@ class Parser(object):
             siblings = [sibling for sibling, in siblings]
             iteration_siblings_tmp[workpackage_id] = siblings
 
+            # Extract operation status
+            op_status = db.select("OperationStatus", ["status"], f"workpackage_id='{workpackage_id}'")
+            for operation_number, status in enumerate(op_status):
+                tmp[workpackage_id].set_operation_status(operation_number,  status[0])
+
             # Extract environment variables
             set_env, unset_env = self._extract_workpackage_env(db, workpackage_id)
             tmp[workpackage_id].env.update(set_env)
@@ -1254,7 +1259,7 @@ class Parser(object):
             shared = bool(shared)
             operation = jube.step.Operation(do, async_fn, stdout_fn, stderr_fn,
                                              active, shared, work_dir, break_fn,
-                                             error_fn)
+                                             error_fn, id)
             ops.append(operation)
         return ops
 
