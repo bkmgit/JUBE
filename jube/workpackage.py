@@ -300,30 +300,30 @@ class Workpackage(object):
 
     def operation_done(self, operation_number, set_done=None):
         """Mark/checks operation status"""
-        done_file = os.path.join(self.workpackage_dir,
-                                 "wp_{0}_{1:02d}".format(
+        if set_done is None:
+            # Check if done file exist (old version)
+            done_file = os.path.join(self.workpackage_dir,
+                                     "wp_{0}_{1:02d}".format(
                                      jube.conf.WORKPACKAGE_DONE_FILENAME,
                                      operation_number))
-        if set_done is None:
-            exist = os.path.exists(done_file)
+            if os.path.exists(done_file):
+                self.set_operation_status(operation_number, "done")
+                os.remove(done_file)
             if jube.conf.DEBUG_MODE:
-                exist = exist or os.path.exists(done_file + "_DEBUG")
-            return exist
+                if os.path.exists(done_file + "_DEBUG"):
+                    self.set_operation_status(operation_number,
+                                              "done_debug")
+                    os.remove(done_file + "_DEBUG")
+                return self.operation_status(operation_number) == "done_debug"
+            return self.operation_status(operation_number) == "done"
         else:
-            if jube.conf.DEBUG_MODE:
-                done_file = done_file + "_DEBUG"
-            elif ((set_done and not os.path.exists(done_file)) or
-                  (not set_done and os.path.exists(done_file))):
-                jube.util.util.update_timestamps(
-                    os.path.join(self._benchmark.bench_dir,
-                                 jube.conf.TIMESTAMPS_INFO),
-                    "change")
             if set_done:
-                fout = open(done_file, "w")
-                fout.close()
+                status = "done"
+                if jube.conf.DEBUG_MODE:
+                    status += "_debug"
+                self.set_operation_status(operation_number, status)
             else:
-                if os.path.exists(done_file):
-                    os.remove(done_file)
+                self.set_operation_status(operation_number, "open")
             return set_done
 
     def _remove_operation_info_files(self):
