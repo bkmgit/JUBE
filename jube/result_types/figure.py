@@ -53,17 +53,39 @@ class Figure(GenericResult):
             self._showfig = showfig
 
         def create_result(self, show=True, filename=None, **kwargs):
-            """Place for the magic: generate the figures"""
+            """Place for the magic: generate the figures
+            this function is called twice for `jube result` command
+            (see main.benchmarks_results())
+                1. show=False, filename=*/*/result/*.dat
+                2. show=True, filename=None
+            or `jube run *xml/yaml -r` with the following args:
+                show=True, filename=*/*/result/*.dat
+            """
 
             import matplotlib.pyplot as plt
 
             table_data = {v.name:k for v,k in self._data.items()}
 
+            rm_plot = list()
+            for id, plot in enumerate(self._plots[:]):
+                for data in plot.plot_data[:]:
+                    if data.x not in table_data.keys() or \
+                        data.y not in table_data.keys():
+                        plot.plot_data.remove(data)
+                if len(plot.plot_data) == 0:
+                    rm_plot.append(id)
+
+            self._plots = [plot for id, plot in enumerate(self._plots)
+                           if id not in rm_plot]
+            if len(self._plots) == 0:
+                return
+
+            print(self._benchmark_ids)
             fig, ax = plt.subplots()
             fig.suptitle(self._title)
             for plot in self._plots:
-                ax.set_xlabel(plot._xlabel)
-                ax.set_ylabel(plot._ylabel)
+                if plot.xlabel: ax.set_xlabel(plot.xlabel)
+                if plot.ylabel: ax.set_ylabel(plot.ylabel)
                 for data in plot.plot_data:
                     # plot function calls are created dynamically because certain
                     # arguments are not mandatory and would cause an error
@@ -92,9 +114,12 @@ class Figure(GenericResult):
                 if plot._legend == "True":
                     ax.legend()
 
-            # save figure in "savefig" file or
-            # if not given in filename (benchmark id result directory)
-            if self._savefig not in [None, ""]:
+            # if "savefig" is set, then save figure in "savefig" file
+            #    (-> use data of all benchmark ids specified on the CLI)
+            # else save figure in "filename" (benchmark id result directory)
+            #    (-> one figure per benchmark id)
+            # Additional clauses are need to avoid multiple saving
+            if self._savefig not in [None, ""] and show is True:
                 file_path_ind = self._savefig.rfind('/')
                 if file_path_ind != -1:
                     # create full directory path if it doesn't exist
@@ -104,8 +129,8 @@ class Figure(GenericResult):
                 fig.savefig(os.path.expanduser(self._savefig))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
-                    self._benchmark_ids[0], os.path.expanduser(self._savefig)))
-            elif filename is not None:
+                    set(self._benchmark_ids), os.path.expanduser(self._savefig)))
+            elif self._savefig in [None, ""] and filename is not None:
                 fig.savefig(filename.replace(".dat", ".png"))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
@@ -113,7 +138,7 @@ class Figure(GenericResult):
                         filename.replace(".dat", ".png"))))
 
             # show figure if "showfig" attribute isn't set to False
-            if self._showfig == "True":
+            if show == True and self._showfig == "True":
                 plt.show()
             plt.close()
 
@@ -198,9 +223,12 @@ class Figure(GenericResult):
                     data_etree.attrib["xscale"] = self._xscale
                 if self._yscale not in [None, ""]:
                     data_etree.attrib["yscale"] = self._yscale
-                data_etree.attrib["color"] = self._color
-                data_etree.attrib["marker"] = self._marker
-                data_etree.attrib["linestyle"] = self._linestyle
+                if self._color not in [None, ""]:
+                    data_etree.attrib["color"] = self._color
+                if self._marker not in [None, ""]:
+                    data_etree.attrib["marker"] = self._marker
+                if self._linestyle not in [None, ""]:
+                    data_etree.attrib["linestyle"] = self._linestyle
                 return data_etree
 
         def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None,
@@ -241,7 +269,7 @@ class Figure(GenericResult):
         
         def __str__(self):
             return f"""IN PLOT: legend: {self._legend}; xlabel: {self._xlabel};
-                    y: {self._ylabel}, data: {self._plot_data}"""
+                    ylabel: {self._ylabel}, data: {self._plot_data}"""
         
         def etree_repr(self):
             """Return etree object representation"""
@@ -282,7 +310,7 @@ class Figure(GenericResult):
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = Result.etree_repr(self)
-        figure_etree = ET.SubElement(result_etree, "Figure")
+        figure_etree = ET.SubElement(result_etree, "figure")
         figure_etree.attrib["name"] = self._name
         if self._title not in [None, ""]:
             figure_etree.attrib["title"] = self._title
