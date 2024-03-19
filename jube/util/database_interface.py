@@ -75,6 +75,7 @@ class Database_Interface(object):
         self._cursor.execute(query)
 
     def pragma(self, statement, table_name):
+        """Execute a query get information about the database"""
         self._cursor.execute(f"PRAGMA {statement}('{table_name}')")
         rows = self._cursor.fetchall()
 

@@ -145,6 +145,7 @@ class Substituteset(object):
                 "benchmark_id": benchmark_id
             }
             db.insert("Substituteset", set_data)
+            # Add files to database
             for data in self._files:
                 file_data = {
                     "in_file": data[1],
@@ -154,6 +155,7 @@ class Substituteset(object):
                 if data[2] != "w":
                     file_data["out_mode"] = data[2]
                 db.insert("Substitutefile", file_data)
+            # Add subs to database
             for name, sub in self._substitute_dict.items():
                 sub_data = {
                     "source": sub.source,

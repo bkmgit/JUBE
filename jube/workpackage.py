@@ -99,16 +99,20 @@ class Workpackage(object):
 
     def add_or_update_additional_information_to_database(self, db):
         """Add or update workpackage information that can be updated in the database"""
+        # Add used paraemeter to database
         for parameter in self.local_parameterset.all_parameters:
             parameter.add_selected_parameter_to_database(db, self._id)
+        # Add workpackage parents relationship to database
         for parent in self._parents:
             db.insert("WorkpackageParents", {"workpackage_id": self._id,
                       "parent_workpackage_id": parent.id}, addition="REPLACE")
+        # Add workpackage iteration siblings relationship to database
         for sibling in self._iteration_siblings:
             # Only add relationship if sibling exists
             if db.select("Workpackage", condition=f"workpackage_id='{sibling.id}'"):
                 db.insert("WorkpackageSibling", {"workpackage_id": self._id,
                           "sibling_workpackage_id": sibling.id}, addition="REPLACE")
+        # Add environment variables to database
         for env_name, value in self._env.items():
             if (env_name not in ["PWD", "OLDPWD", "_"]) and \
                (env_name not in os.environ or os.environ[env_name] != value):

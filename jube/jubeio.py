@@ -464,14 +464,17 @@ class Parser(object):
     def benchmark_info_from_database(self, benchmark_id, db=None):
         """Return name, comment and available tags of first benchmark
         found in database"""
+        # Create a database connection if not already done
         if db is None:
             db = jube.util.database_interface.Database_Interface(self._filename)
         db.connect()
         benchmarks = dict()
 
+        # Extract tags out of database
         tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
         tags = [tag for tag, in tags]
 
+        # Extract name and comment out of database
         name, comment = db.select("Benchmark", ["name", "comment"], f"benchmark_id='{benchmark_id}'")[0]
         comment = "" if comment is None else comment
         comment = re.sub(r"\s+", " ", comment).strip()
@@ -582,6 +585,7 @@ class Parser(object):
         if not os.path.isfile(self._filename):
             raise IOError("Workpackage database file not found: \"{0}\""
                           .format(self._filename))
+        # Get all available workpackages
         workpackages = db.select("Workpackage", None, "")
         max_id = -1
         for workpackage in workpackages:
@@ -590,6 +594,7 @@ class Parser(object):
             
             step = benchmark.steps[step_name]
 
+            # Extract used parametersets
             parameterset = jube.parameter.Parameterset()
             parameter_names = []
             parameters = db.select("SelectedParameter", None, f"workpackage_id='{workpackage_id}'")
@@ -609,16 +614,19 @@ class Parser(object):
                                         parameter_names, parameterset, workpackage_id,
                                         iteration, cycle)
 
+            # Extract workpackage parents
             parents = db.select("WorkpackageParents", ["parent_workpackage_id"], f"workpackage_id='{workpackage_id}'")
             parents = [parent for parent, in parents]
             parents_tmp[workpackage_id] = parents
             if len(parents) == 0:
                 work_list.put(tmp[workpackage_id])
 
+            # Extract workpackage iteration siblings
             siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], f"workpackage_id='{workpackage_id}'")
             siblings = [sibling for sibling, in siblings]
             iteration_siblings_tmp[workpackage_id] = siblings
 
+            # Extract environment variables
             set_env, unset_env = self._extract_workpackage_env(db, workpackage_id)
             tmp[workpackage_id].env.update(set_env)
             for env_name in unset_env:
@@ -1155,6 +1163,7 @@ class Parser(object):
         Return a dict of steps, e.g. {"compile": Step(...), ...}
         """
         steps = dict()
+        # Extract all steps
         steps_attributes = db.select("Step", None, f"benchmark_id='{benchmark_id}'")
         for step_attributes in steps_attributes:
             name, iterations, cycles, depend, export, \
@@ -1176,6 +1185,7 @@ class Parser(object):
             step = jube.step.Step(name.strip(), depend, iterations, work_dir,
                                shared, export, max_async, active, suffix,
                                cycles, procs, do_log_file)
+            # Extract related operations
             ops = self._extract_operation_from_database(db, name)
             for op in ops:
                 step.add_operation(op)
@@ -1433,6 +1443,7 @@ class Parser(object):
 
     def _extract_subresult_from_database(self, db, result_id, result_dir):
         """Extract all tables, databases and syslogs from database"""
+        # Extract table results
         tables = db.select("ResultTable", None, f"result_id='{result_id}'")
         for table in tables:
             name, style, separator, filter, transpose, sort, result_id = table
@@ -1445,6 +1456,7 @@ class Parser(object):
                 id, column_name, title, format, colw, name = column
                 result.add_column(column_name, colw, format, title)
             return result
+        # Extract database results
         databases = db.select("ResultDatabase", None, f"result_id='{result_id}'")
         for database in databases:
             name, filter, file, result_id = database
@@ -1458,6 +1470,7 @@ class Parser(object):
                 id, key_name, title, format, is_primary, name = key
                 result.add_key(key_name, format, title)
             return result
+        # Extract syslog results
         syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
         for syslog in syslogs:
             name, address, format, filter, host, port, sort, result_id = syslog
@@ -2022,6 +2035,7 @@ class Parser(object):
     def _extract_files_from_database(self, db, fileset_name):
         """Extract files from database"""
         filelist = list()
+        # Extract Copys and Links
         files = db.select("File", None, f"fileset_name='{fileset_name}'")
         for file in files:
             id, type, path, source_dir, name, file_path_ref, \
@@ -2035,6 +2049,7 @@ class Parser(object):
                 file_obj = jube.fileset.Link(path, name, is_internal_ref, \
                                               active, source_dir, target_dir)
             filelist.append(file_obj)
+        # Extract Prepares
         prepares = db.select("Prepare", None, f"fileset_name='{fileset_name}'")
         for prepare in prepares:
             id, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare

@@ -34,13 +34,13 @@ class TestDatabaseInterface(unittest.TestCase):
     """Class for testing the database interface"""
 
     def setUp(self):
-        #Create database
+        """Create and connect to database"""
         self.db = jube.util.database_interface.Database_Interface()
         self.db.connect()
         self.db.create_database()
 
     def test_database_commands(self):
-        '''Test database commands'''
+        """Test database commands"""
         # Test INSERT
         check_content = [('BeispielName', 'BeispielKommentar')]
         self.db.insert('Benchmark', {'name': 'BeispielName',
@@ -64,7 +64,7 @@ class TestDatabaseInterface(unittest.TestCase):
         self.assertEqual(actual_content, check_content, "")
 
     def tearDown(self):
-        #Remove database
+        """Disconnect and remove database"""
         self.db.disconnect()
         os.remove('database.db')
 
