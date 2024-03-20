@@ -46,7 +46,8 @@ class Workpackage(object):
     id_counter = 0
 
     def __init__(self, benchmark, step, local_parameter_names, parameterset,
-                 workpackage_id=None, iteration=0, cycle=0, status="open"):
+                 workpackage_id=None, iteration=0, cycle=0, status="open",
+                 done_time=None):
         # set id
         if workpackage_id is None:
             self._id = Workpackage.id_counter
@@ -66,6 +67,7 @@ class Workpackage(object):
         self._env = dict(os.environ)
         self._cycle = cycle
         self._status = status
+        self._done_time = done_time
         self._workpackage_dir_caching_enabled = False
         self._workpackage_dir_cache = None
         self._operation_status = {}
@@ -91,6 +93,8 @@ class Workpackage(object):
                 "status": self._status,
                 "workpackage_id": self._id
             }
+            if self._done_time is not None:
+                workpackage_data["done_time"] = self._done_time
             db.insert("Workpackage", workpackage_data, addition="REPLACE")
             self.add_or_update_additional_information_to_database(db)
             db.commit_transaction()
@@ -220,6 +224,7 @@ class Workpackage(object):
         """Set/reset Workpackage done"""
         if set_done:
             self._remove_operation_info_files()
+            self._done_time = jube.util.util.now_str()
             if jube.conf.DEBUG_MODE:
                 self.status = "done_debug"
             else:
@@ -237,11 +242,13 @@ class Workpackage(object):
         error_file = os.path.join(self.workpackage_dir,
                                   jube.conf.WORKPACKAGE_ERROR_FILENAME)
         if set_error:
+            self._done_time = None
             self.status = "error"
             fout = open(error_file, "w")
             fout.write(msg)
             fout.close()
         else:
+            self._done_time = None
             self.status = "wait"
             if os.path.exists(error_file):
                 os.remove(error_file)
@@ -260,6 +267,11 @@ class Workpackage(object):
     def started(self):
         """Workpackage started?"""
         return self.status != "open"
+
+    @property
+    def done_time(self):
+        """Get status done time"""
+        return self._done_time
 
     def operation_status(self, operation_number):
         """Get operation status"""

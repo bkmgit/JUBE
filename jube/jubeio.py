@@ -589,7 +589,7 @@ class Parser(object):
         workpackages = db.select("Workpackage", None, "")
         max_id = -1
         for workpackage in workpackages:
-            workpackage_id, iteration, cycle, step_name, status = workpackage
+            workpackage_id, iteration, cycle, step_name, status, done_time = workpackage
             max_id = max(max_id, workpackage_id)
             
             step = benchmark.steps[step_name]
@@ -612,7 +612,7 @@ class Parser(object):
 
             tmp[workpackage_id] = jube.workpackage.Workpackage(benchmark, step, \
                                         parameter_names, parameterset, workpackage_id,
-                                        iteration, cycle, status)
+                                        iteration, cycle, status, done_time)
 
             # Extract workpackage parents
             parents = db.select("WorkpackageParents", ["parent_workpackage_id"], f"workpackage_id='{workpackage_id}'")
