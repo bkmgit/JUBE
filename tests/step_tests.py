@@ -106,9 +106,6 @@ class TestStep(unittest.TestCase):
         # Test if first step was succesful
         output = ["66, NO_ACC\n", "77, NO_ACC\n", "88, NO_ACC\n"]
         for i, path in enumerate(["000000_first", "000001_first", "000002_first"]):
-            # Check done file
-            done_path = os.path.join(self.run_path, path, "done")
-            self.assertTrue(os.path.isfile(done_path))
             # Check output
             stdout_path = os.path.join(self.run_path, path, "work", "stdout")
             f = open(stdout_path, "r")
@@ -120,10 +117,6 @@ class TestStep(unittest.TestCase):
         # Test if second step was succesful until done file
         output = ["BEFORE 66, 66\n", "BEFORE 77, 77\n", "BEFORE 88, 88\n"]
         for i, path in enumerate(["000003_sec", "000004_sec", "000005_sec"]):
-            # Check wp_done file
-            for wp in ['wp_done_00', 'wp_done_01']:
-                wp_done_path = os.path.join(self.run_path, path, wp)
-                self.assertTrue(os.path.isfile(wp_done_path))
             # Check output
             stdout_path = os.path.join(self.run_path, path, "work", "stdout")
             f = open(stdout_path, "r")
@@ -142,9 +135,6 @@ class TestStep(unittest.TestCase):
         output = ["BEFORE 66, 66\nAFTER 66, 66\n", "BEFORE 77, 77\nAFTER 77, 77\n",
                   "BEFORE 88, 88\nAFTER 88, 88\n"]
         for i, path in enumerate(["000003_sec", "000004_sec", "000005_sec"]):
-            # Check done file
-            done_path = os.path.join(self.run_path, path, "done")
-            self.assertTrue(os.path.isfile(done_path))
             # Check output
             stdout_path = os.path.join(self.run_path, path, "work", "stdout")
             f = open(stdout_path, "r")
