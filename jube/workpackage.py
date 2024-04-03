@@ -313,6 +313,7 @@ class Workpackage(object):
     def operation_done(self, operation_number, set_done=None):
         """Mark/checks operation status"""
         if set_done is None:
+            # DEPRECATED (BEGIN): Future versions will not use done_files
             # Check if done file exist (old version)
             done_file = os.path.join(self.workpackage_dir,
                                      "wp_{0}_{1:02d}".format(
@@ -327,6 +328,7 @@ class Workpackage(object):
                                               "done_debug")
                     os.remove(done_file + "_DEBUG")
                 return self.operation_status(operation_number) == "done_debug"
+            # DEPRECATED (END): Future versions will not use done_files
             return self.operation_status(operation_number) == "done"
         else:
             if set_done:

@@ -215,12 +215,14 @@ class Benchmark(object):
 
     def delete_xml_configuration(self):
         """Delete configuration.xml"""
+        # DEPRECATED (Full function): Future versions will no longer support XML files
         xml_configuration = os.path.join(self.bench_dir, jube.conf.CONFIGURATION_FILENAME)
         if os.path.exists(xml_configuration):
             os.remove(xml_configuration)
 
     def delete_xml_workpackages(self):
         """Delete workpackages.xml"""
+        # DEPRECATED (Full function): Future versions will no longer support XML files
         xml_workpackages = os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME)
         if os.path.exists(xml_workpackages):
             os.remove(xml_workpackages)

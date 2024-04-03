@@ -798,9 +798,11 @@ def _manipulate_comment(benchmark_folder, args):
 @staticmethod
 def _configuration_exists(benchmark_folder):
     """Search for configuration file and returns found file"""
+    # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_config = os.path.join(benchmark_folder,
                               jube.conf.CONFIGURATION_FILENAME)
     if os.path.isfile(xml_config): return xml_config
+    # DEPRECATED (END): Future versions will no longer support XML files
     database_config = os.path.join(benchmark_folder,
                                    jube.conf.DATABASE_FILENAME)
     if os.path.isfile(database_config): return database_config
@@ -811,9 +813,11 @@ def _configuration_exists(benchmark_folder):
 @staticmethod
 def _workpackage_exists(benchmark_folder):
     """Search for configuration file and returns found file"""
+    # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_workpackage = os.path.join(benchmark_folder,
                                    jube.conf.WORKPACKAGES_FILENAME)
     if os.path.isfile(xml_workpackage): return xml_workpackage
+    # DEPRECATED (END): Future versions will no longer support XML files
     database_workpackage = os.path.join(benchmark_folder,
                                         jube.conf.DATABASE_FILENAME)
     if os.path.isfile(database_workpackage): return database_workpackage

@@ -89,9 +89,11 @@ class TestSubstitute(unittest.TestCase):
     def test_init_with_substitution(self):
         """Testing for existing files and content"""
         jube.main.main(('run -e '+ self._input_path).split())
+        # DEPRECATED (BEGIN): Future versions will not use done_files
         # Test for done file
         done_file = os.path.join(self._wp_path, 'done')
         exist = os.path.exists(done_file)
+        # DEPRECATED (END): Future versions will not use done_files
         status = ""
         database_path = os.path.join(self._run_path, jube.conf.DATABASE_FILENAME)
         if os.path.exists(database_path):

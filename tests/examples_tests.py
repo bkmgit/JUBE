@@ -169,9 +169,11 @@ class TestCase:
             Checks if the done file exists in the given path or
             the workpackage status in database is done
             '''
+            # DEPRECATED (BEGIN): Future versions will not use done_files
             #check for done file (old version)
             done_file_path = os.path.join(file_path, 'done')
             exist = self._existing_file(done_file_path)
+            # DEPRECATED (END): Future versions will not use done_files
             status = ""
             database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
             if os.path.exists(database_path):
