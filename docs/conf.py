@@ -28,13 +28,25 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, re, eralchemy2, jube.util.database_interface
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
+
+
+# -- Pre Build -----------------------------------------------------
+
+# Generate ERM out of database, which contains a overview over the structure of
+# the database and will be included in the developer documentation
+# Create Database
+db = jube.util.database_interface.Database_Interface()
+db.connect()
+db.create_database()
+db.disconnect()
+eralchemy2.render_er("sqlite:///database.db", 'database_erm.png')
 
 # -- General configuration -----------------------------------------------------
 
