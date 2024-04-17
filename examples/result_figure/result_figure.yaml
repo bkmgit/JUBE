@@ -49,9 +49,11 @@ result:
       plot:
         - xlabel: My x label
           ylabel: My y label
+          xscale: symlog
+          yscale: log
           legend: True
           data:
-            - {x: x_pat, y: y_pat, label: NO LINE}
+            - {x: x_pat, y: y_pat, label: NO LINE, color: green, marker: ^, linestyle: dashed}
             - {x: x_pat, y: y2_pat, label: NO LINE2}
         - legend: True
           data:

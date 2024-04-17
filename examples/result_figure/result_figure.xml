@@ -40,9 +40,9 @@
     <result>
       <use>analyse</use> <!-- use existing analyser -->
       <figure name='1_fig' title='FIG Title' savefig='first_fig.png' showfig='True'>
-        <plot xlabel='My x label' ylabel='My y label' legend='True'>
-          <data x='x_pat' y='y_pat' label='NO Line'/>
-          <data x='x_pat' y='y2_pat' label='NO LINE'/>
+        <plot xlabel='My x label' ylabel='My y label' xscale='symlog' yscale='log' legend='True'>
+          <data x='x_pat' y='y_pat' label='NO LINE' color='green' marker='^' linestyle='dashed'/>
+          <data x='x_pat' y='y2_pat' label='NO LINE2'/>
         </plot>
         <plot>
           <data x='x2_pat' y='y2_pat' label='SCATTER' type='scatter'/>

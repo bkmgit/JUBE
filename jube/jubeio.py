@@ -38,6 +38,7 @@ import jube.conf
 import jube.result_types.syslog
 import jube.result_types.table
 import jube.result_types.database
+import jube.result_types.figure
 import jube.util.yaml_converter
 import jube.util.database_interface
 import sys
@@ -1718,35 +1719,69 @@ class Parser(object):
     @staticmethod
     def _extract_figure(etree_figure):
         """Extract a figure from etree"""
-        name = Parser._attribute_from_element(etree_figure, "name").strip()
-        savefig = etree_figure.get("savefig", "").strip()
-        title = etree_figure.get("title", "").strip()
-        showfig = etree_figure.get("showfig", "True").strip()
-        if showfig not in ["True", "False"]:
-            raise ValueError("Supported values for <figure showfig>: True, False")
+        valid_scale_types = ["linear", "log", "logit", "symlog", None]
+        valid_plot_types = ["line", "scatter", "bar", "stem", "step"]
 
-        figure = jube2.result_types.figure.Figure(name, savefig, title, showfig)
+        name = Parser._attribute_from_element(etree_figure, "name").strip()
+        showfig = etree_figure.get("showfig", "true").strip().lower() == "true"
+        savefig = etree_figure.get("savefig")
+        if savefig is not None:
+            savefig = savefig.strip()
+        title = etree_figure.get("title")
+        if title is not None:
+            title = title.strip()
+
+        figure = jube.result_types.figure.Figure(name, showfig, savefig, title)
 
         for etree_plot in etree_figure:
             Parser._check_tag(etree_plot, ["plot"])
-            legend = etree_plot.get("legend", "False").strip()
-            if legend not in ["True", "False"]:
-                raise ValueError("Supported values for <figure legend>: True, False")
-            xlabel = etree_plot.get("xlabel", "").strip()
-            ylabel = etree_plot.get("ylabel", "").strip()
+            legend = etree_figure.get("legend", "false").strip().lower() == "true"
+            xlabel = etree_plot.get("xlabel")
+            if xlabel is not None:
+                xlabel = xlabel.strip()
+            ylabel = etree_plot.get("ylabel")
+            if ylabel is not None:
+                ylabel = ylabel.strip()
+            xscale = etree_plot.get("xscale")
+            if xscale is not None:
+                xscale = xscale.strip()
+                if xscale not in valid_scale_types:
+                    raise ValueError("Supported values for <plot xscale>: {}"
+                                     .format(", ".join(valid_scale_types)))
+            yscale = etree_plot.get("yscale")
+            if yscale is not None:
+                yscale = yscale.strip()
+                if yscale not in valid_scale_types:
+                    raise ValueError("Supported values for <plot yscale>: {}"
+                                     .format(", ".join(valid_scale_types)))
 
             plot_data = list()
             for etree_data in etree_plot:
+                Parser._check_tag(etree_data, ["data"])
                 x = Parser._attribute_from_element(etree_data, "x").strip()
                 y = Parser._attribute_from_element(etree_data, "y").strip()
-                type = etree_data.get("type", "line").strip()
-                label = etree_data.get("label", "").strip()
-                if type not in ["line", "scatter", "bar", "stem", "step"]:
-                    raise ValueError("Supported values for <plot type>: line, scatter, bar, stem, step")
-                figure.add_key(x, None, None)
-                figure.add_key(y, None, None)
-                plot_data.append({'x': x, 'y': y, 'type': type, 'label': label})
-            figure.add_plot(legend, xlabel, ylabel, plot_data)
+                data_type = etree_data.get("type", "line").strip()
+                if data_type not in valid_plot_types:
+                    raise ValueError("Supported values for <data type>: {}"
+                                     .format(", ".join(valid_plot_types)))
+                label = etree_data.get("label")
+                if label is not None:
+                    label = label.strip()
+                color = etree_data.get("color")
+                if color is not None:
+                    color = color.strip()
+                marker = etree_data.get("marker")
+                if marker is not None:
+                    marker = marker.strip()
+                linestyle = etree_data.get("linestyle")
+                if linestyle is not None:
+                    linestyle = linestyle.strip()
+                figure.add_key(x)
+                figure.add_key(y)
+                plot_data.append({'x': x, 'y': y, 'type': data_type, 'label': label,
+                                  'color': color, 'marker': marker,
+                                  'linestyle': linestyle})
+            figure.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
         return figure
 
     @staticmethod
