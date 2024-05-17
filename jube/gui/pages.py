@@ -534,9 +534,9 @@ class WorkpackagePage(tk.Frame):
             self._param_notebook.pack(fill="both", padx=25)
         
         # pack the widgets for the environments into the layout
-        if len(self._wp.env) != 0:
+        if len(self._wp.env)+len(self._wp.nonenv) != 0:
             self._env_label.pack(anchor="w")
-            self._env_tree.config(height = len(self._wp.env))
+            self._env_tree.config(height = len(self._wp.env)+len(self._wp.nonenv))
             self._env_tree.pack(fill="both", expand=True, padx=25, pady=10)
 
         # pack the widgets for the iteration siblings into the layout
@@ -568,6 +568,8 @@ class WorkpackagePage(tk.Frame):
             self._env_tree.insert("","end",values=[f"{name!r}" if name is not None else "", 
                                                    f"{value!r}" if value is not None else "", 
                                                    "env"])
+        for name in self._wp.nonenv:
+            self._env_tree.insert("","end",values=[f"{name!r}", "", "nonenv"])
 
     def bind_wp(self, label, func, text):
         label.config(command=lambda : func(text))
