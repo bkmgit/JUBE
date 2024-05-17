@@ -138,6 +138,11 @@ class Parser(object):
             db.select("Benchmark", None, "")[0]
         tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
         tags = set(tag for tag, in tags)
+        tag_docu = db.select("TagDocu", ["tag", "description"], f"benchmark_id='{benchmark_id}'")
+        docu_dict = dict()
+        for docu in tag_docu:
+            name, description = docu
+            docu_dict[name] = description
         comment, outpath, file_path_ref = self._evaluate_benchmark_attributes(comment, outpath, file_path_ref)
         
         parametersets = self._extract_parametersets_from_database(db, benchmark_id)
@@ -152,7 +157,7 @@ class Parser(object):
                                               parametersets, substitutesets,
                                               filesets, patternsets, steps,
                                               analyser, results, results_order,
-                                              comment, tags,
+                                              comment, tags, docu_dict,
                                               file_path_ref)
         benchmark.id = benchmark_id
         return benchmark

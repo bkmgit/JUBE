@@ -20,6 +20,15 @@ CREATE TABLE IF NOT EXISTS Tag
     FOREIGN KEY (benchmark_id) REFERENCES Benchmark(benchmark_id)
 );
 
+-- Table TagDoku
+CREATE TABLE IF NOT EXISTS TagDocu
+(
+    tag TEXT NOT NULL PRIMARY KEY,
+    description TEXT NOT NULL,
+    benchmark_id INTEGER NOT NULL,
+    FOREIGN KEY (benchmark_id) REFERENCES Benchmark(benchmark_id)
+);
+
 -- Table Parameterset
 CREATE TABLE IF NOT EXISTS Parameterset
 (

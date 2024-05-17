@@ -818,6 +818,10 @@ class Benchmark(object):
             if len(self._tags) > 0:
                 for tag in self._tags:
                     self.db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+            if len(self._tag_docu) > 0:
+                for tag, docu in self._tag_docu.items():
+                    self.db.insert("TagDocu", {"tag": tag, "description": docu,
+                                               "benchmark_id": self._id})
             self.db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))
