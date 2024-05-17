@@ -123,6 +123,11 @@ class Analyser(object):
         """Set analyse result"""
         self._analyse_result = analyse_result
 
+    @property
+    def reduce_iteration(self):
+        """Return reduce iteration"""
+        return self._reduce_iteration
+
     def add_analyse(self, step_name, analyse_file):
         """Add an addtional analyse file"""
         if step_name not in self._analyse:

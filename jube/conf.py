@@ -73,3 +73,12 @@ DEFAULT_LOGGING_MODE = "default"
 # other
 ERROR_MSG_LINES = 5
 MAX_RECURSIVE_SUB = 5
+
+# colors
+BLUE = "#023d6b"
+LIGHT_BLUE = "#adbde3"
+GREY = "#ebebeb"
+LIGHT_GREY = "#f5f5f5"
+WHITE = "white"
+BLACK = "black"
+

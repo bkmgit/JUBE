@@ -200,6 +200,10 @@ class KeyValuesResult(Result):
         else:
             self._sort_names = sort_names
 
+    @property
+    def keys(self):
+        """Return keys/columns"""
+        return self._keys
 
     @property
     def sort(self):

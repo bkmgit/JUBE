@@ -332,7 +332,7 @@ class Parser(object):
                                                global_parametersets,
                                                global_substitutesets,
                                                global_filesets,
-                                               global_patternsets)
+                                               global_patternsets, version)
             benchmarks[benchmark.name] = benchmark
         return benchmarks, list(only_bench), list(not_bench)
 
@@ -1164,7 +1164,7 @@ class Parser(object):
 
     def _create_benchmark(self, benchmark_etree, global_parametersets,
                           global_substitutesets, global_filesets,
-                          global_patternsets):
+                          global_patternsets, version):
         """Create benchmark from etree
 
         Return a benchmark
@@ -1239,11 +1239,11 @@ class Parser(object):
             os.path.normpath(os.path.join(self.file_path_ref, file_path_ref))
 
         benchmark = jube.benchmark.Benchmark(name, outpath,
-                                              parametersets, substitutesets,
-                                              filesets, patternsets, steps,
-                                              analyser, results, results_order,
-                                              comment, self._tags, self._tag_docu,
-                                              file_path_ref)
+                                             parametersets, substitutesets,
+                                             filesets, patternsets, steps,
+                                             analyser, results, results_order,
+                                             comment, self._tags, self._tag_docu,
+                                             file_path_ref, version)
 
         return benchmark
 

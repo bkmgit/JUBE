@@ -48,7 +48,7 @@ class Benchmark(object):
     def __init__(self, name, outpath, parametersets, substitutesets,
                  filesets, patternsets, steps, analyser, results,
                  results_order, comment="", tags=None, tag_docu=dict(),
-                 file_path_ref="."):
+                 file_path_ref=".", version=jube.conf.JUBE_VERSION):
         self._name = name
         self._outpath = outpath
         self._parametersets = parametersets
@@ -74,11 +74,17 @@ class Benchmark(object):
             self._tags = tags
         self._tag_docu = tag_docu
         self._db = None
+        self._version = version
 
     @property
     def name(self):
         """Return benchmark name"""
         return self._name
+    
+    @property
+    def version(self):
+        """Return benchmark JUBE version"""
+        return self._version
 
     @property
     def comment(self):

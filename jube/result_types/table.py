@@ -163,17 +163,17 @@ class Table(KeyValuesResult):
 
     @property
     def style(self):
-        """Return the result style"""
+        """Return the table style"""
         return self._style
 
     @property
     def separator(self):
-        """Return the result separator"""
+        """Return the table separator"""
         return self._separator
 
     @property
     def transpose(self):
-        """Return the result transpose"""
+        """Return the table transpose"""
         return self._transpose
 
     def add_column(self, name, colw=None, format_string=None, title=None):

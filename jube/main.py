@@ -35,6 +35,7 @@ import os
 import re
 import shutil
 from jube.util.version import StrictVersion
+from jube.gui.gui import Gui
 
 try:
     from urllib.request import urlopen
@@ -69,6 +70,17 @@ def status(args):
         if benchmark is None:
             return
         jube.info.print_benchmark_status(benchmark)
+
+def gui(args):
+    """Start GUI"""
+    found_benchmarks = search_for_benchmarks(args)
+    for benchmark_folder in found_benchmarks:
+        benchmark = _load_existing_benchmark(args, benchmark_folder,
+                                             load_analyse=False)
+        if benchmark is None:
+            return
+        gui = Gui(benchmark)
+        gui.mainloop()
         
 
 def tag(args):
@@ -1031,6 +1043,20 @@ def gen_subparser_conf():
             ("-i", "--id"):
                 {"help": "use benchmarks given by id",
                  "nargs": "+"}
+        }
+    }
+    
+    # gui subparser
+    subparser_configuration["gui"] = {
+        "help": "show benchmark data in gui",
+        "func": gui,
+        "arguments": {
+            ('dir',):
+                {"metavar": "DIRECTORY", "nargs": "?",
+                 "help": "benchmark directory", "default": "."},
+            ("-i", "--id"):
+                {"help": "use benchmarks given by id",
+                 "nargs": "?"}
         }
     }
     

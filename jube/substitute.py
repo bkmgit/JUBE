@@ -46,6 +46,16 @@ class Substituteset(object):
     def name(self):
         """Return name of Substituteset"""
         return self._name
+    
+    @property
+    def files(self):
+        """Return files"""
+        return self._files
+    
+    @property
+    def substitute_dict(self):
+        """Return substitute dict"""
+        return self._substitute_dict
 
     @property
     def files(self):

@@ -63,6 +63,16 @@ class Result(object):
         self._benchmark = None
 
     @property
+    def use(self):
+        """Return use"""
+        return self._use
+
+    @property
+    def res_filter(self):
+        """Return result filter"""
+        return self._res_filter
+
+    @property
     def name(self):
         """Return the result name"""
         return self._name

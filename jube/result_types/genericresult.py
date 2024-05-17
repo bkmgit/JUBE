@@ -158,6 +158,11 @@ class GenericResult(Result):
         Result.__init__(self, name, res_filter)
         self._keys = list()
 
+    @property
+    def keys(self):
+        """Return DataKeys"""
+        return self._keys
+
     def add_key(self, name, title=None, unit=None):
         """Add an additional key to the dataset"""
         self._keys.append(GenericResult.DataKey(name, title, unit))

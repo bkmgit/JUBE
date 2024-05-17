@@ -522,6 +522,16 @@ class Operation(object):
     def async_filename(self):
         """Get async filename"""
         return self._async_filename
+    
+    @property
+    def is_active(self):
+        """Get active"""
+        return self._active
+
+    @property
+    def break_filename(self):
+        """Get break filename"""
+        return self._break_filename
 
     @property
     def shared(self):

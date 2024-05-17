@@ -217,6 +217,26 @@ class File(object):
     def is_internal_ref(self):
         """Return path is internal ref"""
         return self._is_internal_ref
+    
+    @property
+    def source_dir(self):
+        """Return source directory"""
+        return self._source_dir
+    
+    @property
+    def target_dir(self):
+        """Return target directory"""
+        return self._target_dir
+    
+    @property
+    def name(self):
+        """Return alternative name"""
+        return self._name
+    
+    @property
+    def active(self):
+        """Return active"""
+        return self._active
 
     def __repr__(self):
         return self._path
