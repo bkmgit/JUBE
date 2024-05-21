@@ -232,6 +232,7 @@ if __name__ == '__main__':
     from example_tests.example_parameterspace_tests import TestParameterspaceExample
     from example_tests.example_result_creation_tests import TestResultCreationExample
     from example_tests.example_result_database_tests import TestResultDatabaseExample
+    from example_tests.example_result_figure_tests import TestResultFigureExample
     from example_tests.example_scripting_parameter_tests import TestScriptingParameterExample
     from example_tests.example_scripting_pattern_tests import TestScriptingPatternExample
     from example_tests.example_shared_tests import TestSharedExample
