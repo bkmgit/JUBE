@@ -65,6 +65,7 @@ class Workpackage(object):
         self._iteration_siblings = set()
         self._queued = False
         self._env = dict(os.environ)
+        self._nonenv = list()
         self._cycle = cycle
         self._status = status
         self._done_time = done_time
@@ -184,6 +185,16 @@ class Workpackage(object):
     def env(self, set_env):
         """Replace own environment by set_env"""
         self._env = set_env
+
+    @property
+    def nonenv(self):
+        """Return system environment"""
+        return self._nonenv
+
+    @nonenv.setter
+    def nonenv(self, set_nonenv):
+        """Replace own environment by set_env"""
+        self._nonenv = set_nonenv
 
     @property
     def cycle(self):

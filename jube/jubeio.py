@@ -665,6 +665,7 @@ class Parser(object):
             # Extract environment variables
             set_env, unset_env = self._extract_workpackage_env(db, workpackage_id)
             tmp[workpackage_id].env.update(set_env)
+            tmp[workpackage_id].nonenv = unset_env
             for env_name in unset_env:
                 if env_name in tmp[workpackage_id].env:
                     del tmp[workpackage_id].env[env_name]
@@ -809,6 +810,7 @@ class Parser(object):
             parents_tmp[workpackage_id] = parents
             iteration_siblings_tmp[workpackage_id] = iteration_siblings
             tmp[workpackage_id].env.update(set_env)
+            tmp[workpackage_id].nonenv = unset_env
             for env_name in unset_env:
                 if env_name in tmp[workpackage_id].env:
                     del tmp[workpackage_id].env[env_name]
