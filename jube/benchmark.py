@@ -80,6 +80,11 @@ class Benchmark(object):
     def name(self):
         """Return benchmark name"""
         return self._name
+
+    @property
+    def outpath(self):
+        """Return benchmark outpath"""
+        return self._outpath
     
     @property
     def version(self):

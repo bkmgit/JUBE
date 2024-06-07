@@ -81,4 +81,6 @@ GREY = "#ebebeb"
 LIGHT_GREY = "#f5f5f5"
 WHITE = "white"
 BLACK = "black"
-
+RED = "#eb5f73"
+YELLOW = "#faeb5a"
+GREEN = "#b9d25f"
