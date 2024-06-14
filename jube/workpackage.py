@@ -32,6 +32,7 @@ import os
 import re
 import stat
 import shutil
+from jube.conf import GREEN, YELLOW, RED
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -469,6 +470,15 @@ class Workpackage(object):
             self._status = status
         else:
             raise TypeError("No valid value for the status")
+        
+    def status_color(self):
+        """return GREEN (DONE), YELLOW (RUNNING) or RED (ERROR) depending on the workpackage status"""
+        if self.done:
+            return GREEN
+        elif self.error:
+            return RED
+        else:
+            return YELLOW
 
     def update_status(self):
         """Update status in jube parameter"""

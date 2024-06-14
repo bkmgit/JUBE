@@ -21,7 +21,7 @@ from tkinter import ttk
 import tkinter as tk
 import jube.gui.tabs as tabs
 import math
-from jube.conf import BLUE, LIGHT_BLUE, GREY, LIGHT_GREY, WHITE
+from jube.conf import BLUE, LIGHT_BLUE, GREY, LIGHT_GREY, WHITE, GREEN, YELLOW, RED
 from jube.gui.sortabletreeview import SortableTreeview
 
 class Page(tk.Frame):
@@ -564,7 +564,7 @@ class StepPage(Page):
                               activebackground=BLUE, 
                               activeforeground=WHITE, 
                               cursor="hand2", 
-                              bg=LIGHT_BLUE)
+                              bg=wp.status_color())
             self.bind_widget(label, self.wp_clicked, wp.id)
             column = i%wp_per_row
             self._step_frames[wp.id] = self._step_canvas.create_window(column * 175, 
@@ -649,7 +649,7 @@ class WorkpackagePage(Page):
                                                command=self._parents_canvas.yview)
         self._wp_frame = tk.LabelFrame(self, 
                                        text="Workpackage "+str(self._wp.id), 
-                                       bg=GREY, 
+                                       bg=GREY,
                                        font=("Arial", 11, "bold"))
         self._mid_canvas = tk.Canvas(self._wp_frame, 
                                      bg=GREY, 
@@ -677,6 +677,12 @@ class WorkpackagePage(Page):
                                       activebackground=BLUE, 
                                       activeforeground=WHITE, 
                                       cursor="hand2")
+        self._status = tk.Canvas(self._step_frame_label, 
+                                     bg=GREY, 
+                                     borderwidth=0, 
+                                     highlightthickness=0, 
+                                     width=22,
+                                     height=22)
         self._step_button.config(command=lambda: self.step_clicked(self._wp.step.name))
         self._step_tree = ttk.Treeview(self._mid, 
                                        selectmode="none", 
@@ -775,10 +781,13 @@ class WorkpackagePage(Page):
         self._mid_canvas.pack(anchor="center", fill="both", expand="true")
         self.show_data()
 
+
         # pack the widgets for the step information into the layout
         self._step_frame_label.pack(anchor="w", fill="both")
         self._step_label.pack(side="left", anchor="center")
-        self._step_button.pack(anchor="w")
+        self._step_button.pack(side='left', anchor="center")
+        self._status.create_oval(1,1,21,21, fill=self._wp.status_color())
+        self._status.pack(side='left', anchor="center", padx=(20,0))
         self._step_tree.pack(anchor="w", fill="both", expand="True")
 
         # pack the widgets for the parametersets into the layout and fill the notebook
@@ -869,7 +878,7 @@ class WorkpackagePage(Page):
                               activebackground=BLUE, 
                               activeforeground=WHITE, 
                               cursor="hand2", 
-                              bg=LIGHT_BLUE)
+                              bg=wp.status_color())
             self.bind_widget(label, self.wp_clicked, wp.id)
             self._wp_frames[wp.id] = self._parents_canvas.create_window(25, 75 * i , 
                                                                         window = label, 
@@ -886,7 +895,7 @@ class WorkpackagePage(Page):
                               activebackground=BLUE, 
                               activeforeground=WHITE, 
                               cursor="hand2", 
-                              bg=LIGHT_BLUE)
+                              bg=wp.status_color())
             self.bind_widget(label, self.wp_clicked, wp.id)
             self._wp_frames[wp.id] = self._children_canvas.create_window(25, 75 * i , 
                                                                          window = label, 
@@ -917,7 +926,7 @@ class WorkpackagePage(Page):
                               activebackground=BLUE, 
                               activeforeground=WHITE, 
                               cursor="hand2", 
-                              bg=LIGHT_BLUE)
+                              bg=wp.status_color())
             self.bind_widget(label, self.wp_clicked, wp.id)
             column = i%wp_per_row
             self._wp_frames[wp.id] = self._wp_canvas.create_window(175 * column, 
