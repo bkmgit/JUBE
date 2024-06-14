@@ -99,8 +99,16 @@ class MainPage(Page):
         self._label_outpath = tk.Label(self, 
                                        text = "outpath: " + f"{self._benchmark.outpath!r}", 
                                        bg=WHITE)
+        self._label_tag_docu = tk.Label(self, 
+                                   text="\nTag Documentation:", 
+                                   font=("Arial", 11, "bold"), 
+                                   bg=WHITE)
+        self._tree_tag_docu = ttk.Treeview(self, 
+                                      selectmode="none", 
+                                      show="tree", 
+                                      style='Custom.Treeview')
         self._label_tag = tk.Label(self, 
-                                   text="\nTags:", 
+                                   text="\nUsed Tags:", 
                                    font=("Arial", 11, "bold"), 
                                    bg=WHITE)
         self._tree_tag = ttk.Treeview(self, 
@@ -157,35 +165,41 @@ class MainPage(Page):
         # pack the widgets with the general benchmark information into the layout
         self._label_file_path_ref.pack(anchor="w")
         self._label_outpath.pack(anchor="w")
-        if self._benchmark.comment is not None: 
-            self._label_comment.config(text="comment: "+f"{self._benchmark.comment!r}")
+        if self._benchmark._comment is not None: 
+            self._label_comment.config(text="comment: "+f"{self._benchmark._comment!r}")
         self._label_comment.pack(anchor="w")
-        if len(self._benchmark.tags) != 0:
+        if len(self._benchmark._tags) != 0:
+            self._label_tag_docu.pack(anchor="w")
+            for tag, desc in self._benchmark._tag_docu.items():
+                self._tree_tag_docu.insert("","end",text=f"{tag}: {desc}" if tag is not None else "")
+            self._tree_tag_docu.config(height=len(self._benchmark._tag_docu))
+            self._tree_tag_docu.pack(anchor="w", fill="x")
+        if len(self._benchmark._tags) != 0:
             self._label_tag.pack(anchor="w")
-            for tag in self._benchmark.tags:
+            for tag in self._benchmark._tags:
                 self._tree_tag.insert("","end",text=f"{tag!r}" if tag is not None else "")
-            self._tree_tag.config(height=len(self._benchmark.tags))
+            self._tree_tag.config(height=len(self._benchmark._tags))
             self._tree_tag.pack(anchor="w", fill="x")
 
         # fill the notebook with tabs and pack it into the layout
-        if len(self._benchmark.parametersets) != 0: 
+        if len(self._benchmark._parametersets) != 0: 
             self._notebook.add(self._parametersets, text="Parametersets")
-        if len(self._benchmark.patternsets) != 0: 
+        if len(self._benchmark._patternsets) != 0: 
             self._notebook.add(self._patternsets, text="Patternsets")
-        if len(self._benchmark.filesets) != 0: 
+        if len(self._benchmark._filesets) != 0: 
             self._notebook.add(self._filesets, text="Filesets")
-        if len(self._benchmark.substitutesets) != 0: 
+        if len(self._benchmark._substitutesets) != 0: 
             self._notebook.add(self._substitutesets, text="Substitutesets")
-        if len(self._benchmark.analyser) != 0: 
+        if len(self._benchmark._analyser) != 0: 
             self._notebook.add(self._analyser, text="Analyser")
-        if len(self._benchmark.results) != 0: 
+        if len(self._benchmark._results) != 0: 
             self._notebook.add(self._results, text="Result")
         self._notebook.pack(fill="both", padx=10, pady=25)
         self._notebook.pack_propagate(True)
         self._notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
 
         # create the step graph and pack the widgets into the layout
-        if len(self._benchmark.steps):
+        if len(self._benchmark._steps):
             self._label_step.pack(anchor="w")
             self.create_graph()
             canvas_bbox = self._canvas_steps.bbox("all")
@@ -199,7 +213,7 @@ class MainPage(Page):
         """Calculates for each step on which height/level (of the dependency graph) it needs to be"""
         levels = {}
         level_len = 0 
-        for step in self._benchmark.steps.values():
+        for step in self._benchmark._steps.values():
             j = -1
             for depend in step.depend:
                 level = level_len - 1
@@ -423,7 +437,7 @@ class StepPage(Page):
         # pack the widgets for the used sets into the layout
         uses = [use for uselist in self._step.use for use in uselist]
         for stepname in self._step.get_depend_history(self._benchmark):
-            step = self._benchmark.steps[stepname]
+            step = self._benchmark._steps[stepname]
             uses.extend([use for use in 
                          [use for uselist in step.use for use in uselist] 
                          if use not in uses])
@@ -451,7 +465,7 @@ class StepPage(Page):
     def plot_parents(self):
         """Plots the parent steps in the layout"""
         for i, stepname in enumerate(self._step.depend):
-            step = self._benchmark.steps[stepname]
+            step = self._benchmark._steps[stepname]
             label = tk.Button(self._parents_canvas, 
                               text=step.name, 
                               highlightbackground=BLUE, 
@@ -469,7 +483,7 @@ class StepPage(Page):
     def plot_children(self):
         """Plots the dependent steps in the layout"""
         children = list()
-        for step in self._benchmark.steps.values():
+        for step in self._benchmark._steps.values():
             if (self._step.name in step.depend): children.append(step)
         for i, step in enumerate(children):
             label = tk.Button(self._children_canvas, 
@@ -513,7 +527,7 @@ class StepPage(Page):
         # fill the use Treeview with data
         uses = [use for uselist in self._step.use for use in uselist]
         for stepname in self._step.get_depend_history(self._benchmark):
-            step = self._benchmark.steps[stepname]
+            step = self._benchmark._steps[stepname]
             uses.extend([use for use in 
                          [use for uselist in step.use for use in uselist] 
                          if use not in uses])
@@ -543,7 +557,7 @@ class StepPage(Page):
                                     self._mid_canvas.winfo_width()-50) / 175)
         self._step_canvas.delete("all")
         if wp_per_row == 0: wp_per_row+=1
-        for i, wp in enumerate(self._benchmark.workpackages[self._step.name]):
+        for i, wp in enumerate(self._benchmark._workpackages[self._step.name]):
             label = tk.Button(self._step_canvas, 
                               text="Workpackage " +str(wp.id), 
                               highlightbackground=BLUE, 
