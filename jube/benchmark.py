@@ -680,7 +680,7 @@ class Benchmark(object):
                 filenames = [file for file in os.listdir(self.bench_dir)
                              if file.startswith(log_fname.split('.')[0]) and
                              file != log_fname]
-                filenames.sort(key=lambda o: int(re.split('_|\.', o)[1]))
+                filenames.sort(key=lambda o: int(re.split(r'_|\.', o)[1]))
                 with open(current_logfile_name, 'a') as outfile:
                     for fname in filenames:
                         with open(os.path.join(self.bench_dir, fname), 'r') as infile:

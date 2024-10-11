@@ -244,7 +244,7 @@ def substitution(text, substitution_dict):
         text = new_text
     # Final substitution to remove $$
     tmp = string.Template(text)
-    return re.sub("\$(?=([\s]|$))","$$",tmp.safe_substitute(str_substitution_dict))
+    return re.sub(r"\$(?=([\s]|$))","$$",tmp.safe_substitute(str_substitution_dict))
 
 
 def convert_type(name, value_type, value, stop=True):

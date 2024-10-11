@@ -21,6 +21,12 @@
 Release notes
 =============
 
+[UNRELEASED]
+~~~~~~~~~~~~
+Release: XXXX-XX-XX
+
+* Fixed: Fixed escape sequence SyntaxWarning on Python 3.12.
+
 Version 2.7.1
 ~~~~~~~~~~~~~
 Release: 2024-05-30
