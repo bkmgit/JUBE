@@ -1550,8 +1550,9 @@ class Parser(object):
         for table in tables:
             name, style, separator, filter, transpose, sort, result_id = table
             transpose = bool(transpose)
+            sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.table.Table(name, style, separator,
-                                                   sort, transpose, filter)
+                                                   sort_names, transpose, filter)
             result.result_dir = result_dir
             columns = db.select("ResultTableColumn", None, f"table_name='{name}'")
             for column in columns:
@@ -1576,8 +1577,9 @@ class Parser(object):
         syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
         for syslog in syslogs:
             name, address, format, filter, host, port, sort, result_id = syslog
+            sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.syslog.SysloggedResult(
-                name, address, host, port, format, sort, filter)
+                name, address, host, port, format, sort_names, filter)
             keys = db.select("ResultSyslogKey", None, f"syslog_name='{name}'")
             for key in keys:
                 id, key_name, format, title, syslog_name = key
