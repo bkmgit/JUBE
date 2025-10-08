@@ -28,7 +28,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, re, eralchemy2, jube.util.database_interface
+import sys, os, re, eralchemy2
+sys.path.insert(0, os.path.abspath('..'))
+import jube.util.database_interface
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
