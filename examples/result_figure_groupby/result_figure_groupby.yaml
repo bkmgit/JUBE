@@ -1,0 +1,69 @@
+name: figure_creation
+outpath: bench_run
+comment: A figrue creation example
+
+#Configuration
+parameterset:
+  name: param_set
+  parameter:
+    - { name: mpi_type, _: 'scatter, bcast, allreduce' }
+    - { name: msg_size, _: '0,1,2,3' }    
+    - name: bw
+      type: int
+      mode: python
+      _: |
+          {
+            "scatter" : [11,12,11,13][$msg_size],
+            "bcast" : [19,18,19,22][$msg_size],
+            "allreduce" : [40,20,35,25][$msg_size],
+          }.get("${mpi_type}",0)
+
+#Regex pattern
+patternset:
+- name: pattern_all
+  pattern:
+    - {name: mpi_pat,            _: "mpi_type: ${jube_pat_wrd}${jube_pat_bl}"} 
+    - {name: msg_pat, type: int, _: "msg_size: $jube_pat_int"} 
+    - {name: bw_pat,  type: int, _: "bw: $jube_pat_int"}
+
+#Operation
+step:
+  name: write_perf
+  use: param_set 
+  do: 'echo "mpi_type: ${mpi_type} ; msg_size: $msg_size; bw: $bw"'
+
+#Analyse
+analyser:
+- name: analyse
+  analyse:
+    step: write_perf
+    file:
+    - { use: pattern_all, _: stdout}
+
+
+#Create result figure
+result:
+  use: analyse #use existing analyser
+  table:
+    name: result
+    style: pretty
+    sort: number
+    column:
+      - mpi_pat
+      - msg_size
+      - bw
+  figure:
+    - name: 1_fig
+      title: FIG Title
+      savefig: group_fig.png
+      showfig: True
+      plot:
+        - xlabel: msg size
+          ylabel: bw
+          legend: True
+          data:
+            - {x: msg_size, y: bw, groupby: mpi_pat, marker: 'x'}
+            #- {x: msg_pat, y: bw, groupby: mpi_pat, marker: 'x'}
+            #- {x: mpi_size, y: bw, groupby: msg_pat}
+            
+

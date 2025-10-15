@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jube>
+  <benchmark name="figure_creation" outpath="bench_run">
+    <comment>A figrue creation example</comment>
+    
+    <!-- Configuration -->
+    <parameterset name="param_set">
+      <!-- Create a parameterspace with one template parameter -->
+      <parameter name="mpi_type">scatter,bcast,allreduce</parameter>
+      <parameter name="msg_size">0,1,2,3</parameter>
+      <parameter name="bw" type="int" mode="python">
+        {
+          "scatter" : [11,12,11,13][$msg_size],
+          "bcast" : [19,18,19,22][$msg_size],
+          "allreduce" : [40,20,35,25][$msg_size],
+        }.get("${mpi_type}",0)
+      </parameter>
+    </parameterset>
+    
+    <!-- Regex pattern -->
+    <patternset name="pattern_all">
+      <pattern name="mpi_pat">mpi_type: ${jube_pat_wrd}${jube_pat_bl}</pattern>
+      <pattern name="msg_pat" type="int">msg_size: $jube_pat_int</pattern>
+      <pattern name="bw_pat"  type="int">bw: $jube_pat_int</pattern>
+    </patternset>
+    
+    <!-- Operation -->
+    <step name="write_perf">
+      <use>param_set</use> <!-- use existing parameterset -->
+      <do>echo "mpi_type: ${mpi_type} ; msg_size: $msg_size; bw: $bw"</do> <!-- shell command -->
+    </step>
+    
+    <!-- Analyse -->
+    <analyser name="analyse">
+      <analyse step="write_perf">
+        <file use="pattern_all">stdout</file> <!-- file stdout will be scanned with pattern_all -->
+      </analyse>
+    </analyser>
+    
+    <!-- Create result figure -->
+    <result>
+      <use>analyse</use> <!-- use existing analyser -->
+      <table name='result' style='pretty'>
+        <column>mpi_pat</column>
+        <column>msg_size</column>
+        <column>bw</column>
+      </table>
+      <figure name='1_fig' title='FIG Title' savefig='group_fig.png' showfig='True'>
+        <plot xlabel='msg size' ylabel='bw' legend='True'>
+          <data x='msg_size' y='bw' groupby='mpi_pat' marker='x'/>
+          <!--<data x='msg_pat' y='bw' groupby='mpi_pat' marker='x'/>
+          <data x='mpi_size' y='bw' groupby='msg_pat'/>-->
+        </plot>
+      </figure>
+    </result>
+  </benchmark>
+</jube>
+            
