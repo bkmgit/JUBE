@@ -25,6 +25,7 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     pass
+from pathlib import Path
 
 from jube.result_types.genericresult import GenericResult
 from jube.result import Result
@@ -63,12 +64,41 @@ class Figure(GenericResult):
             or `jube run *xml/yaml -r` with the following args:
                 show=True, filename=*/*/result/*.dat
             """
+
+            def create_plot(data, table_data, ax, label=None):
+                # plot function calls are created dynamically because certain
+                # arguments are not mandatory and would cause an error
+                label = label if label is not None else data.label
+                if data.type == "line":
+                    func_args = "table_data[data.x], table_data[data.y], label=label"
+                    for attr in ['color', 'marker', 'linestyle']:
+                        attr_val = getattr(data, attr)
+                        if attr_val not in [None, ""]:
+                            func_args += f", {attr}=data.{attr}"
+                    eval(f'ax.plot({func_args})')
+                elif data.type in ["bar", "stem"]:
+                    plot_func = getattr(ax, data.type)
+                    plot_func(table_data[data.x], table_data[data.y],
+                                label=label)
+                else:
+                    # dynamically create plot function call (e.g. ax.scatter())
+                    plot_func = getattr(ax, data.type)
+                    func_args = "table_data[data.x], table_data[data.y], label=label"
+                    for attr in ['color', 'marker', 'linestyle']:
+                        attr_val = getattr(data, attr)
+                        if attr_val not in [None, ""]:
+                            func_args += f", {attr}=data.{attr}"
+                    eval(f'ax.{data.type}({func_args})')
+                if data.xscale not in [None, ""]: ax.set_xscale(data.xscale)
+                if data.yscale not in [None, ""]: ax.set_yscale(data.yscale)
+
+
             table_data = {v.name:k for v,k in self._data.items()}
 
             for plot in self._plots[:]:
                 for data in plot.plot_data[:]:
-                    if data["x"] not in table_data.keys() or \
-                        data["y"] not in table_data.keys():
+                    if data.x not in table_data.keys() or \
+                        data.y not in table_data.keys():
                         plot.plot_data.remove(data)
                 if len(plot.plot_data) == 0:
                     self._plots.remove(plot)
@@ -89,15 +119,16 @@ class Figure(GenericResult):
                 if plot.xscale: ax.set_xscale(plot.xscale)
                 if plot.yscale: ax.set_yscale(plot.yscale)
                 for data in plot.plot_data:
-                    # plot function calls are created dynamically because certain
-                    # arguments are not mandatory and would cause an error
-                    plot_func = data["type"] if data["type"] != "line" else "plot"
-                    func_args = "table_data[data['x']], table_data[data['y']], label=data['label']"
-                    if data["type"] in ["line", "scatter", "step"]:
-                        for attr in ['color', 'marker', 'linestyle']:
-                            if data[attr] is not None:
-                                func_args += f", {attr}=data['{attr}']"
-                    eval(f"ax.{plot_func}({func_args})")
+                    if data.groupby not in [None, ""]:
+                        for group in set(table_data[data.groupby]):
+                            group_ids = [i for i, x in enumerate(table_data[data.groupby]) if x == group]
+                            group_data = {data.x:list(), data.y:list()}
+                            for key in group_data.keys():
+                                for i in group_ids:
+                                    group_data[key].append(table_data[key][i])
+                            create_plot(data, group_data, ax, label=group)
+                    else:
+                        create_plot(data, table_data, ax)
                 if plot._legend: ax.legend()
 
             # if "savefig" is set, then save figure in "savefig" file
@@ -105,17 +136,17 @@ class Figure(GenericResult):
             # else save figure in "filename" (benchmark id result directory)
             #    (-> one figure per benchmark id)
             # Additional clauses are need to avoid multiple saving
-            if self._savefig and show:
+            if self._savefig not in [None, ""] and show:
                 file_path_ind = self._savefig.rfind('/')
                 if file_path_ind != -1:
                     # create full directory path if it doesn't exist
                     path = os.path.expanduser(self._savefig[:file_path_ind])
-                    os.mkdir(path, parents=True, exist_ok=True)
+                    Path(path).mkdir(parents=True, exist_ok=True)
                 fig.savefig(os.path.expanduser(self._savefig))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
-                    self._benchmark_ids[0], os.path.expanduser(self._savefig)))
-            elif self._savefig is None and filename is not None:
+                    set(self._benchmark_ids), os.path.expanduser(self._savefig)))
+            elif self._savefig in [None, ""] and filename is not None:
                 fig.savefig(filename.replace(".dat", ".png"))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
@@ -123,15 +154,119 @@ class Figure(GenericResult):
                         filename.replace(".dat", ".png"))))
 
             # show figure if "showfig" attribute isn't set to False
-            if show and self._showfig:
+            if show and self._showfig == "True":
                 plt.show()
             plt.close()
 
-    class Plot():
+    class Plot(GenericResult.DataKey):
         """A Plot type"""
 
-        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, xscale=None, yscale=None):
-            self._plot_data = plot_data
+        class Data():
+            """Plot data"""
+            def __init__(self, x, y, groupby, type, label, xscale, yscale,
+                         color, marker, linestyle):
+                self._x = x
+                self._y = y
+                self._groupby = groupby
+                self._type = type
+                self._label = label
+                self._xscale = xscale
+                self._yscale = yscale
+                self._color = color
+                self._marker = marker
+                self._linestyle = linestyle
+
+            @property
+            def x(self):
+                """Get 'x'"""
+                return self._x
+
+            @property
+            def y(self):
+                """Get 'y'"""
+                return self._y
+
+            @property
+            def groupby(self):
+                """Get 'groupby'"""
+                return self._groupby
+
+            @property
+            def type(self):
+                """Get 'type'"""
+                return self._type
+
+            @property
+            def label(self):
+                """Get 'label'"""
+                return self._label
+
+            @property
+            def xscale(self):
+                """Get 'xscale'"""
+                return self._xscale
+
+            @property
+            def yscale(self):
+                """Get 'yscale'"""
+                return self._yscale
+
+            @property
+            def color(self):
+                """Get 'color'"""
+                return self._color
+
+            @property
+            def marker(self):
+                """Get 'marker'"""
+                return self._marker
+
+            @property
+            def linestyle(self):
+                """Get 'linestyle'"""
+                return self._linestyle
+
+            def __str__(self):
+                return f"Data: x: {self._x}; y: {self._y}; "\
+                    f"groupby: {self._groupby}, type: {self._type}, "\
+                    f"label: {self._label}, xscale: {self._xscale}, " \
+                    f"yscale: {self._yscale}, color: {self._color}, " \
+                    f"marker: {self._marker}, linestyle: {self._linestyle}"
+
+            def etree_repr(self):
+                """Return etree object representation"""
+                data_etree = ET.Element("data")
+                data_etree.attrib["x"] = self._x
+                data_etree.attrib["y"] = self._y
+                if self._groupby not in [None, ""]:
+                    data_etree.attrib["groupby"] = self._groupby
+                if self._type not in [None, ""]:
+                    data_etree.attrib["type"] = self._type
+                if self._label not in [None, ""]:
+                    data_etree.attrib["label"] = self._label
+                if self._xscale not in [None, ""]:
+                    data_etree.attrib["xscale"] = self._xscale
+                if self._yscale not in [None, ""]:
+                    data_etree.attrib["yscale"] = self._yscale
+                if self._color not in [None, ""]:
+                    data_etree.attrib["color"] = self._color
+                if self._marker not in [None, ""]:
+                    data_etree.attrib["marker"] = self._marker
+                if self._linestyle not in [None, ""]:
+                    data_etree.attrib["linestyle"] = self._linestyle
+                return data_etree
+
+        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, xscale=None, yscale=None,
+                     name=None, title=None, unit=None):
+            GenericResult.DataKey.__init__(self, name, title, unit)
+            self._plot_data = list()
+            for data in plot_data:
+                self._plot_data.append(
+                    Figure.Plot.Data(data['x'], data['y'], data['groupby'],
+                                     data['type'], data['label'], 
+                                     data['xscale'], data['yscale'],
+                                     data['color'], data['marker'], 
+                                     data['linestyle']))
             self._legend = legend
             self._xlabel = xlabel
             self._ylabel = ylabel
@@ -180,21 +315,24 @@ class Figure(GenericResult):
         
         def etree_repr(self):
             """Return etree object representation"""
-            plot_etree = ET.Element("plot")
-            if self._legend:
-                plot_etree.attrib["legend"] = "true"
-            if self._xlabel:
+            plot_etree = GenericResult.DataKey.etree_repr(self)
+            plot_etree.tag = "plot"
+            if self._legend not in [None, ""]:
+                plot_etree.attrib["legend"] = self._legend
+            if self._xlabel not in [None, ""]:
                 plot_etree.attrib["xlabel"] = self._xlabel
-            if self._ylabel:
+            if self._ylabel not in [None, ""]:
                 plot_etree.attrib["ylabel"] = self._ylabel
+            if self._xscale not in [None, ""]:
+                plot_etree.attrib["xscale"] = self._xscale
+            if self._yscale not in [None, ""]:
+                plot_etree.attrib["yscale"] = self._yscale
             for data in self._plot_data:
-                data_etree = ET.SubElement(plot_etree, "data")
-                # Add all data attributes to ET attributes
-                data_etree.attrib = {k:v for k,v in data.items() if v is not None}
+                plot_etree.append(data.etree_repr())
             return plot_etree
 
-    def __init__(self, name, showfig=True, savefig=None, title=None):
-        GenericResult.__init__(self, name, None)
+    def __init__(self, name, showfig="True", savefig=None, title=None, res_filter=None):
+        GenericResult.__init__(self, name, res_filter)
         self._showfig = showfig
         self._savefig = savefig
         self._title = title
@@ -218,14 +356,16 @@ class Figure(GenericResult):
     def etree_repr(self):
         """Return etree object representation"""
         result_etree = Result.etree_repr(self)
-        figure_etree = ET.SubElement(result_etree, "Figure")
+        figure_etree = ET.SubElement(result_etree, "figure")
         figure_etree.attrib["name"] = self._name
         if self._title:
             figure_etree.attrib["title"] = self._title
         if self._savefig:
             figure_etree.attrib["savefig"] = self._savefig
-        if not self._showfig:
-            figure_etree.attrib["showfig"] = "false"
+        if self._showfig:
+            figure_etree.attrib["showfig"] = self._showfig
+        if self._res_filter:
+            figure_etree.attrib["filter"] = self._res_filter
         for plot in self._plots:
             figure_etree.append(plot.etree_repr())
         return result_etree
