@@ -672,6 +672,7 @@ Glossary
           <table>...</table>
           <syslog>...</syslog>
           <database>...</database>
+          <figure>...</figure>
           ...
         </result>
 
@@ -741,6 +742,42 @@ Glossary
 
        * ``format`` can contain a C like format string: e.g. ``format=".2f"``
        * ``title`` is optional: alternative key title.
+
+     * Unlike the result table, the unit attribute of a parameter or pattern
+       is not taken into account.
+
+   figure_tag
+     A figure result type
+
+     .. code-block:: xml
+
+        <figure name="..." title="..." savefig="..." showfig="..." filter="..."> 
+          <plot xlabel="..." ylabel="..." legend="..." xscale="..." yscale="...">
+            <data x="..." y="..." label="..." type="..." xscale="..." yscale="..."/> 
+            <data x="..." y="..." label="..." type="..." color="..." marker="..." linestyle="..."/> 
+            <data x="..." y="..." groupby="..."/> 
+            ...
+          </plot> 
+          ...
+        </figure> 
+
+     * ``title`` is optional: figure title
+     * ``savefig`` is optional: Here you can specify an different output file.
+     * ``showfig`` is optional (default: ``true``)
+       Given patterntype or parametertype will be used for sorting
+     * ``filter`` is optional, it can contain a bool expression to show only specific result entries
+     * ``<plot>`` can be specified in the figure result and can contain the data that will be plotted.
+
+       * ``legend`` is optional (default: ``false``)
+       * ``xscale`` and ``yscale`` are optional: They can be used to scale the x- or y-axis of the plot. Allowed scale options: ``linear``, ``log``, ``logit``, ``symlog`` (default: ``linear``)
+       * ``xlabel`` and ``ylabel`` are optional: They can be used to define labels for the x- and y-axis
+       * ``<data>`` can contain the specific data that will be plotted.
+
+         * ``x`` and ``y`` can contain the name of a pattern or the name of a parameter
+         * ``label`` is optional: It can be used to define a label for the legend
+         * ``type`` is optional. Allowed plot types: ``line``, ``scatter``, ``bar``, ``stem``, ``step`` (default: ``line``)
+         * ``color``, ``marker`` and ``linestyle`` are optional, but are only allowed if the types ``line``, ``scatter`` or ``bar`` are used
+         * ``groupby`` is optional: It can contain the name of a pattern or the name of a parameter
 
      * Unlike the result table, the unit attribute of a parameter or pattern
        is not taken into account.
