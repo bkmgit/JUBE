@@ -185,7 +185,7 @@ analyse = element analyse { attlist.analyse, (file | \include)* }
 attlist.analyse &=
   attribute step { text },
   attribute tag { text }?
-result = element result { attlist.result, (use | table |database | syslog | \include)* }
+result = element result { attlist.result, (use | table |database | syslog | figure | \include)* }
 attlist.result &=
   attribute result_dir { text }?,
   attribute tag { text }?
@@ -226,6 +226,35 @@ attlist.key &=
   attribute format { text }?,
   attribute title { text }?,
   attribute primekey { "true" | "false" | "True" | "False" }?,
+  attribute tag { text }?
+figure = element figure { attlist.figure, (plot | \include)* }
+attlist.figure &=
+  attribute name { text },
+  attribute title { text }?,
+  attribute savefig { text }?,
+  attribute showfig { "true" | "false" | "True" | "False" }?,
+  attribute filter { text }?,
+  attribute tag { text }?
+plot = element plot { attlist.plot, (data | \include)* }
+attlist.plot &=
+  attribute legend { "true" | "false" | "True" | "False" }?,
+  attribute xlabel { text }?,
+  attribute ylabel { text }?,
+  attribute xscale { "linear" | "log" | "logit" | "symlog" }?,
+  attribute yscale { "linear" | "log" | "logit" | "symlog" }?,
+  attribute tag { text }?
+data = element data { attlist.data, \include* }
+attlist.data &=
+  attribute x { text },
+  attribute y { text },
+  attribute groupby { text }?,
+  attribute type { "line" | "scatter" | "bar" | "stem" | "step" }?,
+  attribute label { text }?,
+  attribute xscale { "linear" | "log" | "logit" | "symlog" }?,
+  attribute yscale { "linear" | "log" | "logit" | "symlog" }?,
+  attribute color { text }?,
+  attribute marker { text }?,
+  attribute linestyle { text }?,
   attribute tag { text }?
 file = element file { attlist.file, text }
 attlist.file &=

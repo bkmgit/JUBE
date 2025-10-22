@@ -16,8 +16,6 @@
 <!ATTLIST path          tag CDATA #IMPLIED>
 <!ELEMENT tags ((tag|check_tags)*)>
 <!ATTLIST tags          forced CDATA #IMPLIED>
-<!ELEMENT tag (#PCDATA)>
-<!ATTLIST tag           name CDATA #IMPLIED>
 <!ELEMENT check_tags (#PCDATA)>
 <!ELEMENT benchmark (comment?,(parameterset|substituteset|fileset|step|patternset|analyser|analyzer|result|include)*)>
 <!ATTLIST benchmark     name CDATA #REQUIRED
@@ -134,7 +132,7 @@
 <!ELEMENT analyse ((file|include)*)>
 <!ATTLIST analyse       step CDATA #REQUIRED
                         tag CDATA #IMPLIED>
-<!ELEMENT result ((use|table|database|syslog|include)*)>
+<!ELEMENT result ((use|table|database|syslog|figure|include)*)>
 <!ATTLIST result        result_dir CDATA #IMPLIED
                         tag CDATA #IMPLIED>
 <!ELEMENT table ((column|include)*)>
@@ -169,6 +167,32 @@
 <!ATTLIST key           format CDATA #IMPLIED
                         title CDATA #IMPLIED
                         primekey (true|false|True|False) #IMPLIED
+                        tag CDATA #IMPLIED>
+<!ELEMENT figure ((plot,include)*)>
+<!ATTLIST figure        name CDATA #REQUIRED
+                        title CDATA #IMPLIED
+                        savefig CDATA #IMPLIED
+                        showfig (true|false) #IMPLIED
+                        filter CDATA #IMPLIED
+                        tag CDATA #IMPLIED>
+<!ELEMENT plot ((data,include)*)>
+<!ATTLIST plot          legend (true|false) #IMPLIED
+                        xlabel CDATA #IMPLIED
+                        ylabel CDATA #IMPLIED
+                        xscale (linear|log|logit|symlog) #IMPLIED
+                        yscale (linear|log|logit|symlog) #IMPLIED
+                        tag CDATA #IMPLIED>
+<!ELEMENT data (include*)>
+<!ATTLIST data          x CDATA #REQUIRED
+                        y CDATA #REQUIRED
+                        groupby CDATA #IMPLIED
+                        type (line|scatter|bar|stem|step) #IMPLIED
+                        label CDATA #IMPLIED
+                        xscale (linear|log|logit|symlog) #IMPLIED
+                        yscale (linear|log|logit|symlog) #IMPLIED
+                        color CDATA #IMPLIED
+                        marker CDATA #IMPLIED
+                        linestyle CDATA #IMPLIED
                         tag CDATA #IMPLIED>
 <!ELEMENT file (#PCDATA)>
 <!ATTLIST file          tag CDATA #IMPLIED

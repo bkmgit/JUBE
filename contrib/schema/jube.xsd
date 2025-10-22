@@ -220,8 +220,9 @@
     <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element name="use" type="stringTagType" />
         <xs:element name="table" type="tableType" />
-	<xs:element name="database" type="databaseType" />
+	      <xs:element name="database" type="databaseType" />
         <xs:element name="syslog" type="syslogType" />
+        <xs:element name="figure" type="figureType" />
         <xs:element name="include" type="includeType" />
     </xs:choice>
     <xs:attribute name="result_dir" type="xs:string" use="optional"/>
@@ -268,6 +269,68 @@
     <xs:attribute name="filter" type="xs:string" use="optional" />
     <xs:attribute name="tag" type="xs:string" use="optional" />
   </xs:complexType>
+
+  <xs:complexType name="figureType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="plot" type="plotType" />
+      <xs:element name="include" type="includeType" />
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="title" type="xs:string" use="optional"/>
+    <xs:attribute name="savefig" type="xs:string" use="optional"/>
+    <xs:attribute name="showfig" type="booleanType" use="optional"/>
+    <xs:attribute name="filter" type="xs:string" use="optional"/>
+    <xs:attribute name="tag" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="plotType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="data" type="dataType" />
+      <xs:element name="include" type="includeType" />
+    </xs:choice>
+    <xs:attribute name="legend" type="booleanType" use="optional"/>
+    <xs:attribute name="xlabel" type="xs:string" use="optional"/>
+    <xs:attribute name="ylabel" type="xs:string" use="optional"/>
+    <xs:attribute name="xscale" type="scaleType" use="optional"/>
+    <xs:attribute name="yscale" type="scaleType"/>
+    <xs:attribute name="tag" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="dataType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="include" type="includeType" />
+    </xs:choice>
+    <xs:attribute name="x" type="xs:string" use="required"/>
+    <xs:attribute name="y" type="xs:string" use="required"/>
+    <xs:attribute name="groupby" type="xs:string"/>
+    <xs:attribute name="type" type="plottypeType"/>
+    <xs:attribute name="label" type="xs:string"/>
+    <xs:attribute name="xscale" type="scaleType"/>
+    <xs:attribute name="yscale" type="scaleType"/>
+    <xs:attribute name="color" type="xs:string"/>
+    <xs:attribute name="marker" type="xs:string"/>
+    <xs:attribute name="linestyle" type="xs:string"/>
+    <xs:attribute name="tag" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:simpleType name="scaleType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="linear"/>
+      <xs:enumeration value="log"/>
+      <xs:enumeration value="logit"/>
+      <xs:enumeration value="symlog"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="plottypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="line"/>
+      <xs:enumeration value="scatter"/>
+      <xs:enumeration value="bar"/>
+      <xs:enumeration value="stem"/>
+      <xs:enumeration value="step"/>
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:complexType name="keyType">
     <xs:complexContent>
