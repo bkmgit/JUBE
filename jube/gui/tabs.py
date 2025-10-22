@@ -25,6 +25,7 @@ from jube.fileset import Copy, Link, Prepare
 from jube.result_types.database import Database
 from jube.result_types.table import Table
 from jube.result_types.syslog import SysloggedResult
+from jube.result_types.figure import Figure
 
 class Tab(tk.Frame):
 
@@ -564,6 +565,7 @@ class ResultTab(Tab):
             if isinstance(result, Table): text = "Table: "
             elif isinstance(result, SysloggedResult): text = "Syslog: "
             elif isinstance(result, Database): text = "Database: "
+            elif isinstance(result, Figure): text = "Figure: "
             label = tk.Label(self._content, 
                              text = text + result.name, 
                              bg=WHITE, 
@@ -681,6 +683,37 @@ class ResultTab(Tab):
                     table.insert("","end",values=[key.name,
                                                   key.title, 
                                                   key.unit])
+                    
+            # Create result table for a figure result
+            if isinstance(result, Figure):
+                tree_result = ttk.Treeview(self._content, 
+                                           selectmode="none", 
+                                           show="tree", 
+                                           style="Custom.Treeview", 
+                                           height = 1 + 
+                                                    (1 if result.title is not None else 0) + 
+                                                    (1 if result.savefig is not None else 0) + 
+                                                    (1 if result.showfig is not None else 0) + 
+                                                    (1 if result.res_filter is not None else 0))
+                if result.title is not None: 
+                    tree_result.insert("", "end", text="title: " + f"{result.title!r}")
+                if result.savefig is not None: 
+                    tree_result.insert("", "end", text="savefig: " + f"{result.savefig!r}")
+                if result.showfig is not None: 
+                    tree_result.insert("", "end", text="showfig: " + f"{result.showfig!r}")
+                if result.res_filter is not None: 
+                    tree_result.insert("", "end", text="filter: " + f"{result.res_filter!r}")
+                columns = ["Plot","legend","xlabel","ylabel","xscale","yscale","x","y","groupby","type","label","data xscale","data yscale","color","marker","linestyle"]
+                table = SortableTreeview(self._content, 
+                                         columns, 
+                                         selectmode="none", 
+                                         show="headings", 
+                                         height=len(result.keys), 
+                                         style="Custom.Treeview")
+                for i, plot in enumerate(result.plots):
+                    for data in plot.plot_data:
+                        table.insert("","end",values=[i, plot.legend, plot.xlabel, plot.ylabel, plot.xscale, plot.yscale, data.x, data.y, data.groupby, data.type, data.label, data.xscale, data.yscale, data.color, data.marker, data.linestyle])
+                    
             self.widget_dict[result.name] = {"label": label, 
                                              "tree_general": tree_general, 
                                              "tree_result": tree_result, 
