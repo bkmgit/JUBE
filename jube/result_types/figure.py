@@ -104,6 +104,7 @@ class Figure(GenericResult):
                     self._plots.remove(plot)
 
             if len(self._plots) == 0:
+                LOGGER.debug("No plotable data was found \n")
                 return
 
             try:
@@ -129,7 +130,7 @@ class Figure(GenericResult):
                             create_plot(data, group_data, ax, label=group)
                     else:
                         create_plot(data, table_data, ax)
-                if plot._legend: ax.legend()
+                if plot._legend == "true": ax.legend()
 
             # if "savefig" is set, then save figure in "savefig" file
             #    (-> use data of all benchmark ids specified on the CLI)
@@ -154,7 +155,7 @@ class Figure(GenericResult):
                         filename.replace(".dat", ".png"))))
 
             # show figure if "showfig" attribute isn't set to False
-            if show and self._showfig == "True":
+            if show and self._showfig == "true":
                 plt.show()
             plt.close()
 
@@ -233,28 +234,29 @@ class Figure(GenericResult):
                     f"yscale: {self._yscale}, color: {self._color}, " \
                     f"marker: {self._marker}, linestyle: {self._linestyle}"
 
-            def etree_repr(self):
-                """Return etree object representation"""
-                data_etree = ET.Element("data")
-                data_etree.attrib["x"] = self._x
-                data_etree.attrib["y"] = self._y
+            def add_information_to_database(self, db, plot_id):
+                """Store plot data information in database"""
+                data = dict()
+                data["x"] = self._x
+                data["y"] = self._y
                 if self._groupby not in [None, ""]:
-                    data_etree.attrib["groupby"] = self._groupby
+                    data["groupby"] = self._groupby
                 if self._type not in [None, ""]:
-                    data_etree.attrib["type"] = self._type
+                    data["plot_type"] = self._type
                 if self._label not in [None, ""]:
-                    data_etree.attrib["label"] = self._label
+                    data["label"] = self._label
                 if self._xscale not in [None, ""]:
-                    data_etree.attrib["xscale"] = self._xscale
+                    data["xscale"] = self._xscale
                 if self._yscale not in [None, ""]:
-                    data_etree.attrib["yscale"] = self._yscale
+                    data["yscale"] = self._yscale
                 if self._color not in [None, ""]:
-                    data_etree.attrib["color"] = self._color
+                    data["color"] = self._color
                 if self._marker not in [None, ""]:
-                    data_etree.attrib["marker"] = self._marker
+                    data["marker"] = self._marker
                 if self._linestyle not in [None, ""]:
-                    data_etree.attrib["linestyle"] = self._linestyle
-                return data_etree
+                    data["linestyle"] = self._linestyle
+                data["plot_id"] = plot_id
+                db.insert("ResultFigurePlotData", data)
 
         def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, xscale=None, yscale=None,
                      name=None, title=None, unit=None):
@@ -312,34 +314,54 @@ class Figure(GenericResult):
                             f"label: {data['label']}, color: {data['color']}," \
                             f"marker: {data['marker']}, linestyle: {data['linestyle']}\n"
             return plot_str
-        
-        def etree_repr(self):
-            """Return etree object representation"""
-            plot_etree = GenericResult.DataKey.etree_repr(self)
-            plot_etree.tag = "plot"
+            
+        def add_information_to_database(self, db, figure_name):
+            """Store plot information in database"""
+            plot_data = dict()
+            plot_data["figure_name"] = figure_name
             if self._legend not in [None, ""]:
-                plot_etree.attrib["legend"] = self._legend
+                plot_data["legend"] = self._legend
             if self._xlabel not in [None, ""]:
-                plot_etree.attrib["xlabel"] = self._xlabel
+                plot_data["xlabel"] = self._xlabel
             if self._ylabel not in [None, ""]:
-                plot_etree.attrib["ylabel"] = self._ylabel
+                plot_data["ylabel"] = self._ylabel
             if self._xscale not in [None, ""]:
-                plot_etree.attrib["xscale"] = self._xscale
+                plot_data["xscale"] = self._xscale
             if self._yscale not in [None, ""]:
-                plot_etree.attrib["yscale"] = self._yscale
+                plot_data["yscale"] = self._yscale
+            plot_id = db.insert("ResultFigurePlot", plot_data)
             for data in self._plot_data:
-                plot_etree.append(data.etree_repr())
-            return plot_etree
+                data.add_information_to_database(db, plot_id)
 
-    def __init__(self, name, showfig="True", savefig=None, title=None, res_filter=None):
+    def __init__(self, name, showfig="true", savefig=None, title=None, res_filter=None):
         GenericResult.__init__(self, name, res_filter)
         self._showfig = showfig
         self._savefig = savefig
         self._title = title
         self._plots = list()
 
+    @property
+    def showfig(self):
+        """Get 'showfig'"""
+        return self._showfig
+
+    @property
+    def savefig(self):
+        """Get 'savefig'"""
+        return self._savefig
+
+    @property
+    def title(self):
+        """Get 'title'"""
+        return self._title
+
+    @property
+    def plots(self):
+        """Get 'plots'"""
+        return self._plots
+
     def add_key(self, name, title=None, unit=None):
-        """Add an additional key to the dataset if it is not alread in the set"""
+        """Add an additional key to the dataset if it is not already in the set"""
         if name not in [key.name for key in self._keys]:
             self._keys.append(GenericResult.DataKey(name, title, unit))
 
@@ -352,20 +374,30 @@ class Figure(GenericResult):
         result_data = GenericResult.create_result_data(self, select, exclude)
         return Figure.FigureData(result_data, self._plots, self._savefig,
                                  self._title, self._showfig)
-
-    def etree_repr(self):
-        """Return etree object representation"""
-        result_etree = Result.etree_repr(self)
-        figure_etree = ET.SubElement(result_etree, "figure")
-        figure_etree.attrib["name"] = self._name
-        if self._title:
-            figure_etree.attrib["title"] = self._title
-        if self._savefig:
-            figure_etree.attrib["savefig"] = self._savefig
-        if self._showfig:
-            figure_etree.attrib["showfig"] = self._showfig
-        if self._res_filter:
-            figure_etree.attrib["filter"] = self._res_filter
-        for plot in self._plots:
-            figure_etree.append(plot.etree_repr())
-        return result_etree
+    
+    def add_information_to_database(self, db, benchmark_id, update=False):
+        """Store figure information in database"""
+        try:
+            db.start_transaction()
+            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+            figure_data = {
+                "figure_name": self._name,
+                "result_id": result_id
+            }
+            if self._title:
+                figure_data["title"] = self._title
+            if self._savefig:
+                figure_data["savefig"] = self._savefig
+            if self._showfig:
+                figure_data["showfig"] = self._showfig
+            if self._res_filter:
+                figure_data["filter"] = self._res_filter
+            db.insert("ResultFigure", figure_data)
+            for plot in self._plots:
+                plot.add_information_to_database(db, self._name)
+            db.commit_transaction()
+        except Exception as e:
+            LOGGER.warning(str(e))
+            db.rollback_transaction()
+            db.disconnect()
+            raise e

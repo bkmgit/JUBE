@@ -421,3 +421,46 @@ CREATE TABLE IF NOT EXISTS ResultDatabaseKey
     database_name TEXT NOT NULL,
     FOREIGN KEY (database_name) REFERENCES ResultDatabase(database_name) ON DELETE CASCADE
 );
+
+-- Table ResultFigure
+CREATE TABLE IF NOT EXISTS ResultFigure
+(
+    figure_name TEXT NOT NULL PRIMARY KEY,
+    title TEXT,
+    savefig TEXT,
+    showfig TEXT,
+    filter TEXT,
+    result_id INTEGER NOT NULL,
+    FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
+);
+
+-- Table ResultFigurePlot
+CREATE TABLE IF NOT EXISTS ResultFigurePlot
+(
+    plot_id INTEGER NOT NULL PRIMARY KEY,
+    legend TEXT,
+    xlabel TEXT,
+    ylabel TEXT,
+    xscale TEXT,
+    yscale TEXT,
+    figure_name TEXT NOT NULL,
+    FOREIGN KEY (figure_name) REFERENCES ResultFigure(figure_name) ON DELETE CASCADE
+);
+
+-- Table ResultFigurePlotData
+CREATE TABLE IF NOT EXISTS ResultFigurePlotData
+(
+    data_id INTEGER NOT NULL PRIMARY KEY,
+    x TEXT,
+    y TEXT,
+    groupby TEXT,
+    plot_type TEXT,
+    label TEXT,
+    xscale TEXT,
+    yscale TEXT,
+    color TEXT,
+    marker TEXT,
+    linestyle TEXT,
+    plot_id TEXT NOT NULL,
+    FOREIGN KEY (plot_id) REFERENCES ResultFigurePlot(plot_id) ON DELETE CASCADE
+);

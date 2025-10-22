@@ -1545,7 +1545,7 @@ class Parser(object):
         return results, results_order
 
     def _extract_subresult_from_database(self, db, result_id, result_dir):
-        """Extract all tables, databases and syslogs from database"""
+        """Extract all tables, databases, syslogs and figures from database"""
         # Extract table results
         tables = db.select("ResultTable", None, f"result_id='{result_id}'")
         for table in tables:
@@ -1585,6 +1585,30 @@ class Parser(object):
             for key in keys:
                 id, key_name, format, title, syslog_name = key
                 result.add_key(key_name, format, title)
+            return result
+        # Extract figure results
+        figures = db.select("ResultFigure", None, f"result_id='{result_id}'")
+        for figure in figures:
+            name, title, savefig, showfig, filter, result_id = figure
+            result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter)
+
+            plots = db.select("ResultFigurePlot", None, f"figure_name='{name}'")
+            for plot in plots:
+                id, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
+                
+                db_data = db.select("ResultFigurePlotData", None, f"plot_id='{id}'")
+                plot_data = list()
+                for data in db_data:
+                    data_id, x, y, groupby, plot_type, label, data_xscale, data_yscale, color, marker, linestyle, plot_name = data
+                    result.add_key(x)
+                    result.add_key(y)
+                    if groupby not in [None, ""]: result.add_key(groupby)
+                    plot_data.append({'x': x, 'y': y, 'type': plot_type, 
+                                    'groupby': groupby, 'label': label,
+                                    'xscale': data_xscale, 'yscale': data_yscale,
+                                    'color': color, 'marker': marker,
+                                    'linestyle': linestyle})
+                result.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
             return result
 
     @staticmethod
@@ -1719,25 +1743,26 @@ class Parser(object):
     @staticmethod
     def _extract_figure(etree_figure):
         """Extract a figure from etree"""
-        valid_scale_types = ["linear", "log", "logit", "symlog", "None"]
+        valid_scale_types = ["linear", "log", "logit", "symlog"]
         valid_plot_types = ["line", "scatter", "bar", "stem", "step"]
 
         name = Parser._attribute_from_element(etree_figure, "name").strip()
-        showfig = etree_figure.get("showfig", "True").strip()
-        if showfig not in ["True", "False"]:
-            raise ValueError("Supported values for <figure showfig>: True, False")
+        showfig = etree_figure.get("showfig", "true").strip().lower()
+        if showfig not in ["true", "false"]:
+            raise ValueError("Supported values for <figure showfig>: true, false")
         savefig = etree_figure.get("savefig")
         if savefig is not None:
             savefig = savefig.strip()
         title = etree_figure.get("title", "").strip()
+        res_filter = etree_figure.get("filter", "").strip()
 
-        figure = jube.result_types.figure.Figure(name, showfig, savefig, title)
+        figure = jube.result_types.figure.Figure(name, showfig, savefig, title, res_filter)
 
         for etree_plot in etree_figure:
             Parser._check_tag(etree_plot, ["plot"])
-            legend = etree_plot.get("legend", "False").strip()
-            if legend not in ["True", "False"]:
-                raise ValueError("Supported values for <figure legend>: True, False")
+            legend = etree_plot.get("legend", "false").strip().lower()
+            if legend not in ["true", "false"]:
+                raise ValueError("Supported values for <figure legend>: true, false")
             xlabel = etree_plot.get("xlabel", "").strip()
             ylabel = etree_plot.get("ylabel", "").strip()
             xscale = etree_plot.get("xscale","").strip()

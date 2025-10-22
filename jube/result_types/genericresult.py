@@ -76,7 +76,7 @@ class GenericResult(Result):
                     else:
                         self._data[key] = list()
 
-            number_of_new_values = len(list(data.values())[0])
+            number_of_new_values = len(list(data.values())[0]) if len(data) > 0 else 0
             # Add new rows
             for key in self._data.keys():
                 if key in data.keys():
