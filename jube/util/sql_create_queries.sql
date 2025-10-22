@@ -456,8 +456,6 @@ CREATE TABLE IF NOT EXISTS ResultFigurePlotData
     groupby TEXT,
     plot_type TEXT,
     label TEXT,
-    xscale TEXT,
-    yscale TEXT,
     color TEXT,
     marker TEXT,
     linestyle TEXT,

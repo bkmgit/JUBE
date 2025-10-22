@@ -250,8 +250,6 @@ attlist.data &=
   attribute groupby { text }?,
   attribute type { "line" | "scatter" | "bar" | "stem" | "step" }?,
   attribute label { text }?,
-  attribute xscale { "linear" | "log" | "logit" | "symlog" }?,
-  attribute yscale { "linear" | "log" | "logit" | "symlog" }?,
   attribute color { text }?,
   attribute marker { text }?,
   attribute linestyle { text }?,

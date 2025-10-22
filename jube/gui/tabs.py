@@ -703,7 +703,7 @@ class ResultTab(Tab):
                     tree_result.insert("", "end", text="showfig: " + f"{result.showfig!r}")
                 if result.res_filter is not None: 
                     tree_result.insert("", "end", text="filter: " + f"{result.res_filter!r}")
-                columns = ["Plot","legend","xlabel","ylabel","xscale","yscale","x","y","groupby","type","label","data xscale","data yscale","color","marker","linestyle"]
+                columns = ["Plot","legend","xlabel","ylabel","xscale","yscale","x","y","groupby","type","label","color","marker","linestyle"]
                 table = SortableTreeview(self._content, 
                                          columns, 
                                          selectmode="none", 
@@ -712,7 +712,7 @@ class ResultTab(Tab):
                                          style="Custom.Treeview")
                 for i, plot in enumerate(result.plots):
                     for data in plot.plot_data:
-                        table.insert("","end",values=[i, plot.legend, plot.xlabel, plot.ylabel, plot.xscale, plot.yscale, data.x, data.y, data.groupby, data.type, data.label, data.xscale, data.yscale, data.color, data.marker, data.linestyle])
+                        table.insert("","end",values=[i, plot.legend, plot.xlabel, plot.ylabel, plot.xscale, plot.yscale, data.x, data.y, data.groupby, data.type, data.label, data.color, data.marker, data.linestyle])
                     
             self.widget_dict[result.name] = {"label": label, 
                                              "tree_general": tree_general, 

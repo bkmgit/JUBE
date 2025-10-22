@@ -89,8 +89,6 @@ class Figure(GenericResult):
                         if attr_val not in [None, ""]:
                             func_args += f", {attr}=data.{attr}"
                     eval(f'ax.{data.type}({func_args})')
-                if data.xscale not in [None, ""]: ax.set_xscale(data.xscale)
-                if data.yscale not in [None, ""]: ax.set_yscale(data.yscale)
 
 
             table_data = {v.name:k for v,k in self._data.items()}
@@ -164,15 +162,13 @@ class Figure(GenericResult):
 
         class Data():
             """Plot data"""
-            def __init__(self, x, y, groupby, type, label, xscale, yscale,
+            def __init__(self, x, y, groupby, type, label,
                          color, marker, linestyle):
                 self._x = x
                 self._y = y
                 self._groupby = groupby
                 self._type = type
                 self._label = label
-                self._xscale = xscale
-                self._yscale = yscale
                 self._color = color
                 self._marker = marker
                 self._linestyle = linestyle
@@ -203,16 +199,6 @@ class Figure(GenericResult):
                 return self._label
 
             @property
-            def xscale(self):
-                """Get 'xscale'"""
-                return self._xscale
-
-            @property
-            def yscale(self):
-                """Get 'yscale'"""
-                return self._yscale
-
-            @property
             def color(self):
                 """Get 'color'"""
                 return self._color
@@ -230,8 +216,7 @@ class Figure(GenericResult):
             def __str__(self):
                 return f"Data: x: {self._x}; y: {self._y}; "\
                     f"groupby: {self._groupby}, type: {self._type}, "\
-                    f"label: {self._label}, xscale: {self._xscale}, " \
-                    f"yscale: {self._yscale}, color: {self._color}, " \
+                    f"label: {self._label}, color: {self._color}, " \
                     f"marker: {self._marker}, linestyle: {self._linestyle}"
 
             def add_information_to_database(self, db, plot_id):
@@ -245,10 +230,6 @@ class Figure(GenericResult):
                     data["plot_type"] = self._type
                 if self._label not in [None, ""]:
                     data["label"] = self._label
-                if self._xscale not in [None, ""]:
-                    data["xscale"] = self._xscale
-                if self._yscale not in [None, ""]:
-                    data["yscale"] = self._yscale
                 if self._color not in [None, ""]:
                     data["color"] = self._color
                 if self._marker not in [None, ""]:
@@ -265,8 +246,7 @@ class Figure(GenericResult):
             for data in plot_data:
                 self._plot_data.append(
                     Figure.Plot.Data(data['x'], data['y'], data['groupby'],
-                                     data['type'], data['label'], 
-                                     data['xscale'], data['yscale'],
+                                     data['type'], data['label'],
                                      data['color'], data['marker'], 
                                      data['linestyle']))
             self._legend = legend
@@ -310,9 +290,7 @@ class Figure(GenericResult):
                        f"ylabel: {self._ylabel}, xscale: {self._xscale}, "\
                        f"yscale: {self._yscale}\n"
             for data in self._plot_data:
-                plot_str += f"Data: x: {data['x']}; y: {data['y']}; type: {data['type']}, "\
-                            f"label: {data['label']}, color: {data['color']}," \
-                            f"marker: {data['marker']}, linestyle: {data['linestyle']}\n"
+                plot_str += f"{data}\n"
             return plot_str
             
         def add_information_to_database(self, db, figure_name):

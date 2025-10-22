@@ -188,8 +188,6 @@
                         groupby CDATA #IMPLIED
                         type (line|scatter|bar|stem|step) #IMPLIED
                         label CDATA #IMPLIED
-                        xscale (linear|log|logit|symlog) #IMPLIED
-                        yscale (linear|log|logit|symlog) #IMPLIED
                         color CDATA #IMPLIED
                         marker CDATA #IMPLIED
                         linestyle CDATA #IMPLIED

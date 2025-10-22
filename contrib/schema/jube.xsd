@@ -305,8 +305,6 @@
     <xs:attribute name="groupby" type="xs:string"/>
     <xs:attribute name="type" type="plottypeType"/>
     <xs:attribute name="label" type="xs:string"/>
-    <xs:attribute name="xscale" type="scaleType"/>
-    <xs:attribute name="yscale" type="scaleType"/>
     <xs:attribute name="color" type="xs:string"/>
     <xs:attribute name="marker" type="xs:string"/>
     <xs:attribute name="linestyle" type="xs:string"/>

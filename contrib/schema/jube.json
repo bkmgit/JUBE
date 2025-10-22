@@ -1415,16 +1415,6 @@
 					"description": "The label for the data that is shown in the legend",
 					"type": "string"
 				},
-				"xscale": {
-					"description": "xscale scales the x-axis depending on the chosen option. Possible options are: linear, log, logit, symlog",
-					"type": "string",
-					"pattern": "^(linear|log|logit|symlog)$"
-				},
-				"yscale": {
-					"description": "yscale scales the y-axis depending on the chosen option. Possible options are: linear, log, logit, symlog",
-					"type": "string",
-					"pattern": "^(linear|log|logit|symlog)$"
-				},
 				"color": {
 					"description": "It changes the color of the plotted data. Supported values are the values that are supported by matplotlib e.g. (r, g, b), (r, g, b, a), '#rrggbb' and '#rrggbbaa'",
 					"type": "string"

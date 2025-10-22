@@ -1599,13 +1599,12 @@ class Parser(object):
                 db_data = db.select("ResultFigurePlotData", None, f"plot_id='{id}'")
                 plot_data = list()
                 for data in db_data:
-                    data_id, x, y, groupby, plot_type, label, data_xscale, data_yscale, color, marker, linestyle, plot_name = data
+                    data_id, x, y, groupby, plot_type, label, color, marker, linestyle, plot_name = data
                     result.add_key(x)
                     result.add_key(y)
                     if groupby not in [None, ""]: result.add_key(groupby)
                     plot_data.append({'x': x, 'y': y, 'type': plot_type, 
                                     'groupby': groupby, 'label': label,
-                                    'xscale': data_xscale, 'yscale': data_yscale,
                                     'color': color, 'marker': marker,
                                     'linestyle': linestyle})
                 result.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
@@ -1785,14 +1784,6 @@ class Parser(object):
                     raise ValueError("Supported values for <data type>: {}"
                                      .format(", ".join(valid_plot_types)))
                 label = etree_data.get("label", "").strip()
-                xscale_data = etree_data.get("xscale", "").strip()
-                if xscale_data not in valid_scale_types and xscale_data !="":
-                    raise ValueError("Supported values for <data xscale>: {}"
-                                    .format(", ".join(valid_scale_types)))
-                yscale_data = etree_data.get("yscale", "").strip()
-                if yscale_data not in valid_scale_types and yscale_data !="":
-                    raise ValueError("Supported values for <data yscale>: {}"
-                                    .format(", ".join(valid_scale_types)))
                 color = etree_data.get("color", "").strip()
                 marker = etree_data.get("marker", "").strip()
                 linestyle = etree_data.get("linestyle", "").strip()
@@ -1801,7 +1792,6 @@ class Parser(object):
                 if groupby != "": figure.add_key(groupby)
                 plot_data.append({'x': x, 'y': y, 'type': data_type, 
                                   'groupby': groupby, 'label': label,
-                                  'xscale': xscale_data, 'yscale': yscale_data,
                                   'color': color, 'marker': marker,
                                   'linestyle': linestyle})
             figure.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)

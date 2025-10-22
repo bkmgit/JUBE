@@ -753,7 +753,7 @@ Glossary
 
         <figure name="..." title="..." savefig="..." showfig="..." filter="..."> 
           <plot xlabel="..." ylabel="..." legend="..." xscale="..." yscale="...">
-            <data x="..." y="..." label="..." type="..." xscale="..." yscale="..."/> 
+            <data x="..." y="..." label="..." type="..."/> 
             <data x="..." y="..." label="..." type="..." color="..." marker="..." linestyle="..."/> 
             <data x="..." y="..." groupby="..."/> 
             ...
