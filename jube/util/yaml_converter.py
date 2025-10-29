@@ -92,7 +92,7 @@ class YAML_Converter(object):
         # to gather all available tags
         while changed and counter < jube.conf.PREPROCESS_MAX_ITERATION:
             self._include_path = list(include_path) + \
-                self.__search_for_include_pathes() + \
+                self.__search_for_include_paths() + \
                 [os.path.dirname(self._path)]
             self._tags.update(self.__search_for_tags())
             changed = len(self._tags.difference(old_tags)) > 0
@@ -136,14 +136,14 @@ class YAML_Converter(object):
         self._int_file.close()
 
     def __find_include_file(self, filename):
-        """Search for filename in include-pathes and return resulting path"""
+        """Search for filename in include-paths and return resulting path"""
         for path in self._include_path:
             file_path = os.path.join(path, filename)
             if os.path.exists(file_path):
                 break
         else:
             raise ValueError(("\"{0}\" not found in possible " +
-                              "include pathes").format(filename))
+                              "include paths").format(filename))
 
         return file_path
 
@@ -161,22 +161,22 @@ class YAML_Converter(object):
                             set(tag.split(jube.conf.DEFAULT_SEPARATOR)))
         return tags
 
-    def __search_for_include_pathes(self):
+    def __search_for_include_paths(self):
         """Search a YAML file for stored include-path information"""
-        include_pathes = []
+        include_paths = []
         with open(self._path, "r") as file_handle:
             data = yaml.load(file_handle.read(), Loader=yaml.Loader)
             # include-path is only allowed on the top level of the tree
             if "include-path" in data:
                 if type(data["include-path"]) is not list:
                     data["include-path"] = [data["include-path"]]
-                values = self.__search_for_pathes(data["include-path"])
+                values = self.__search_for_paths(data["include-path"])
                 for val in values:
-                    include_pathes.append(os.path.join(
+                    include_paths.append(os.path.join(
                         os.path.dirname(self._path), val))
-        return include_pathes
+        return include_paths
 
-    def __search_for_pathes(self, data):
+    def __search_for_paths(self, data):
         """Search in given data for stored path informations"""
         paths = []
         for path in data:
@@ -186,10 +186,10 @@ class YAML_Converter(object):
                 value = path["path"] if "path" in path else path["_"]
                 if type(value) is not list:
                     value = [value]
-                path_val = self.__search_for_pathes(value)
+                path_val = self.__search_for_paths(value)
                 paths.extend(path_val)
             elif type(path) is list:
-                path_val = self.__search_for_pathes(path)
+                path_val = self.__search_for_paths(path)
                 paths.extend(path_val)
             else:
                 paths.append(path)
@@ -227,7 +227,7 @@ class YAML_Converter(object):
                 raise ve
 
     @staticmethod
-    def create_headtags(data, parent_node, include_pathes):
+    def create_headtags(data, parent_node, include_paths):
         """ Search for the headtags in given dictionary """
         if type(data) is not dict:
             data = {'benchmark': data}
@@ -235,7 +235,7 @@ class YAML_Converter(object):
         for tag in data.keys():
             # Override include-path with parsed include-path
             if tag == "include-path":
-                data[tag] = include_pathes
+                data[tag] = include_paths
             if type(data[tag]) is not list:
                 data[tag] = [data[tag]]
             # benchmark is optional on the top level, but if it is used only

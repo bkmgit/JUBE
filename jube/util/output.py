@@ -44,7 +44,7 @@ def text_boxed(text):
 
 
 def text_line(char="#"):
-    """Return a horizonal ASCII line"""
+    """Return a horizontal ASCII line"""
     return char * jube.conf.DEFAULT_WIDTH
 
 
@@ -211,7 +211,7 @@ def element_tree_tostring(element, encoding=None):
 
 
 def format_value(format_string, value):
-    """Return formated value"""
+    """Return formatted value"""
     if (type(value) is not int) and \
             (("d" in format_string) or ("b" in format_string) or
              ("c" in format_string) or ("o" in format_string) or

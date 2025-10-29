@@ -134,7 +134,7 @@ def print_benchmark_info(benchmark):
         for parameterset_name, parameterset in benchmark.parametersets.items():
             print("\n   Parameterset name: " + parameterset_name)
             print("   Duplicate: " + parameterset.duplicate)
-            parameter_info = [("name", "mode", "type", "seperator", "export", "unit",
+            parameter_info = [("name", "mode", "type", "separator", "export", "unit",
                             "update_mode", "duplicate", "value")]
             for parameter in parameterset.all_parameters:
                 parameter_info.append((parameter.name, parameter.mode, parameter.parameter_type,
@@ -321,7 +321,7 @@ def print_benchmark_info(benchmark):
             print("   Used Analyser: " + ", ".join(result.use))
             result_type = result.result_type
             if result_type == "Table":
-                table_info = [("name", "style", "sort", "seperator", "transpose", "filter")]
+                table_info = [("name", "style", "sort", "separator", "transpose", "filter")]
                 column_info = [("column", "colw", "format", "title")]
                 res_filter = result.res_filter if result.res_filter else ""
                 table_info.append((result.name, result.style, ", ".join(result.sort),
@@ -577,7 +577,7 @@ def print_workpackage_info(benchmark, workpackage):
 def print_benchmark_status(benchmark):
     """Print overall workpackage status in the following order
         RUNNING: At least one WP is still active
-        ERROR: At least one WP raised an errror
+        ERROR: At least one WP raised an error
         FINISHED: All WPs are finalized and no error was raised
     """
     error = False
@@ -605,8 +605,8 @@ def print_tag_documentation(dir, benchmark):
     print("  Path: {0}".format(os.path.abspath(dir)))
 
     tag_docu = [("tag name", "description")]
-    for name, doku in benchmark.tag_docu.items():
-        tag_docu.append((name, doku))
+    for name, docu in benchmark.tag_docu.items():
+        tag_docu.append((name, docu))
 
     print("\n" + jube.util.output.text_table(tag_docu, use_header_line=True,
                                               indent=1))
@@ -628,8 +628,8 @@ def print_benchmark_tag_documentation(benchmark):
           .format(os.path.abspath(benchmark.bench_dir)))
 
     tag_docu = [("tag name", "description")]
-    for name, doku in benchmark.tag_docu.items():
-        tag_docu.append((name, doku))
+    for name, docu in benchmark.tag_docu.items():
+        tag_docu.append((name, docu))
 
     print("\n" + jube.util.output.text_table(tag_docu, use_header_line=True,
                                               indent=1))

@@ -341,7 +341,7 @@
 					"type": "string"
 				},
 				"duplicate": {
-					"description": "It is of relevance, if there are more than one *parameter* definitions with the same name within one *parameterset*. This duplicate option has lower priority than the duplicte option of the *parameters*. It must contain one of the following three options: replace, concat, error",
+					"description": "It is of relevance, if there are more than one *parameter* definitions with the same name within one *parameterset*. This duplicate option has lower priority than the duplicate option of the *parameters*. It must contain one of the following three options: replace, concat, error",
 					"type": "string",
 					"pattern": "^(replace|concat|error)$"
 				},
@@ -394,7 +394,7 @@
 					"type": "string"
 				},
 				"duplicate": {
-					"description": "It is of relevance, if there are more than one *parameter* definitions with the same name within one *parameterset*. This duplicate option has higher priority than the duplicte option of the *parameterset*. It must contain one of the following four options: none, replace , concat , error",
+					"description": "It is of relevance, if there are more than one *parameter* definitions with the same name within one *parameterset*. This duplicate option has higher priority than the duplicate option of the *parameterset*. It must contain one of the following four options: none, replace , concat , error",
 					"type": "string",
 					"pattern": "^(none|replace|concat|error)$"
 				},
@@ -557,7 +557,7 @@
 					"$ref": "#/$defs/tag"
 				},
 				"copy": {
-					"description": "A *copy* can be used to copy a file or directory from your normal filesytem to your sandbox work directory. It can contain a list of filenames (or directories).",
+					"description": "A *copy* can be used to copy a file or directory from your normal filesystem to your sandbox work directory. It can contain a list of filenames (or directories).",
 					"anyOf": [{
 						"type": "array",
 						"items": {
@@ -619,7 +619,7 @@
 			"type": "object",
 			"properties": {
 				"directory": {
-					"description": "It will be used as a prefix for the source filenames. It does not allow *parameter* substitution (deprecated; new attribut: *source_dir*).",
+					"description": "It will be used as a prefix for the source filenames. It does not allow *parameter* substitution (deprecated; new attribute: *source_dir*).",
 					"type": "string"
 				},
 				"name": {
@@ -678,7 +678,7 @@
 					"type": ["string", "boolean"]
 				},
 				"work_dir": {
-					"description": "The work_dir can be used to change the work directory of this single command (relativly seen towards the original work directory).",
+					"description": "The work_dir can be used to change the work directory of this single command (relatively seen towards the original work directory).",
 					"type": "string"
 				},
 				"tag": {
@@ -816,7 +816,7 @@
 					"pattern": "^(true|false)$"
 				},
 				"shared": {
-					"description": "This attribte can be used to create a shared folder which can be accessed by all workpackages based on this *step*.",
+					"description": "This attribute can be used to create a shared folder which can be accessed by all workpackages based on this *step*.",
 					"type": "string"
 				},
 				"tag": {
@@ -831,11 +831,11 @@
 					"type": "integer"
 				},
 				"do_log_file": {
-					"description": "Name or path of a do log file trying to mimick the *do* steps and the environment of a workpacakge of a *step* to produce an executable script.",
+					"description": "Name or path of a do log file trying to mimic the *do* steps and the environment of a workpackage of a *step* to produce an executable script.",
 					"type": "string"
 				},
 				"use": {
-					"description": "It declares, which *parametersets*, *filesets* and *substitutionsets* are usable.",
+					"description": "It declares, which *parametersets*, *filesets* and *substitutesets* are usable.",
 					"$ref": "#/$defs/use"
 				},
 				"do": {
@@ -931,7 +931,7 @@
 					"pattern": "^(true|false)$"
 				},
 				"work_dir": {
-					"description": "The work_dir can be used to change the work directory of this single command (relativly seen towards the original work directory).",
+					"description": "The work_dir can be used to change the work directory of this single command (relatively seen towards the original work directory).",
 					"type": "string"
 				},
 				"_": {
@@ -991,7 +991,7 @@
 					"$ref": "#/$defs/tag"
 				},
 				"file": {
-					"description": "The file-attribute contains the files that will be analysed. Each file using each workpackage will be scanned seperatly.",
+					"description": "The file-attribute contains the files that will be analysed. Each file using each workpackage will be scanned separately.",
 					"anyOf": [{
 						"type": "array",
 						"items": {
@@ -1062,7 +1062,7 @@
 					}]
 				},
 				"table": {
-					"description": "A simple ASCII based *table* ouput",
+					"description": "A simple ASCII based *table* output",
 					"anyOf": [{
 						"type": "array",
 						"items": {
@@ -1224,7 +1224,7 @@
 					"type": "string"
 				},
 				"address": {
-					"description": "The socket adress that gives a syslog daemon (the combination of *host*/*port* and *address* is not allowed).",
+					"description": "The socket address that gives a syslog daemon (the combination of *host*/*port* and *address* is not allowed).",
 					"type": "string"
 				},
 				"host": {

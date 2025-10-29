@@ -55,7 +55,7 @@ class Database(KeyValuesResult):
             # Place for the magic #
             # show = If False do not show something on screen (result
             # only into file)
-            # filename = name of standard output/datbase file
+            # filename = name of standard output/database file
             # All keys: print([key.name for key in self._keys])
             #col_names = [key.name for key in self._keys]
             # All data: print(self.data)

@@ -74,7 +74,7 @@ class Parameterset(object):
 
     @property
     def has_templates(self):
-        """This Parameterset contains template paramters?"""
+        """This Parameterset contains template parameters?"""
         for parameter in self._parameters.values():
             if parameter.is_template:
                 return True
@@ -235,16 +235,16 @@ class Parameterset(object):
                 (parameter.update_mode == ALWAYS_MODE and mode == USE_MODE) or
                     (parameter.update_mode == ALWAYS_MODE and
                      mode == STEP_MODE)):
-                root_paramter = parameter.based_on_root.copy()
+                root_parameter = parameter.based_on_root.copy()
                 if keep_index:
-                    root_paramter.idx = parameter.idx
-                parameterset.add_parameter(root_paramter)
+                    root_parameter.idx = parameter.idx
+                parameterset.add_parameter(root_parameter)
         return parameterset
 
     def is_compatible(self, parameterset,
                       update_mode=NEVER_MODE):
         """Two Parametersets are compatible, if the intersection only contains
-        equivilant parameters"""
+        equivalent parameters"""
         return len(self.get_incompatible_parameter(
             parameterset, update_mode)) == 0
 
@@ -371,7 +371,7 @@ class Parameterset(object):
             substitution_list = [self._parameters[name] for name in
                                  jube.util.util.resolve_depend(depend_dict)]
 
-            # Do substition and evaluation if possible
+            # Do substitution and evaluation if possible
             set_changed = self.__substitute_parameters_in_list(
                 substitution_list, additional_parametersets)
 
@@ -547,7 +547,7 @@ class Parameter(object):
 
     @property
     def separator(self):
-        """Return seperator"""
+        """Return separator"""
         return self._separator
 
     @property

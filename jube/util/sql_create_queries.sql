@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Tag
     FOREIGN KEY (benchmark_id) REFERENCES Benchmark(benchmark_id)
 );
 
--- Table TagDoku
+-- Table TagDocu
 CREATE TABLE IF NOT EXISTS TagDocu
 (
     tag TEXT NOT NULL PRIMARY KEY,

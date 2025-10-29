@@ -172,7 +172,7 @@ def output(args):
     #sort paths
     paths = sorted(paths)
 
-    #show conten of file, not only filename
+    #show content of file, not only filename
     if args.display:
         for path in paths:
             LOGGER.info(path + "\n")
@@ -386,8 +386,8 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
             parser = jube.jubeio.Parser(found_configuration, force=args.force,
                                          strict=args.strict)
             benchmark = parser.load_benchmark_from_configuration(db, benchmark_folder)
-        except IOError as exeption:
-            LOGGER.warning(str(exeption))
+        except IOError as exception:
+            LOGGER.warning(str(exception))
             return None
     else:
         raise IOError("Benchmark configuration file not found in \"{0}\""
@@ -400,8 +400,8 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
             parser = jube.jubeio.Parser(found_workpackage, force=args.force,
                                          strict=args.strict)
             workpackages, work_stat = parser.load_workpackages_from_configuration(benchmark, db)
-        except IOError as exeption:
-            LOGGER.warning(str(exeption))
+        except IOError as exception:
+            LOGGER.warning(str(exception))
             return None
         benchmark.set_workpackage_information(workpackages, work_stat)
     elif not found_workpackage and restore_workpackages:
@@ -550,16 +550,16 @@ def run_new_benchmark(args):
 
         # Read new benchmarks
         if args.include_path is not None:
-            include_pathes = [include_path for include_path in
+            include_paths = [include_path for include_path in
                               args.include_path if include_path != ""]
         else:
-            include_pathes = None
+            include_paths = None
 
         # Get benchmark outpath out of environment if args.outpath not set
         if args.outpath is None:
             args.outpath = jube.util.util.check_and_get_benchmark_outpath()
 
-        parser = jube.jubeio.Parser(path, tags, include_pathes,
+        parser = jube.jubeio.Parser(path, tags, include_paths,
                                      args.outpath, args.force, args.strict,
                                      args.subparser)
         benchmarks, only_bench, not_bench = parser.benchmarks_from_xml()
@@ -732,11 +732,11 @@ def _update_analyse_and_result(args, benchmark):
 
         # Read new benchmarks
         if args.include_path is not None:
-            include_pathes = [include_path for include_path in
+            include_paths = [include_path for include_path in
                               args.include_path if include_path != ""]
         else:
-            include_pathes = None
-        parser = jube.jubeio.Parser(args.update, tags, include_pathes,
+            include_paths = None
+        parser = jube.jubeio.Parser(args.update, tags, include_paths,
                                      args.force, args.strict)
         benchmarks = parser.benchmarks_from_xml()[0]
 
@@ -1079,7 +1079,7 @@ def gen_subparser_conf():
             ("-d", "--display"):
                 {"help": "display content of output file" , "action": "store_true"},
             ("-o", "--only"):
-                {"help": "show only stdour or stderr",
+                {"help": "show only stdout or stderr",
                  "choices": ["stdout", "stderr"]}
         }
     }
@@ -1115,7 +1115,7 @@ def gen_subparser_conf():
                 {"help": "remove benchmarks given by id",
                  "nargs": "+"},
             ("-w", "--workpackage"):
-                {"help": "specifc workpackage id to be removed",
+                {"help": "specific workpackage id to be removed",
                  "nargs": "+"},
             ("-f", "--force"):
                 {"help": "force removing, never prompt",
@@ -1256,9 +1256,9 @@ def main(command=None):
         else:
             try:
                 args.func(args)
-            except Exception as exeption:
+            except Exception as exception:
                 # Catch all possible Exceptions
-                LOGGER.error("\n" + str(exeption))
+                LOGGER.error("\n" + str(exception))
                 jube.log.reset_logging()
                 exit(1)
     else:

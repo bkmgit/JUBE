@@ -76,7 +76,7 @@ class Workpackage(object):
 
 
     def update_information_in_database(self):
-        """Update worpackage information after run in database"""
+        """Update workpackage information after run in database"""
         db = self._benchmark.db
         db.connect()
         # Adding used sets that need to be substituted
@@ -108,7 +108,7 @@ class Workpackage(object):
 
     def add_or_update_additional_information_to_database(self, db):
         """Add or update workpackage information that can be updated in the database"""
-        # Add used paraemeter to database
+        # Add used parameter to database
         for parameter in self.local_parameterset.all_parameters:
             parameter.add_selected_parameter_to_database(db, self._id)
         # Add workpackage parents relationship to database
@@ -460,12 +460,12 @@ class Workpackage(object):
 
     @property
     def status(self):
-        """return done, error, wait or open dependign on the workpackage status"""
+        """return done, error, wait or open depending on the workpackage status"""
         return self._status
 
     @status.setter
     def status(self, status):
-        """return done, error, wait or open dependign on the workpackage status"""
+        """return done, error, wait or open depending on the workpackage status"""
         if status in ["done", "done_debug", "error", "wait", "open"]:
             self._status = status
         else:
@@ -497,7 +497,7 @@ class Workpackage(object):
         information"""
         parameterset = jube.parameter.Parameterset()
 
-        # worpackage cycle
+        # workpackage cycle
         parameterset.add_parameter(
             jube.parameter.Parameter.
             create_parameter("jube_wp_cycle",
@@ -549,7 +549,7 @@ class Workpackage(object):
 
         parameterset.add_parameterset(self.get_jube_cycle_parameterset())
 
-        # pathes
+        # paths
         if self._step.alt_work_dir is None:
             path = self.work_dir
         else:
@@ -808,7 +808,7 @@ class Workpackage(object):
 
     def run(self, mode='s'):
         """Run step and use current parameter space
-            mode: s = seriell (default); p = parallel
+            mode: s = serial (default); p = parallel
         """
 
         proc_id = None
@@ -897,7 +897,7 @@ class Workpackage(object):
             if self._cycle == 0:
                 self.create_shared_folder_link(parameter)
 
-            # --- Create alternativ working dir ---
+            # --- Create alternative working dir ---
             alt_work_dir = self.alt_work_dir(parameter)
             if alt_work_dir is not None:
                 # Check if given work directory contains any remaining variable
@@ -906,7 +906,7 @@ class Workpackage(object):
                     raise IOError(("Given work directory {0} contains a " +
                                    "unknown JUBE or environment variable.")
                                   .format(alt_work_dir))
-                LOGGER.debug("  switch to alternativ work dir: \"{0}\""
+                LOGGER.debug("  switch to alternative work dir: \"{0}\""
                              .format(alt_work_dir))
 
                 if not jube.conf.DEBUG_MODE and \
@@ -952,7 +952,7 @@ class Workpackage(object):
 
             # --- File substitution ---
             if not started_before:
-                # Filter for substitutionsets in uses
+                # Filter for substitutesets in uses
                 substituteset_names = \
                     self._step.get_used_sets(self._benchmark.substitutesets,
                                              parameter)

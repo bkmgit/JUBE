@@ -120,7 +120,7 @@ class Tab(tk.Frame):
     
     def item_selected(self, event):
         """Event Handler that is used if a item in the listbox is clicked
-        It is ussed to display the correct set."""
+        It is used to display the correct set."""
         if event.widget == self._listbox and self._listbox.curselection():
             for i in range(self._listbox.size()):
                 self._listbox.itemconfig(i, bg=GREY)

@@ -312,7 +312,7 @@ Release: 2021-11-30
 
 * Fixes a bug in YAML input format if *benchmark* key is not used.
 
-* A empty value in YAML input format will now be treated liek an empty
+* A empty value in YAML input format will now be treated like an empty
   String not as a *None* value.
 
 * Avoid crash due to overflow error for huge pattern values.
@@ -402,8 +402,8 @@ Release: 2019-11-07
 
 * New option "dotall=true" in "<pattern>" (default: "false") allows
   that "." within a regular expression also matches newline
-  characters. This can be very helpfull to extract a line only after a
-  specific header was mentioned. See Extract data from a specifc text
+  characters. This can be very helpful to extract a line only after a
+  specific header was mentioned. See Extract data from a specific text
   block
 
 * "--tags" used in combination with the "--update" option will now be
@@ -411,7 +411,7 @@ Release: 2019-11-07
   overwriting the old tags. If no new tags need to be added within an
   update "--tags" can now be skipped.
 
-* "parse.log" is now automatically moved into the specifc job run
+* "parse.log" is now automatically moved into the specific job run
   folder and is also available within the "jube log" command
 
 
@@ -514,7 +514,7 @@ Release: 2016-12-20
 * "<parameter>" using "mode="shell"" or "mode="perl"" will now stop
   program execution if an error occurs (similar to "mode="python"")
 
-* "<do>" specfic "work_dir" is now created automatically if needed
+* "<do>" specific "work_dir" is now created automatically if needed
 
 * "directory" attribute in "<link>" and "<copy>" was renamed to
   "source_dir" (old attribute name is still possible)
@@ -580,7 +580,7 @@ Release: 2016-07-29
 
 * Fix bug when using *JUBE* in a *Python3.x* environment
 
-* The "jube help" output was restructed to display separate key
+* The "jube help" output was restricted to display separate key
   columns instead of a keyword list
 
 * "<pattern>" can now contain a "default=..." attribute which set
@@ -601,7 +601,7 @@ Release: 2016-07-29
   which points to a sub directory
 
 * Added new option "-c / --csv-parametrization" to "jube info" command
-  to show a workpackage specfic parametrisation by using the CSV
+  to show a workpackage specific parametrisation by using the CSV
   format (similar to the existing "-p" option)
 
 * Allow Shell expansion in "<link>" tags. "<link>" now also support
@@ -624,7 +624,7 @@ Release: 2016-04-14
   attribute
 
 * Added "filter" attribute in "<table>" and "<syslog>" to show only
-  specifix result entries (based on a bool expression)
+  specific result entries (based on a bool expression)
 
 * New "<parameter>" and "<pattern>" mode: "mode="shell""
 
@@ -790,7 +790,7 @@ Release: 2015-04-09
 * change default platform output filenames: using *job.out* and
   *job.err* instead of *stdout* and *stderr* for default job output
 
-* new internal workflow generation alogrithm
+* new internal workflow generation algorithm
 
 * parameter can now be used in step "<use>", e.g.
   "<use>set_$number</use>"
@@ -824,7 +824,7 @@ Release: 2015-02-23
 * fix bug when using *JUBE* in a *Python3.x* environment
 
 * time information (start, last modified) will now be stored in a
-  seperate file and are not extracted out of file and directory
+  separate file and are not extracted out of file and directory
   metadata
 
 * "jube run" now allows the "--id/-i" command line option to set a
@@ -864,7 +864,7 @@ Release: 2015-01-29
   shows the current parametrization using a csv table format
 
 * add new (optional) attribute "max_async="..."" to "<step>": Maximum
-  number of parallel workpackages of the correspondig step will run at
+  number of parallel workpackages of the corresponding step will run at
   the same time (default: 0, means no limitation)
 
 * switch "<analyzer>" to "<analyser>" (also "<analyzer>" will be

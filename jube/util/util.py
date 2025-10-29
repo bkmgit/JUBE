@@ -214,7 +214,7 @@ def substitution(text, substitution_dict):
     """Substitute templates given by parameter_dict inside of text"""
     changed = True
     count = 0
-    # All values must be string values (handle Python 2 separatly)
+    # All values must be string values (handle Python 2 separately)
     try:
         str_substitution_dict = \
             dict([(k, str(v).decode("utf-8", errors="ignore")) for k, v in
@@ -519,7 +519,7 @@ class CompType(object):
         return self.__value
 
     def _special_comp(self, other, comp_func):
-        """Allow comparision of different datatypes"""
+        """Allow comparison of different datatypes"""
         if self.value is None or other.value is None:
             return False
         else:

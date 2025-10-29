@@ -82,7 +82,7 @@ Configuration
 The main *JUBE* configuration bases on the given input configuration file. But in addition, some
 shell environment variables are available which can be used to set system specific options:
 
-* ``JUBE_INCLUDE_PATH``: Can contain a list of paths (seperated by ``:``) pointing to directories, which contain
+* ``JUBE_INCLUDE_PATH``: Can contain a list of paths (separated by ``:``) pointing to directories, which contain
   system relevant include configuration files. This technique can be used to store platform specific parameter
   in a platform specific directory.
 * ``JUBE_EXEC_SHELL``: *JUBE* normally uses ``/bin/sh`` to execute the given shell commands. This default shell can be changed
@@ -109,12 +109,12 @@ Input format
 ~~~~~~~~~~~~
 
 *JUBE* supports two different types of input formats: *XML* based files and *YAML* based files. Both formats support the same amount of *JUBE*
-features and you can select your more preffered input format.
+features and you can select your more preferred input format.
 
-The following sections will always show all examples using both formats. However the explanations will mostly stick to the *XML* format but can be easily transfered 
+The following sections will always show all examples using both formats. However the explanations will mostly stick to the *XML* format but can be easily transferred 
 to the *YAML* solution.
 
-Both formats depends on a specifc special scharacter handling. More details can be found in the following FAQ sections:
+Both formats depends on a specific special character handling. More details can be found in the following FAQ sections:
 
 * :ref:`XML_character_handling`
 * :ref:`YAML_character_handling`
@@ -191,7 +191,7 @@ To run the benchmark just type::
 
    >>> jube run hello_world.xml
 
-This benchmark will produce the follwing output:
+This benchmark will produce the following output:
 
 .. code-block:: none
 
@@ -225,7 +225,7 @@ which runs one shell command ``echo $hello_str`` that will be expanded to ``echo
 The **id** is (in addition to the benchmark directory handle) an important number.
 Every benchmark run will get a new unique **id** inside the benchmark directory.
 
-Inside the benchmark directory you will see the follwing structure:
+Inside the benchmark directory you will see the following structure:
 
 .. code-block:: none
 
@@ -513,7 +513,7 @@ will create its own result entry. Additional ``<patternset>`` can be used inside
 The analyser automatically knows all parameters which were used in the given step and in depending steps. There is no ``<use>`` option to include additional ``<parameterset>`` 
 that have not been already used within the analysed ``<step>``.
 
-To run the anlayse you have to write::
+To run the analyse you have to write::
 
    >>> jube analyse bench_run
 

@@ -37,7 +37,7 @@ class Database_Interface(object):
         self._name = name
 
     def connect(self):
-        """Create the database connection to execute querys"""
+        """Create the database connection to execute queries"""
         self._connection = sqlite3.connect(self._name)
         self._connection.isolation_level = None
         self._cursor = self._connection.cursor()

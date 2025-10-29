@@ -42,7 +42,7 @@
       <table name="result" style="pretty" sort="number">
         <column>number</column>
         <column>number_pat</column> <!-- Column with title same as pattern name -->
-        <column title="Number">number_pat_en</column> <!-- Column with costum title -->
+        <column title="Number">number_pat_en</column> <!-- Column with custom title -->
         <column title="Zahl">number_pat_de</column>
       </table>
     </result>

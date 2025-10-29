@@ -36,7 +36,7 @@ LOGGER = jube.log.get_logger(__name__)
 class Step(object):
 
     """A Step represent one execution step. It contains a list of
-    Do-operations and multiple parametersets, substitutionsets and filesets.
+    Do-operations and multiple parametersets, substitutesets and filesets.
     A Step is a template for Workpackages.
     """
 
@@ -253,7 +253,7 @@ class Step(object):
                              parameter_type="int",
                              update_mode=jube.parameter.JUBE_MODE))
 
-        # default worpackage cycle, will be overwritten by specific worpackage
+        # default workpackage cycle, will be overwritten by specific workpackage
         # cycle
         parameterset.add_parameter(
             jube.parameter.Parameter.
@@ -344,7 +344,7 @@ class Step(object):
         global_parameterset.update_parameterset(update_parameters)
 
         # Set tag-mode evaluation helper function to allow access to tag list
-        # during paramter evaluation
+        # during parameter evaluation
         for parameter in global_parameterset.all_parameters:
             if parameter.mode == "tag":
                 parameter.eval_helper = \
@@ -437,7 +437,7 @@ class Step(object):
 
     @property
     def alt_work_dir(self):
-        """Return alternativ work directory"""
+        """Return alternative work directory"""
         return self._alt_work_dir
 
     @property

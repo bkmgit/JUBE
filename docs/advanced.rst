@@ -460,7 +460,7 @@ An example benchmark structure is based on three include files:
 * The main benchmark include file which contain all benchmark specific but platform independent data
 * A mostly generic platform include file which contain benchmark independent but platform specific data (this can be created once and placed somewhere
   central on the system, it can be easily accessed using the ``JUBE_INCLUDE_PATH`` environment variable.
-* A platform specific and benchmark specific include file which must be placed in a unique directory to allow inlcude-path usage
+* A platform specific and benchmark specific include file which must be placed in a unique directory to allow include-path usage
 
 Inside the ``platform`` directory you will find some example benchmark independent platform configuration files for the supercomputers at
 Forschungszentrum Jülich.

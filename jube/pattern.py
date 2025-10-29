@@ -311,9 +311,9 @@ def get_jube_pattern():
     patternset.add_pattern(
         Pattern("jube_pat_nfp",
                 r"(?:[+-]?(?:\d*\.?\d+(?:[eE][-+]?\d+)?|\d+\.))"))
-    # Pattern for word (all noblank characters)
+    # Pattern for word (all no blank characters)
     patternset.add_pattern(Pattern("jube_pat_wrd", r"(\S+)"))
-    # Pattern for word (all noblank characters), no ()
+    # Pattern for word (all no blank characters), no ()
     patternset.add_pattern(Pattern("jube_pat_nwrd", r"(?:\S+)"))
     # Pattern for blank space (variable length)
     patternset.add_pattern(Pattern("jube_pat_bl", r"(?:\s+)"))

@@ -166,14 +166,14 @@ class File(object):
         if alt_work_dir is not None:
             work_dir = alt_work_dir
         # Shell expansion
-        pathes = glob.glob(pathname)
-        if (len(pathes) == 0) and (not jube.conf.DEBUG_MODE):
+        paths = glob.glob(pathname)
+        if (len(paths) == 0) and (not jube.conf.DEBUG_MODE):
             raise RuntimeError("no files found using \"{0}\""
                                .format(pathname))
-        for path in pathes:
+        for path in paths:
             # When using shell extensions, alternative filenames are not
             # allowed for multiple matches.
-            if (len(pathes) > 1) or ((pathname != path) and
+            if (len(paths) > 1) or ((pathname != path) and
                                      (name == os.path.basename(pathname))):
                 name = os.path.basename(path)
 

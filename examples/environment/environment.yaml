@@ -21,4 +21,4 @@ step:
     use: param_set
     do:
       - echo $$EXPORT_ME
-      - echo "$$SHELL_VAR again" #use exported Shell var out of privious step
+      - echo "$$SHELL_VAR again" #use exported Shell var out of previous step

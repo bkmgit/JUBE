@@ -48,7 +48,7 @@ class Analyser(object):
             self._use = set()
 
         def add_uses(self, use_names):
-            """Add an addtional patternset name"""
+            """Add an additional patternset name"""
             for use_name in use_names:
                 if use_name in self._use:
                     raise ValueError(("Element \"{0}\" can only be used once")
@@ -129,7 +129,7 @@ class Analyser(object):
         return self._reduce_iteration
 
     def add_analyse(self, step_name, analyse_file):
-        """Add an addtional analyse file"""
+        """Add an additional analyse file"""
         if step_name not in self._analyse:
             self._analyse[step_name] = list()
         if (analyse_file not in self._analyse[step_name]) and \
@@ -137,7 +137,7 @@ class Analyser(object):
             self._analyse[step_name].append(analyse_file)
 
     def add_uses(self, use_names):
-        """Add an addtional patternset name"""
+        """Add an additional patternset name"""
         for use_name in use_names:
             if use_name in self._use:
                 raise ValueError(("Element \"{0}\" can only be used once")

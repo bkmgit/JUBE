@@ -42,7 +42,7 @@ E.g. you have two parameters:
      - { name: foo,  _: '10,100' }
      - { name: bar,  _: '20,200' }
    
-Without any additional change, *JUBE* will run four paramater combinations (
+Without any additional change, *JUBE* will run four parameter combinations (
 ``foo=10,bar=20``, ``foo=100,bar=20``, ``foo=10,bar=200``, ``foo=100,bar=200``).
 But maybe within your configuration only ``foo=10,bar=20`` and ``foo=100,bar=200`` make sense.
 For this you can use the parameter dependencies feature and small *Python* snippets 
@@ -140,7 +140,7 @@ directories e.g. by using the :term:`jube_variables`.
 Using the ``*_padid`` variables will help to create a sorted directory structure.
 
 *JUBE* does not create any symbolic links inside the changed work directories. If you want to access files, out of
-a dependend step, you can use a ``<fileset>`` and the ``rel_path_ref``-attribute.
+a dependent step, you can use a ``<fileset>`` and the ``rel_path_ref``-attribute.
 
 .. code-block:: xml
 
@@ -157,7 +157,7 @@ a dependend step, you can use a ``<fileset>`` and the ``rel_path_ref``-attribute
 
 This will create a link inside your alternative working dir and the link target path will be seen relative towards
 the original *JUBE* directory structure. So here you can use the normal automatic created link to access all
-dependend files.
+dependent files.
 
 To access files out of an alternative working directory in a following step and if you created this working directory by
 using the :term:`jube_variables`, you can use ``jube_wp_parent_<parent_name>_id`` to get the id of the parent step to
@@ -185,7 +185,7 @@ inside a ``<sub>``. Linebreaks are possible for the ``dest=""`` part, by switchi
 Whitespaces will only be removed in the beginning and in the end of the whole string. So indentation of a multiline string
 can create some problems.
 
-Some characters are not allowed inside an *XML* script or at least not inside a tag-option. Here are some of the typcial replacments:
+Some characters are not allowed inside an *XML* script or at least not inside a tag-option. Here are some of the typical replacements:
 
 * ``<`` : ``&lt;``
 * ``>`` : ``&gt;``
@@ -213,14 +213,14 @@ The input file ``hello_world.yaml``:
 
 You can use different styles of writing key value pairs:
 In the example, the ``parameter`` is declared in one line using ``{}``.
-Mutliple key value pairs can be stored per element. The main content attribute is marked by using ``_``.
+Multiple key value pairs can be stored per element. The main content attribute is marked by using ``_``.
 As an alternative you can write the key value pairs amongst multiple lines using the same indent as the preceding line, 
 like the key ``do`` in the example.
 If a key like ``use`` has only a value, you can write it in one line without using the special ``_`` key.
 
-Is list of elements can be specifiec by using ``[]`` or by using ``-`` amongst multiple lines (always keeping the same indent).
+Is list of elements can be specific by using ``[]`` or by using ``-`` amongst multiple lines (always keeping the same indent).
 
-*YAML* also has a number of spcial characters which can be integrated by using quotation marks:
+*YAML* also has a number of special characters which can be integrated by using quotation marks:
 
 The input file ``special_values.yaml``:
 
@@ -271,7 +271,7 @@ If you want to use a file dependent patternset you can move the use to a ``<file
 This avoids the generation of incorrect result entries. A ``from=...`` option is not available in this case. Instead you
 can copy the patternset first to your local file by using the ``init_with`` attribute.
 
-Due to the independet result_entries, you will end up with the following result table if you mix the extracted pattern:
+Due to the independent result_entries, you will end up with the following result table if you mix the extracted pattern:
 
 .. code-block:: none
 
@@ -284,8 +284,8 @@ Due to the independet result_entries, you will end up with the following result 
    |               |               |            12 |
    |               |               |            13 |
 
-The different ``<analyse>`` were not combined. So you end up with independet result lines for each workpackage. *JUBE*
-does not see possible step dependencies in this point the user has to set the dependcies manually:
+The different ``<analyse>`` were not combined. So you end up with independent result lines for each workpackage. *JUBE*
+does not see possible step dependencies in this point the user has to set the dependencies manually:
 
 .. code-block:: xml
 
@@ -308,11 +308,11 @@ correct result:
    |            1  |             A |            12 |
    |            2  |             B |            13 |
 
-.. index:: extract specifc block
+.. index:: extract specific block
 
-.. _extract_specifc_block:
+.. _extract_specific_block:
 
-Extract data from a specifc text block
+Extract data from a specific text block
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In many cases the standard program output is structured into multiple blocks:
@@ -328,7 +328,7 @@ In many cases the standard program output is structured into multiple blocks:
    time=30
 
 Using a simple ``<pattern>`` like ``time=$jube_pat_int`` will match all ``time=`` lines (the default match will be the first one,
-and :ref:`statistic_values` are available as well). However in many cases a specifc value from a sepcifc block should be extracted.
+and :ref:`statistic_values` are available as well). However in many cases a specific value from a specific block should be extracted.
 This is possible by using ``\s`` within the pattern for each individual newline character within the block, or by using the ``dotall`` option:
 
 .. code-block:: xml
@@ -355,9 +355,9 @@ If a problem occurs outside of the general *JUBE* handling (e.g. a crashed HPC j
 
 .. code-block:: none
 
-   jube remove bechmark_directory --id <id> --workpackage <workpackage_id>
+   jube remove benchmark_directory --id <id> --workpackage <workpackage_id>
    ...
-   jube continue bechmark_directory
+   jube continue benchmark_directory
 
-This will rerun the specific workpackage. The *JUBE* configuration will stay unchanged. It is not possible to change the ``<paramter>`` or ``<step>`` configuration later on. Shared ``<do>``
-operations (``shared=true``) will be ignored within such a rerun scenario except if all workpackages of a specifc step were removed and the full step is re-executed.
+This will rerun the specific workpackage. The *JUBE* configuration will stay unchanged. It is not possible to change the ``<parameter>`` or ``<step>`` configuration later on. Shared ``<do>``
+operations (``shared=true``) will be ignored within such a rerun scenario except if all workpackages of a specific step were removed and the full step is re-executed.

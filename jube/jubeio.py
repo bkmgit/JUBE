@@ -295,7 +295,7 @@ class Parser(object):
         for element in tree.getroot():
             Parser._check_tag(element, valid_tags)
 
-        # Check for remaing <include> tags
+        # Check for remaining <include> tags
         node = jube.util.util.get_tree_element(tree.getroot(),
                                                 tag_path="include")
                                                 
@@ -443,14 +443,14 @@ class Parser(object):
                     set_type, fileid, name))
 
     def _find_include_file(self, filename):
-        """Search for filename in include-pathes and return resulting path"""
+        """Search for filename in include-paths and return resulting path"""
         for path in self._include_path:
             file_path = os.path.join(path, filename)
             if os.path.exists(file_path):
                 break
         else:
             raise ValueError(("\"{0}\" not found in possible " +
-                              "include pathes").format(filename))
+                              "include paths").format(filename))
         return file_path
 
     def _find_set_type(self, filename, name):
@@ -1010,7 +1010,7 @@ class Parser(object):
 
     @staticmethod
     def _extract_selection(selection_etree):
-        """Extract selction information from etree
+        """Extract selection information from etree
 
         Return names of benchmarks and tags (set([only,...]),set([not,...]),
         set([tag, ...]))
@@ -1036,12 +1036,12 @@ class Parser(object):
         return only_bench, not_bench, tags
 
     def _extract_include_path(self, include_path_etree):
-        """Extract include-path pathes from etree"""
+        """Extract include-path paths from etree"""
         LOGGER.debug("  Parsing <include-path>")
         valid_tags = ["path"]
-        pathes = []
+        paths = []
         if (include_path_etree.text) and len(include_path_etree.text.strip()) > 0:
-            pathes.append(include_path_etree.text.strip())
+            paths.append(include_path_etree.text.strip())
         for element in include_path_etree:
             # Skip include tags that have not yet been replaced to allow include
             if element.tag == "include":
@@ -1053,8 +1053,8 @@ class Parser(object):
             path = path.strip()
             if len(path) == 0:
                 raise ValueError("Empty \"<path>\" found")
-            pathes.append(path)
-        for path in pathes:
+            paths.append(path)
+        for path in paths:
             path = os.path.expandvars(os.path.expanduser(path))
             path = os.path.join(self.file_path_ref, path)
             self._include_path += [path]
@@ -1091,14 +1091,14 @@ class Parser(object):
 
     def _extract_tags(self, tree, check_tags=True):
         """
-        Extract tag documentation from tree and controll check_tags.
+        Extract tag documentation from tree and control check_tags.
         Returns the tags with documentation found as dictionary.
         """
         valid_tags = ["tag", "check_tags"]
         tags = dict()
         forced = False
         for tags_tree in tree.findall("tags"):
-            # controll check tags
+            # control check tags
             if check_tags:
                 self._control_check_tags(tags_tree)
 
@@ -1896,7 +1896,7 @@ class Parser(object):
             raise
 
     def _extract_extern_set(self, filename, set_type, name, search_name=None, duplicate=None):
-        """Load a parameter-/file-/substitutionset from a given file"""
+        """Load a parameter-/file-/substituteset from a given file"""
         if search_name is None:
             search_name = name
         LOGGER.debug("    Searching for <{0} name=\"{1}\"> in {2}"
@@ -2212,7 +2212,7 @@ class Parser(object):
             if pattern_mode not in \
                     set(["pattern", "text"]).union(
                         jube.conf.ALLOWED_SCRIPTTYPES):
-                raise ValueError(("pattern-mdoe \"{0}\" not allowed in " +
+                raise ValueError(("pattern-mode \"{0}\" not allowed in " +
                                   "<pattern name=\"{1}\">").format(
                     pattern_mode, name))
             content_type = pattern.get("type", default="string").strip()
@@ -2245,7 +2245,7 @@ class Parser(object):
     def _extract_files_from_database(self, db, fileset_name):
         """Extract files from database"""
         filelist = list()
-        # Extract Copys and Links
+        # Extract Copies and Links
         files = db.select("File", None, f"fileset_name='{fileset_name}'")
         for file in files:
             id, type, path, source_dir, name, file_path_ref, \
@@ -2319,7 +2319,7 @@ class Parser(object):
                 active = etree_file.get("active", "true").strip()
                 file_path_ref = etree_file.get("file_path_ref")
                 alt_name = etree_file.get("name")
-                # Check if the filepath is relativly seen to working dir or the
+                # Check if the filepath is relatively seen to working dir or the
                 # position of the xml-input-file
                 is_internal_ref = \
                     etree_file.get("rel_path_ref",
@@ -2330,7 +2330,7 @@ class Parser(object):
                 files = jube.util.util.safe_split(etree_file.text.strip(),
                                                    separator)
                 if alt_name is not None:
-                    # Use the new alternativ filenames
+                    # Use the new alternative filenames
                     names = [name.strip() for name in
                              alt_name.split(jube.conf.DEFAULT_SEPARATOR)]
                     if len(names) != len(files):

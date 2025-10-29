@@ -50,6 +50,6 @@ result:
     column:
     - number
     - number_pat # Column with title same as pattern name
-    - { title: "Number", _: number_pat_en} # Column with costum title
+    - { title: "Number", _: number_pat_en} # Column with custom title
     - { title: "Zahl", _: number_pat_de}
 

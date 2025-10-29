@@ -18,7 +18,7 @@
     <step name="second_step" depend="first_step">
       <use>param_set</use>
       <do>echo $$EXPORT_ME</do>
-      <do>echo "$$SHELL_VAR again"</do> <!-- use exported Shell var out of privious step -->
+      <do>echo "$$SHELL_VAR again"</do> <!-- use exported Shell var out of previous step -->
     </step>    
   </benchmark>
 </jube>

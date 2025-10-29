@@ -37,7 +37,7 @@ analyser_tag
 
    * the step-attribute contains an existing stepname
 
-   * each file using each workpackage will be scanned seperatly
+   * each file using each workpackage will be scanned separately
 
    * the "use" argument inside the "<file>" tag is optional and can be
      used to specify a file specific patternset;
@@ -133,7 +133,7 @@ continue
 
 copy_tag
    A copy can be used to copy a file or directory from your normal
-   filesytem to your sandbox work directory.
+   filesystem to your sandbox work directory.
 
       <copy source_dir="..." target_dir="..." name="..." rel_path_ref="..." separator="..." active="...">...</copy>
 
@@ -274,7 +274,7 @@ do_tag
      and "stderr")
 
    * "work_dir" is optional, it can be used to change the work
-     directory of this single command (relativly seen towards the
+     directory of this single command (relatively seen towards the
      original work directory)
 
    * "active" is optional
@@ -356,7 +356,7 @@ general_structure_xml
         <check_tags>...</check_tags>
         <!-- global sets -->
         <parameterset name="">...</parameterset>
-        <substitutionset name="">...</substitutionset>
+        <substituteset name="">...</substituteset>
         <fileset name="">...</fileset>
         <patternset name="">...</patternset>
         ...
@@ -406,7 +406,7 @@ general_structure_yaml
       # global sets
       parameterset:
         ...
-      substitutionset:
+      substituteset:
         ...
       fileset:
         ...
@@ -422,7 +422,7 @@ general_structure_yaml
           # local sets
           parameterset:
             ...
-          substitutionset:
+          substituteset:
             ...
           fileset:
             ...
@@ -621,7 +621,7 @@ parameter_space
 
    The parameter space of a specific step will be one of these
    parameter combinations. To fulfill all combinations the step will
-   be executed multible times (each time using a new combination). The
+   be executed multiple times (each time using a new combination). The
    specific combination of a step and an expanded parameter space is
    named *workpackage*.
 
@@ -703,7 +703,7 @@ parameter_tag
    * "duplicate" is optional and of relevance, if there are more than
      one parameter definitions with the same name within one
      parameterset. This "duplicate" option has higher priority than
-     the "duplicte" option of the parameterset. "duplicate" must
+     the "duplicate" option of the parameterset. "duplicate" must
      contain one of the following four options:
 
      * "none" (default): The "duplicate" option of the parameterset is
@@ -725,7 +725,7 @@ parameterset_tag
       </parameterset>
 
    * parameterset-name must be unique (cannot be reused inside
-     substitutionsets or filesets)
+     substitutesets or filesets)
 
    * "init_with" is optional
 
@@ -772,7 +772,7 @@ parameterset_tag
    * "duplicate" is optional and of relevance, if there are more than
      one parameter definitions with the same name within one
      parameterset. This "duplicate" option has lower priority than the
-     "duplicte" option of the parameters. "duplicate" must contain one
+     "duplicate" option of the parameters. "duplicate" must contain one
      of the following three options:
 
      * "replace" (default): Parameters with the same name are
@@ -814,7 +814,7 @@ pattern_tag
 
    * "dotall" is optional (default: "false"): Can be set to "true" or
      "false" to specify if a "." within the regular expression should
-     also match newline characters, which can be very helpfull to
+     also match newline characters, which can be very helpful to
      extract a line only after a specific header was mentioned.
 
 patternset_tag
@@ -856,7 +856,7 @@ prepare_tag
      and "stderr")
 
    * "work_dir" is optional, it can be used to change the work
-     directory of this single command (relativly seen towards the
+     directory of this single command (relatively seen towards the
      original work directory)
 
    * "active" is optional
@@ -955,7 +955,7 @@ statistical_values
 
    * "cnt": counter
 
-   These variabels can be accessed within the the result creation or
+   These variables can be accessed within the the result creation or
    to create derived pattern by "variable_name_<statistic_option>"
    e.g. "${nodes_min}"
 
@@ -980,7 +980,7 @@ step_tag
         ...
       </step>
 
-   * parametersets, filesets and substitutionsets are usable
+   * parametersets, filesets and substitutesets are usable
 
    * using sets "<use>set1,set2</use>" is the same as
      "<use>set1</use><use>set2</use>"
@@ -1048,11 +1048,11 @@ step_tag
      parameter expansions of the corresponding step in parallel.
 
    * "do_log_file" is optional. Name or path of a do log file trying
-     to mimick the do steps and the environment of a workpacakge of a
+     to mimic the do steps and the environment of a workpackage of a
      step to produce an executable script.
 
 sub_tag
-   A substition expression.
+   A substitution expression.
 
       <sub source="..." dest="..." mode="..."/>
 
@@ -1096,7 +1096,7 @@ syslog_tag
         ...
       </syslog>
 
-   * Syslog deamon can be given by a "host" and "port" combination
+   * Syslog daemon can be given by a "host" and "port" combination
      (default "port": 541) or by a socket "address" e.g.: "/dev/log"
      (mixing of host and address is not allowed)
 
@@ -1122,7 +1122,7 @@ syslog_tag
      pattern is not taken into account.
 
 table_tag
-   A simple ASCII based table ouput.
+   A simple ASCII based table output.
 
       <table name="..." style="..." sort="..." separator="..." transpose="..." filter="...">
         <column>...</column>

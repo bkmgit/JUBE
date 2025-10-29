@@ -66,12 +66,12 @@ class TestCase:
                               for arg in run_args \
                               for file in [cls._xml_file, cls._yaml_file]]
 
-            #Execute all commands and save the created worpackage directories
+            #Execute all commands and save the created workpackage directories
             cls._wp_paths = {}
             for command_id, command in enumerate(cls._commands):
                 jube.main.main(command)
                 run_path = cls._get_run_path(cls, cls._bench_run_path, command_id)
-                cls._wp_paths[run_path] = cls._get_wp_pathes(cls, run_path)
+                cls._wp_paths[run_path] = cls._get_wp_paths(cls, run_path)
 
             #Save run arguments for result test
             cls._run_args = run_args
@@ -136,7 +136,7 @@ class TestCase:
             """Returns the path of the run directory for the given path and id"""
             return os.path.join(bench_run_path, f"{command_id:06}")
 
-        def _get_wp_pathes(self, run_path):
+        def _get_wp_paths(self, run_path):
             """
             Returns a dictionary with the path of the workpackage
             directory in the given path to the corresponding

@@ -140,7 +140,7 @@ class Gui(tk.Tk):
                                 width = canvas_width, 
                                 height=canvas_height if canvas_height >= main_height else main_height)
         
-        # Configure the height of the canvas and the srollregion of its scrollbars
+        # Configure the height of the canvas and the scrollregion of its scrollbars
         if main_height > canvas_height:
             self._canvas.configure(scrollregion=(0,0,canvas_width,main_height))
             self._scrollbar_y.pack(side="right",fill="y")

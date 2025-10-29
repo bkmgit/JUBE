@@ -186,7 +186,7 @@ class Benchmark(object):
         return None
 
     def remove_workpackage(self, workpackage_to_delete):
-        """Remove a specifc workpackage"""
+        """Remove a specific workpackage"""
         stepname = workpackage_to_delete.step.name
         if stepname in self._workpackages and \
                 workpackage_to_delete in self._workpackages[stepname]:
@@ -194,7 +194,7 @@ class Benchmark(object):
             self._remove_workpackage_from_database(workpackage_to_delete)
 
     def _remove_workpackage_from_database(self, workpackage_to_delete):
-        """Remove a specifc workpackage from database"""
+        """Remove a specific workpackage from database"""
         # Get database instance and connect
         self.db.connect()
         try:
@@ -245,7 +245,7 @@ class Benchmark(object):
 
     @property
     def workpackage_status(self):
-        """Retun workpackage information dict"""
+        """Return workpackage information dict"""
         result_dict = dict()
         for stepname in self._workpackages:
             result_dict[stepname] = {"all": 0,
@@ -266,7 +266,7 @@ class Benchmark(object):
 
     @property
     def benchmark_status(self):
-        """Retun global workpackage information dict"""
+        """Return global workpackage information dict"""
         result_dict = {"all": 0,
                        "open": 0,
                        "wait": 0,
@@ -541,7 +541,7 @@ class Benchmark(object):
             parameterset.add_parameterset(
                 parent_workpackage.parameterset)
 
-        # Sort parent workpackges after total iteration number and name
+        # Sort parent workpackages after total iteration number and name
         sorted_parents = list(parent_workpackages)
         sorted_parents.sort(key=lambda x: x.step.name)
         sorted_parents.sort(key=lambda x: x.step.iterations)
@@ -898,7 +898,7 @@ class Benchmark(object):
                 workpackage.done = False
 
     def add_workpackage_information_to_database(self):
-        """Store initial worpackage information in database"""
+        """Store initial workpackage information in database"""
         self.db.connect()
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:

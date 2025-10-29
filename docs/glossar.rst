@@ -222,7 +222,7 @@ Glossary
 
       * ``default`` is optional: Specify default value if pattern cannot be found or if it cannot be evaluated
       * ``dotall`` is optional (default: ``false``): Can be set to ``true`` or ``false`` to specify if a ``.`` within the regular expression
-        should also match newline characters, which can be very helpfull to extract a line only after a specific header was mentioned.
+        should also match newline characters, which can be very helpful to extract a line only after a specific header was mentioned.
 
    statistical_values
       If there are multiple pattern matches within one file, multiple files or
@@ -238,7 +238,7 @@ Glossary
       * ``sum``: sum 
       * ``cnt``: counter
 
-      These variabels can be accessed within the the result creation or to create derived pattern
+      These variables can be accessed within the the result creation or to create derived pattern
       by ``variable_name_<statistic_option>`` e.g. ``${nodes_min}``
 
       The variable name itself always matches the first match.
@@ -253,7 +253,7 @@ Glossary
             ...
          </parameterset>
 
-      * parameterset-name must be unique (cannot be reused inside substitutionsets or filesets)
+      * parameterset-name must be unique (cannot be reused inside substitutesets or filesets)
       * ``init_with`` is optional
 
         * if the given filepath can be found inside of the ``JUBE_INCLUDE_PATH`` and if it contains a parameterset
@@ -292,7 +292,7 @@ Glossary
                <parameter name="test2">bar</parameter> <!-- Other content in set2 -->
              </parameterset>
 
-      * ``duplicate`` is optional and of relevance, if there are more than one parameter definitions with the same name within one parameterset. This ``duplicate`` option has lower priority than the ``duplicte`` option of the parameters. ``duplicate`` must contain one of the following three options:
+      * ``duplicate`` is optional and of relevance, if there are more than one parameter definitions with the same name within one parameterset. This ``duplicate`` option has lower priority than the ``duplicate`` option of the parameters. ``duplicate`` must contain one of the following three options:
 
         * ``replace`` (default): Parameters with the same name are overwritten
         * ``concat``: Parameters with the same name are concatenated
@@ -342,7 +342,7 @@ Glossary
           * ``cycle``: reevaluation in each cycle, but not at the begin of a new step (number of workpackages will stay unchanged)
           * ``always``: reevaluation in each step and cycle
 
-      * ``duplicate`` is optional and of relevance, if there are more than one parameter definitions with the same name within one parameterset. This ``duplicate`` option has higher priority than the ``duplicte`` option of the parameterset. ``duplicate`` must contain one of the following four options:
+      * ``duplicate`` is optional and of relevance, if there are more than one parameter definitions with the same name within one parameterset. This ``duplicate`` option has higher priority than the ``duplicate`` option of the parameterset. ``duplicate`` must contain one of the following four options:
 
         * ``none`` (default): The ``duplicate`` option of the parameterset is prioritized
         * ``replace``: Parameters with the same name are overwritten
@@ -400,7 +400,7 @@ Glossary
 
      * ``active`` is optional
 
-       * can be set to ``true`` or ``false`` or any *Python* parsable bool expression to enable or disable the single command
+       * can be set to ``true`` or ``false`` or any *Python* parseable bool expression to enable or disable the single command
        * :term:`parameter <parameter_tag>` are allowed inside this attribute
 
      * each link-tag can contain a list of filenames (or directories), separated by ``,``, the default separator can be changed
@@ -411,7 +411,7 @@ Glossary
      * in the execution step the given files or directories will be linked
 
    copy_tag
-     A copy can be used to copy a file or directory from your normal filesytem to your sandbox work directory.
+     A copy can be used to copy a file or directory from your normal filesystem to your sandbox work directory.
 
      .. code-block:: xml
 
@@ -428,7 +428,7 @@ Glossary
 
      * ``active`` is optional
 
-       * can be set to ``true`` or ``false`` or any *Python* parsable bool expression to enable or disable the single command
+       * can be set to ``true`` or ``false`` or any *Python* parseable bool expression to enable or disable the single command
        * :term:`parameter <parameter_tag>` are allowed inside this attribute
 
      * each copy-tag can contain a list of filenames (or directories), separated by ``,``, the default separator can be changed
@@ -452,11 +452,11 @@ Glossary
         <prepare stdout="..." stderr="..." work_dir="..." active="...">...</prepare>
 
      * ``stdout``- and ``stderr``-filename are optional (default: ``stdout`` and ``stderr``)
-     * ``work_dir`` is optional, it can be used to change the work directory of this single command (relativly seen towards
+     * ``work_dir`` is optional, it can be used to change the work directory of this single command (relatively seen towards
        the original work directory)
      * ``active`` is optional
 
-       * can be set to ``true`` or ``false`` or any *Python* parsable bool expression to enable or disable the single command
+       * can be set to ``true`` or ``false`` or any *Python* parseable bool expression to enable or disable the single command
        * :term:`parameter <parameter_tag>` are allowed inside this attribute
 
    substituteset_tag
@@ -494,7 +494,7 @@ Glossary
        * ``a`` : ``out``-file will be appended
 
    sub_tag
-     A substition expression.
+     A substitution expression.
 
      .. code-block:: xml
 
@@ -517,7 +517,7 @@ Glossary
           ...
         </step>
 
-     * parametersets, filesets and substitutionsets are usable
+     * parametersets, filesets and substitutesets are usable
      * using sets ``<use>set1,set2</use>`` is the same as ``<use>set1</use><use>set2</use>``
      * parameter can be used inside the ``<use>``-tag
      * the ``from`` attribute is optional and can be used to specify an external set source
@@ -535,7 +535,7 @@ Glossary
      * ``suffix`` is optional and can contain a string (parameters are allowed) which will be attached to the default workpackage directory name
      * ``active`` is optional
 
-       * can be set to ``true`` or ``false`` or any *Python* parsable bool expression to enable or disable the single command
+       * can be set to ``true`` or ``false`` or any *Python* parseable bool expression to enable or disable the single command
        * :term:`parameter <parameter_tag>` are allowed inside this attribute
 
      * ``shared`` is optional and can be used to create a shared folder which can be accessed by all workpackages based on this step
@@ -550,7 +550,7 @@ Glossary
      * ``iterations`` is optional. All workpackages within this step will be executed multiple times if the iterations value is used.
      * ``cycles`` is optional. All ``<do>`` commands within the step will be executed ``cycles``-times
      * ``procs`` is optional. Amount of processes used to execute the parameter expansions of the corresponding step in parallel.
-     * ``do_log_file`` is optional. Name or path of a do log file trying to mimick the do steps and the environment of a workpacakge of a step to produce an executable script.
+     * ``do_log_file`` is optional. Name or path of a do log file trying to mimic the do steps and the environment of a workpackage of a step to produce an executable script.
 
    do_tag
      A do contain a executable *Shell* operation.
@@ -566,7 +566,7 @@ Glossary
 
      * ``do`` can contain any *Shell*-syntax-snippet (:term:`parameter <parameter_tag>` will be replaced ``... $nameofparameter ...``)
      * ``stdout``- and ``stderr``-filename are optional (default: ``stdout`` and ``stderr``)
-     * ``work_dir`` is optional, it can be used to change the work directory of this single command (relativly seen towards
+     * ``work_dir`` is optional, it can be used to change the work directory of this single command (relatively seen towards
        the original work directory)
      * ``active`` is optional
 
@@ -610,7 +610,7 @@ Glossary
      * the from-attribute is optional and can be used to specify an external set source
      * any name must be unique, it is not allowed to reuse a set
      * the step-attribute contains an existing stepname
-     * each file using each workpackage will be scanned seperatly
+     * each file using each workpackage will be scanned separately
      * the ``use`` argument inside the ``<file>`` tag is optional and can be used to specify a file specific patternset;
 
        * the global ``<use>`` and this local use will be combined and evaluated at the same time
@@ -693,7 +693,7 @@ Glossary
      * ``float``
 
    table_tag
-     A simple ASCII based table ouput.
+     A simple ASCII based table output.
 
      .. code-block:: xml
 
@@ -732,7 +732,7 @@ Glossary
           ...
         </syslog>
 
-     * Syslog deamon can be given by a ``host`` and ``port`` combination (default ``port``: 541) or
+     * Syslog daemon can be given by a ``host`` and ``port`` combination (default ``port``: 541) or
        by a socket ``address`` e.g.: ``/dev/log`` (mixing of host and address is not allowed)
      * ``format`` is optional: can contain a log format written in a pythonic way (default: ``jube[%(process)s]: %(message)s``)
      * ``sort`` is optional: can contain a list of parameter- or patternnames (separated by ,).
@@ -789,7 +789,7 @@ Glossary
      combinations: ``a=1``, ``b="p"``; ``a=1``, ``b="q"``; ``a=2``, ``b="p"``; ``a=2``, ``b="q"``.
 
      The parameter space of a specific step will be one of these parameter combinations. To fulfill all combinations
-     the step will be executed multible times (each time using a new combination). The specific combination of a step and
+     the step will be executed multiple times (each time using a new combination). The specific combination of a step and
      an expanded parameter space is named :term:`workpackage`.
 
    include_tag
@@ -881,7 +881,7 @@ Glossary
            <check_tags>...</check_tags>
            <!-- global sets -->
            <parameterset name="">...</parameterset>
-           <substitutionset name="">...</substitutionset>
+           <substituteset name="">...</substituteset>
            <fileset name="">...</fileset>
            <patternset name="">...</patternset>
            ...
@@ -934,7 +934,7 @@ Glossary
          # global sets
          parameterset: 
            ...
-         substitutionset:
+         substituteset:
            ...
          fileset:
            ...
@@ -950,7 +950,7 @@ Glossary
              # local sets
              parameterset:
                ...
-             substitutionset:
+             substituteset:
                ...
              fileset:
                ...

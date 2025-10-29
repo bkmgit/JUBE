@@ -274,7 +274,7 @@ Shows path and content of the stdout and stderr files of the given benchmark.
    display content of output file
 
 ``-o {stdout,stderr}``, ``--only {stdout,stderr}``
-   show only stdour or stderr
+   show only stdout or stderr
 
 ``DIRECTORY``
    directory which contains benchmarks, default: ``.``
@@ -324,7 +324,7 @@ Remove an existing benchmark
    |ID_DESCRIPTION|
 
 ``-w WORKPACKAGE [WORKPACKAGE ...]``, ``--workpackage WORKPACKAGE [WORKPACKAGE ...]``
-   specifc workpackage id to be removed
+   specific workpackage id to be removed
 
 ``-f``, ``--force``
    do not prompt

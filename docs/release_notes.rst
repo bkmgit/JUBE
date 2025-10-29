@@ -156,7 +156,7 @@ Release: 2021-11-30
 * A bug was solved which enabled `dotall="true"` by default for all pattern, which can make those costly to evaluate.
 * Fixes a bug in result data processing.
 * Fixes a bug in YAML input format if `benchmark` key is not used.
-* A empty value in YAML input format will now be treated liek an empty String not as a `None` value.
+* A empty value in YAML input format will now be treated like an empty String not as a `None` value.
 * Avoid crash due to overflow error for huge pattern values.
 * Fixes a bug, which blocked `include` blocks to include other `include` blocks.
 * `setup.py` now moves all additional non-code data to `.../share/jube`, which allows better utilization of `pip` based installation
@@ -203,11 +203,11 @@ Release: 2019-11-07
   * ``mode="tag``: include the tag name if the tag was set during execution, otherwise the content is empty
 
 * New option ``dotall=true`` in ``<pattern>`` (default: ``false``) allows that ``.`` within a
-  regular expression also matches newline characters. This can be very helpfull to extract a
-  line only after a specific header was mentioned. See :ref:`extract_specifc_block`
+  regular expression also matches newline characters. This can be very helpful to extract a
+  line only after a specific header was mentioned. See :ref:`extract_specific_block`
 * ``--tags`` used in combination with the ``--update`` option will now be added to the existing
   tags of the original run instead of overwriting the old tags. If no new tags need to be added within an update ``--tags`` can now be skipped.
-* ``parse.log`` is now automatically moved into the specifc job run folder and is also available 
+* ``parse.log`` is now automatically moved into the specific job run folder and is also available 
   within the ``jube log`` command
 
 
@@ -261,7 +261,7 @@ Release: 2016-12-20
 * New FAQ entry concerning multiple file analysis: :doc:`faq`
 * ``<parameter>`` using ``mode="shell"`` or ``mode="perl"`` will now stop program execution if an error occurs
   (similar to ``mode="python"``)
-* ``<do>`` specfic ``work_dir`` is now created automatically if needed
+* ``<do>`` specific ``work_dir`` is now created automatically if needed
 * ``directory`` attribute in ``<link>`` and ``<copy>`` was renamed to ``source_dir`` (old attribute name is still possible)
 
   * ``source_dir`` now allows parameter substitution
@@ -299,14 +299,14 @@ Release: 2016-07-29
 * Combining ``-u`` and ``tags`` in a ``jube result`` run will not filter the result branches anymore
 * Allow lowercase ``false`` in bool expressions (e.g. the ``active`` option)
 * Fix bug when using *JUBE* in a *Python3.x* environment
-* The ``jube help`` output was restructed to display separate key columns instead of a keyword list
+* The ``jube help`` output was restricted to display separate key columns instead of a keyword list
 * ``<pattern>`` can now contain a ``default=...`` attribute which set their default value if the pattern can't be found or if it can't be evaluated
 * ``null_value=...`` was removed from the ``<column>`` and ``<key>``-tag because the new default attribute matches its behaviour
 * Added first *JUBE* FAQ entries to the documentation: :doc:`faq`
 * New ``active``-attribute inside a ``<step>``-tag. The attribute enables or disables the corresponding step (and all following steps). It can contain any 
   bool expression and available parameter.
 * Fix bug in ``<link>`` handling if an alternative link name is used which points to a sub directory
-* Added new option ``-c / --csv-parametrization`` to ``jube info`` command to show a workpackage specfic parametrisation
+* Added new option ``-c / --csv-parametrization`` to ``jube info`` command to show a workpackage specific parametrisation
   by using the CSV format (similar to the existing ``-p`` option)
 * Allow Shell expansion in ``<link>`` tags. ``<link>`` now also support the ``*``
 * Restructure internal ``<copy>`` and ``<link>`` handling
@@ -319,7 +319,7 @@ Release: 2016-04-14
 
 * *JUBE* will now show only the latest benchmark result by default, ``--id all`` must be used to see all results
 * Bool expressions can now be used directly in the ``<do active="">`` attribute
-* Added ``filter`` attribute in ``<table>`` and ``<syslog>`` to show only specifix result entries (based on a bool expression)
+* Added ``filter`` attribute in ``<table>`` and ``<syslog>`` to show only specific result entries (based on a bool expression)
 * New ``<parameter>`` and ``<pattern>`` mode: ``mode="shell"``
 * Allow multiline output in result tables
 * Fix wrong group handling if ``JUBE_GROUP_NAME`` is used
@@ -404,7 +404,7 @@ Release: 2015-04-09
 * ``argparse`` is now marked as a dependency in ``setup.py``. It will be automatically loaded when using *setuptools*.
 * tags will now also be used when including external sets by using ``<use from="...">``
 * change default platform output filenames: using *job.out* and *job.err* instead of *stdout* and *stderr* for default job output
-* new internal workflow generation alogrithm
+* new internal workflow generation algorithm
 * parameter can now be used in step ``<use>``, e.g. ``<use>set_$number</use>``
 
   * external sets had to be given by name to allow later substitution: ``<use from="file:set1:set2">set$nr</use>``
@@ -421,7 +421,7 @@ Version 2.0.4
 Release: 2015-02-23
 
 * fix bug when using *JUBE* in a *Python3.x* environment
-* time information (start, last modified) will now be stored in a seperate file and are not extracted out of
+* time information (start, last modified) will now be stored in a separate file and are not extracted out of
   file and directory metadata
 * ``jube run`` now allows the ``--id/-i`` command line option to set a specific benchmark id
 * ``jube result`` now automatically combines multiple benchmark runs within the same benchmark directory. *JUBE* automatically
@@ -444,7 +444,7 @@ Release: 2015-01-29
 * ``jube info <benchmark-dir> --id <id> --step <step_name> -p`` only shows the
   current parametrization using a csv table format
 * add new (optional) attribute ``max_async="..."`` to ``<step>``: Maximum number of parallel workpackages
-  of the correspondig step will run at the same time (default: 0, means no limitation)
+  of the corresponding step will run at the same time (default: 0, means no limitation)
 * switch ``<analyzer>`` to ``<analyser>`` (also ``<analyzer>`` will be available) to avoid mixing of "s" and "z" versions
 * fix bug when using ``,`` inside of a ``<pattern>``
 * *JUBE* now return a none zero error code if it sends an error message

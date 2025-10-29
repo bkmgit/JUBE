@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Resulttype definition"""
+"""ResultType definition"""
 
 from __future__ import (print_function,
                         unicode_literals,
@@ -34,7 +34,7 @@ class Result(object):
 
     class ResultData(object):
 
-        """A gerneric result data type"""
+        """A generic result data type"""
 
         def __init__(self, name):
             self._name = name
@@ -113,7 +113,7 @@ class Result(object):
         self._benchmark = benchmark
 
     def add_uses(self, use_names):
-        """Add an addtional analyser name"""
+        """Add an additional analyser name"""
         for use_name in use_names:
             if use_name in self._use:
                 raise ValueError(("Element \"{0}\" can only be used once")
@@ -153,7 +153,7 @@ class Result(object):
             for ids in [analyse[stepname].keys() for stepname in analyse]:
                 all_wps.update(set(map(int, ids)))
 
-            # Find workpackages without children (or at least no childen in
+            # Find workpackages without children (or at least no children in
             # the given analyser)
             last_wps = set()
             for id in all_wps:
@@ -195,7 +195,7 @@ class Result(object):
                                 not in parameter_dict):
                             parameter_dict[par.name + "_" +
                                            workpackage.step.name] = value
-                        # parmater without suffix is used for the last WP in
+                        # parameter without suffix is used for the last WP in
                         # the chain
                         if wp_id == chain[-1]:
                             parameter_dict[par.name] = value

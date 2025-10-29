@@ -13,5 +13,5 @@ benchmark: # having only a single benchmark, this key is optional
     name: say_hello
     use: hello_parameter # special key _ can be skipped
     do:
-      - _: echo $hello_str # - is optional in this case, as ther is only one do entry
+      - _: echo $hello_str # - is optional in this case, as there is only one do entry
         active: true

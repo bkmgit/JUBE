@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""GernicResultType definition"""
+"""GenericResultType definition"""
 
 from __future__ import (print_function,
                         unicode_literals,
@@ -23,9 +23,6 @@ from __future__ import (print_function,
 
 from jube.result import Result
 import jube.log
-import operator
-import jube.util.util
-import jube.util.output
 
 LOGGER = jube.log.get_logger(__name__)
 

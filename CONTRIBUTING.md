@@ -57,7 +57,7 @@ If you contribute outside of any legal obligations towards third parties, you ma
 
 If You are an employee and have created the Contribution as part of your employment, You need to have Your employers approval as a Legal Entity.
 
-If you are a Legal Entity you must provide and update a list of your employees that will contribute to the Material, as well as your contact information. All contributions of employees must be individualy attributable to each one.
+If you are a Legal Entity you must provide and update a list of your employees that will contribute to the Material, as well as your contact information. All contributions of employees must be individually attributable to each one.
 
 #### Definitions
 

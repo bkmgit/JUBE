@@ -280,7 +280,7 @@ class MainPage(Page):
 
 class StepPage(Page):
 
-    """A page for the information of a specfic step (used sets, operations, ...)"""
+    """A page for the information of a specific step (used sets, operations, ...)"""
 
     def __init__(self, root, step, benchmark):
         super().__init__(root)
@@ -396,7 +396,7 @@ class StepPage(Page):
         self._parents_canvas.pack(anchor="center", side="left", pady=25)
         self._parents_arrow.pack(anchor="center", side="left", pady=25)
 
-        # pack the widgets for the childrens region into the layout
+        # pack the widgets for the children region into the layout
         self.plot_children()
         canvas_bbox = self._children_canvas.bbox("all")
         if canvas_bbox:
@@ -758,7 +758,7 @@ class WorkpackagePage(Page):
         self._parents_canvas.pack(anchor="center", side="left", pady=25)
         self._parents_arrow.pack(anchor="center", side="left", pady=25)
 
-        # pack the widgets for the childrens region into the layout
+        # pack the widgets for the children region into the layout
         self.plot_children()
         canvas_bbox = self._children_canvas.bbox("all")
         if canvas_bbox:
