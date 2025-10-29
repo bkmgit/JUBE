@@ -595,14 +595,14 @@ def print_benchmark_status(benchmark):
         print("FINISHED")
 
 
-def print_tag_documentation(dir, benchmark):
+def print_tag_documentation(directory, benchmark):
     """Print tag documentation concerning a specific input file"""
     infostr = \
         jube.util.output.text_boxed("{0} \n\n{1}".format(benchmark.name,
                                                           benchmark.comment))
     print(infostr)
 
-    print("  Path: {0}".format(os.path.abspath(dir)))
+    print("  Path: {0}".format(os.path.abspath(directory)))
 
     tag_docu = [("tag name", "description")]
     for name, docu in benchmark.tag_docu.items():

@@ -156,11 +156,11 @@ class Result(object):
             # Find workpackages without children (or at least no children in
             # the given analyser)
             last_wps = set()
-            for id in all_wps:
+            for iid in all_wps:
                 child_ids = set([wp.id for wp in self._benchmark.
-                                 workpackage_by_id(id).children_future])
+                                 workpackage_by_id(iid).children_future])
                 if not child_ids.intersection(all_wps):
-                    last_wps.add(id)
+                    last_wps.add(iid)
 
             while (len(last_wps) > 0):
                 next_id = last_wps.pop()

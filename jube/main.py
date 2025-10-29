@@ -282,7 +282,7 @@ def info(args):
                 else:
                     steps = benchmark.steps.keys()
                 if args.workpackage:
-                    wp_ids = [int(id) for id in args.workpackage]
+                    wp_ids = [int(iid) for iid in args.workpackage]
                 else:
                     wp_ids = [wp.id for wps in benchmark.workpackages.values()
                                     for wp in wps]

@@ -43,9 +43,9 @@ class Page(tk.Frame):
         """Open the step page for the specified step"""
         self.master.master.open_step_page(name)
 
-    def wp_clicked(self, id):
+    def wp_clicked(self, iid):
         """Open the workpackage page for the specified workpackage"""
-        self.master.master.open_wp_page(id)
+        self.master.master.open_wp_page(iid)
 
     def bind_widget(self, label, func, text):
         """Configure the command of a button"""

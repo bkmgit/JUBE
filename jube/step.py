@@ -481,7 +481,7 @@ class Operation(object):
     def __init__(self, do, async_filename=None, stdout_filename=None,
                  stderr_filename=None, active="true", shared=False,
                  work_dir=None, break_filename=None, error_filename=None,
-                 id=-1):
+                 iid=-1):
         self._do = do
         self._error_filename = error_filename
         self._async_filename = async_filename
@@ -491,7 +491,7 @@ class Operation(object):
         self._active = active
         self._shared = shared
         self._work_dir = work_dir
-        self._database_id = id
+        self._database_id = iid
 
     @property
     def do(self):

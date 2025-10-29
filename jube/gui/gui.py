@@ -160,11 +160,11 @@ class Gui(tk.Tk):
                     self.configure_scrollregion()
                     break
 
-    def open_wp_page(self, id):
+    def open_wp_page(self, iid):
         """Opens a new workpackage page"""
         self._canvas.delete("all")
         for wp in [wp for wplist in self._benchmark.workpackages.values() for wp in wplist]:
-                if id == wp.id:
+                if iid == wp.id:
                     self._main_frame = page.WorkpackagePage(self._canvas, wp)
                     self._canvas.create_window((0, 0), window=self._main_frame, 
                                                anchor="nw", 

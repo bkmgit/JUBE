@@ -631,13 +631,13 @@ class Parser(object):
             parameter_names = []
             parameters = db.select("SelectedParameter", None, f"workpackage_id='{workpackage_id}'")
             for parameter in parameters:
-                id, workpackage_id, selected, idx = parameter
-                id, name, type, export, unit, mode, separator, update_mode, \
+                iid, workpackage_id, selected, idx = parameter
+                iid, name, datatype, export, unit, mode, separator, update_mode, \
                     duplicate, value, parameterset_name = \
-                    db.select("Parameter", None, f"parameter_id='{id}'")[0]
+                    db.select("Parameter", None, f"parameter_id='{iid}'")[0]
                 parameter_names.append(name)
                 parameter = jube.parameter.Parameter.create_parameter(
-                    name, value, separator, type, selected,
+                    name, value, separator, datatype, selected,
                     mode, export, update_mode=update_mode, idx=idx,
                     eval_helper=None, fixed=False, duplicate=duplicate)
                 parameterset.add_parameter(parameter)
@@ -1306,14 +1306,14 @@ class Parser(object):
         ops = []
         ops_attributes = db.select("Operation", None, f"step_name='{step_name}'")
         for op_attributes in ops_attributes:
-            id, do, error_fn, async_fn, stdout_fn, \
+            iid, do, error_fn, async_fn, stdout_fn, \
                 stderr_fn, break_fn, active, shared, \
                 work_dir, step_name = op_attributes
             active = str(active).lower()
             shared = bool(shared)
             operation = jube.step.Operation(do, async_fn, stdout_fn, stderr_fn,
                                              active, shared, work_dir, break_fn,
-                                             error_fn, id)
+                                             error_fn, iid)
             ops.append(operation)
         return ops
 
@@ -1467,12 +1467,12 @@ class Parser(object):
         file_objects = []
         files = db.select("AnalyseFile", ["analysefile_id", "path"], f"analyser_name='{analyser_name}'")
         for file in files:
-            id, path = file
+            iid, path = file
             file_obj = jube.analyser.Analyser.AnalyseFile(path)
-            uses = db.select("AnalyseFilePattern", ["patternset_name"], f"analysefile_id='{id}'")
+            uses = db.select("AnalyseFilePattern", ["patternset_name"], f"analysefile_id='{iid}'")
             uses = [use for use, in uses]
             file_obj.add_uses(uses)
-            steps = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{id}'")[0][0]
+            steps = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{iid}'")[0][0]
             file_objects.append((file_obj, steps))
         return file_objects
 
@@ -1535,9 +1535,9 @@ class Parser(object):
         results_order = list()
         results_attributes = db.select("Result", ["result_id", "result_dir"], f"benchmark_id='{benchmark_id}'")
         for result_attributes in results_attributes:
-            id, result_dir = result_attributes
-            result = self._extract_subresult_from_database(db, id, result_dir)
-            uses = db.select("ResultAnalyser", ["analyser_name"], f"result_id='{id}'")
+            iid, result_dir = result_attributes
+            result = self._extract_subresult_from_database(db, iid, result_dir)
+            uses = db.select("ResultAnalyser", ["analyser_name"], f"result_id='{iid}'")
             uses = [use for use, in uses]
             result.add_uses(uses)
             results[result.name] = result
@@ -1549,42 +1549,42 @@ class Parser(object):
         # Extract table results
         tables = db.select("ResultTable", None, f"result_id='{result_id}'")
         for table in tables:
-            name, style, separator, filter, transpose, sort, result_id = table
+            name, style, separator, res_filter, transpose, sort, result_id = table
             transpose = bool(transpose)
             sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.table.Table(name, style, separator,
-                                                   sort_names, transpose, filter)
+                                                   sort_names, transpose, res_filter)
             result.result_dir = result_dir
             columns = db.select("ResultTableColumn", None, f"table_name='{name}'")
             for column in columns:
-                id, column_name, title, format, colw, name = column
-                result.add_column(column_name, colw, format, title)
+                iid, column_name, title, data_format, colw, name = column
+                result.add_column(column_name, colw, data_format, title)
             return result
         # Extract database results
         databases = db.select("ResultDatabase", None, f"result_id='{result_id}'")
         for database in databases:
-            name, filter, file, result_id = database
+            name, res_filter, file, result_id = database
             primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
                                   f"database_name='{name} AND is_primary=1'")
             primekeys = [key for key, in primekeys]
-            result = jube.result_types.database.Database(name, filter, primekeys, file)
+            result = jube.result_types.database.Database(name, res_filter, primekeys, file)
             result.result_dir = result_dir
             keys = db.select("ResultDatabaseKey", None, f"database_name='{name}'")
             for key in keys:
-                id, key_name, title, format, is_primary, name = key
-                result.add_key(key_name, format, title)
+                iid, key_name, title, data_format, is_primary, name = key
+                result.add_key(key_name, data_format, title)
             return result
         # Extract syslog results
         syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
         for syslog in syslogs:
-            name, address, format, filter, host, port, sort, result_id = syslog
+            name, address, sys_format, res_filter, host, port, sort, result_id = syslog
             sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.syslog.SysloggedResult(
-                name, address, host, port, format, sort_names, filter)
+                name, address, host, port, sys_format, sort_names, res_filter)
             keys = db.select("ResultSyslogKey", None, f"syslog_name='{name}'")
             for key in keys:
-                id, key_name, format, title, syslog_name = key
-                result.add_key(key_name, format, title)
+                iid, key_name, data_format, title, syslog_name = key
+                result.add_key(key_name, data_format, title)
             return result
         # Extract figure results
         figures = db.select("ResultFigure", None, f"result_id='{result_id}'")
@@ -1595,10 +1595,10 @@ class Parser(object):
 
             plots = db.select("ResultFigurePlot", None, f"figure_name='{name}'")
             for plot in plots:
-                id, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
+                iid, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
                 legend = bool(legend)
                 
-                db_data = db.select("ResultFigurePlotData", None, f"plot_id='{id}'")
+                db_data = db.select("ResultFigurePlotData", None, f"plot_id='{iid}'")
                 plot_data = list()
                 for data in db_data:
                     data_id, x, y, groupby, plot_type, label, color, marker, linestyle, sort_data, plot_id = data
@@ -2016,12 +2016,12 @@ class Parser(object):
         parameters = list()
         params = db.select("Parameter", None, f"parameterset_name='{parameterset_name}'")
         for param in params:
-            id, name, type, export, unit, mode, separator, \
+            iid, name, datatype, export, unit, mode, separator, \
                 update_mode, duplicate, value, parameterset_name = param
             export = bool(export)
             parameter = \
                 jube.parameter.Parameter.create_parameter(
-                    name, value, separator, type, None,
+                    name, value, separator, datatype, None,
                     mode, unit, export, update_mode=update_mode,
                     eval_helper=None, fixed=False, duplicate=duplicate)
             parameters.append(parameter)
@@ -2156,11 +2156,11 @@ class Parser(object):
         patternlist = list()
         patterns = db.select("Pattern", None, f"patternset_name='{patternset_name}'")
         for pattern in patterns:
-            name, type, unit, mode, dotall, \
+            name, datatype, unit, mode, dotall, \
                 default, value, patternset_name = pattern
             dotall = bool(dotall)
             patternlist.append(jube.pattern.Pattern(name, value, mode,
-                                                     type, unit,
+                                                     datatype, unit,
                                                      default, dotall))
         return patternlist
 
@@ -2248,21 +2248,21 @@ class Parser(object):
         # Extract Copies and Links
         files = db.select("File", None, f"fileset_name='{fileset_name}'")
         for file in files:
-            id, type, path, source_dir, name, file_path_ref, \
+            iid, file_type, path, source_dir, name, file_path_ref, \
                 active, is_internal_ref, target_dir, fileset_name = file
             is_internal_ref = bool(is_internal_ref)
             active = str(active).lower()
-            if type == "Copy":
+            if file_type == "Copy":
                 file_obj = jube.fileset.Copy(path, name, is_internal_ref, \
                                               active, source_dir, target_dir)
-            elif type == "Link":
+            elif file_type == "Link":
                 file_obj = jube.fileset.Link(path, name, is_internal_ref, \
                                               active, source_dir, target_dir)
             filelist.append(file_obj)
         # Extract Prepares
         prepares = db.select("Prepare", None, f"fileset_name='{fileset_name}'")
         for prepare in prepares:
-            id, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare
+            iid, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare
             if work_dir is not None:
                 work_dir = work_dir.strip()
             active = str(active).lower()
@@ -2397,11 +2397,11 @@ class Parser(object):
         sub_dict = dict()
         file_rows = db.select("SubstituteFile", None, f"substituteset_name='{substituteset_name}'")
         for file in file_rows:
-            id, in_file, out_file, out_mode, substituteset_name = file
+            iid, in_file, out_file, out_mode, substituteset_name = file
             files.append((out_file, in_file, out_mode))
         sub_rows = db.select("Substitute", None, f"substituteset_name='{substituteset_name}'")
         for sub in sub_rows:
-            id, source, dest, mode, substituteset_name = sub
+            iid, source, dest, mode, substituteset_name = sub
             sub_dict[source] = jube.substitute.Sub(source, mode, dest)
         return files, sub_dict
 

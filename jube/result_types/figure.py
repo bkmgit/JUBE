@@ -185,12 +185,12 @@ class Figure(GenericResult):
 
         class Data():
             """Plot data"""
-            def __init__(self, x, y, groupby, type, label,
+            def __init__(self, x, y, groupby, plot_type, label,
                          color, marker, linestyle, sort_data):
                 self._x = x
                 self._y = y
                 self._groupby = groupby
-                self._type = type
+                self._type = plot_type
                 self._label = label
                 self._color = color
                 self._marker = marker
