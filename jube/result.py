@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """ResultType definition"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.util.util
 import re
 import jube.log

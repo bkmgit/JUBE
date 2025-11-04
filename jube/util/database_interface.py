@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Database Interface"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.log
 import os
 import sqlite3

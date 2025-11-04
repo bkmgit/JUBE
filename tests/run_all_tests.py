@@ -18,10 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Collection of all tests"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import unittest
 from parameter_tests import TestParameter, TestParameterSet
 from multiprocessing_tests import TestMultiprocessing

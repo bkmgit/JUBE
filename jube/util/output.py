@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """ASCII and string output generators"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.conf
 import textwrap
 import copy

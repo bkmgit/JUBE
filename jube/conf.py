@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Configuration"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 # general
 JUBE_VERSION = "2.7.1"
 ALLOWED_SCRIPTTYPES = set(["python", "perl", "shell"])

@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Gives benchmark related info"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.util.util
 import jube.util.output
 import jube.conf

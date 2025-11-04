@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """KeyValuesResultType definition"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 from jube.result import Result
 import jube.log
 import operator

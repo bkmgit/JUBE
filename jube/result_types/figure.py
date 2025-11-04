@@ -17,9 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """FigureType definition"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
 import os
 try:
     import matplotlib.pyplot as plt

@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """The Workpackage class handles a step and its parameter space"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import multiprocessing as mp
 import jube.util.util
 import jube.util.output

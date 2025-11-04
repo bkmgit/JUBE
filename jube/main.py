@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """CLI program"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.jubeio
 import jube.util.util
 import jube.util.output
@@ -37,10 +33,7 @@ import shutil
 from jube.util.version import StrictVersion
 from jube.gui.gui import Gui
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
+from urllib.request import urlopen
 
 try:
     import argparse
@@ -758,11 +751,7 @@ def _remove_benchmark(benchmark_folder, args):
     """Remove existing benchmark"""
     remove = True
     if not args.force:
-        try:
-            inp = raw_input("Really remove \"{0}\" (y/n):"
-                            .format(benchmark_folder))
-        except NameError:
-            inp = input("Really remove \"{0}\" (y/n):"
+        inp = input("Really remove \"{0}\" (y/n):"
                         .format(benchmark_folder))
         remove = inp.startswith("y")
     if remove:
@@ -776,12 +765,7 @@ def _remove_workpackage(workpackage, args):
     # Ignore deleted/unstarted workpackages
     if workpackage.started:
         if not args.force:
-            try:
-                inp = raw_input(("Really remove \"{0}\" and its dependent " +
-                                 "workpackages (y/n):")
-                                .format(workpackage.workpackage_dir))
-            except NameError:
-                inp = input(("Really remove \"{0}\" and its dependent " +
+            inp = input(("Really remove \"{0}\" and its dependent " +
                              "workpackages (y/n):")
                             .format(workpackage.workpackage_dir))
             remove = inp.startswith("y")

@@ -44,13 +44,6 @@ Coding standards
 * use multiple files for completely different classes
 * try to stay **Python3.2** conform
 * ``import`` of package files should use the complete path (avoid ``from``)
-* all files must include the **Python3** compatible header:
-
-  .. code-block:: xml
-
-      from __future__ import (print_function,
-                              unicode_literals,
-                              division)
 
 * new include file features:
 

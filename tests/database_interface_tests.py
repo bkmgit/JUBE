@@ -18,10 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Database Interface related tests"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import re
 import unittest
 import sqlite3

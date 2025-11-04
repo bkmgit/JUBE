@@ -17,11 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Shell Completions"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
-
 import jube.main
 
 

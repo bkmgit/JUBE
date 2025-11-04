@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Utility functions, constants and classes"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 from collections import deque
 import re
 import string

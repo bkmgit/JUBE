@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """YAML to XML converter"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import xml.etree.ElementTree as etree
 import xml.dom.minidom as DOM
 try:
@@ -37,10 +33,7 @@ import jube.util.output
 import os
 import copy
 import jube.util.util
-try:
-    from StringIO import StringIO as IOStream
-except ImportError:
-    from io import BytesIO as IOStream
+from io import BytesIO as IOStream
 
 LOGGER = jube.log.get_logger(__name__)
 

@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Basic I/O module"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import xml.etree.ElementTree as ET
 import os
 from jube.util.util import Queue
@@ -97,10 +93,7 @@ class Parser(object):
                        "to database. This automatic conversion will " + \
                        "be removed in one of the next releases. " + \
                        "Continue? (y/n):"
-            try:
-                inp = raw_input(info_str)
-            except NameError:
-                inp = input(info_str)
+            inp = input(info_str)
             if not inp.startswith("y"):
                 return None
             benchmark = self.benchmarks_from_xml(check_tags=True)[0]
@@ -205,10 +198,7 @@ class Parser(object):
                                 "\nContinue? (y/n):").format(
                                     self._filename, version,
                                     jube.conf.JUBE_VERSION)
-                    try:
-                        inp = raw_input(info_str)
-                    except NameError:
-                        inp = input(info_str)
+                    inp = input(info_str)
                     if not inp.startswith("y"):
                         return None, list(), list()
 

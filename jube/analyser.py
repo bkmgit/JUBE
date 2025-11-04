@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """The Analyser class handles the analyse process"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import xml.etree.ElementTree as ET
 import jube.log
 import os

@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Parameter related classes"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import itertools
 import os
 import copy

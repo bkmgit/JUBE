@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Logging Support"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import logging
 import sys
 import glob

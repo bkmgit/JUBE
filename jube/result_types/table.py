@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """TableType definition"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 from jube.result_types.keyvaluesresult import KeyValuesResult
 from jube.result import Result
 import jube.log

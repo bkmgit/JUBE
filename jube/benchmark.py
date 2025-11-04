@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """The Benchmark class manages the benchmark process"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import multiprocessing as mp
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as DOM

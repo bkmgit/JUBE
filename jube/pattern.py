@@ -17,10 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Patternset definition"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import jube.parameter
 
 LOGGER = jube.log.get_logger(__name__)

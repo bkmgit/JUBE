@@ -18,10 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Test additional xml script examples"""
 
-from __future__ import (print_function,
-                        unicode_literals,
-                        division)
-
 import sys
 import filecmp
 import re
