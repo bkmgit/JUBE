@@ -47,6 +47,7 @@ import copy
 import hashlib
 import jube.log
 from jube.util.version import StrictVersion
+import ast
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -68,11 +69,6 @@ class Parser(object):
         self._force = force
         self._strict = strict
         self._command_name = command_name # run, continue, analyse, ...
-        self._file_handle = None
-
-    def __del__(self):
-        if self._file_handle is not None:
-            self._file_handle.close()
 
     @property
     def file_path_ref(self):
@@ -136,14 +132,13 @@ class Parser(object):
         LOGGER.debug("Parsing {0}".format(self._filename))
         
         benchmark_id, name, comment, outpath, version, file_path_ref = \
-            db.select("Benchmark", None, "")[0]
+            db.select("Benchmark")[0]
         tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
         tags = set(tag for tag, in tags)
         tag_docu = db.select("TagDocu", ["tag", "description"], f"benchmark_id='{benchmark_id}'")
         docu_dict = dict()
-        for docu in tag_docu:
-            name, description = docu
-            docu_dict[name] = description
+        for tag_name, description in tag_docu:
+            docu_dict[tag_name] = description
         comment, outpath, file_path_ref = self._evaluate_benchmark_attributes(comment, outpath, file_path_ref)
         
         parametersets = self._extract_parametersets_from_database(db, benchmark_id)
@@ -154,7 +149,7 @@ class Parser(object):
         analyser = self._extract_analysers_from_database(db, benchmark_id)
         results, results_order = self._extract_results_from_database(db, benchmark_id)
 
-        benchmark = jube.benchmark.Benchmark(name.strip(), outpath,
+        benchmark = jube.benchmark.Benchmark(name, outpath,
                                               parametersets, substitutesets,
                                               filesets, patternsets, steps,
                                               analyser, results, results_order,
@@ -191,9 +186,8 @@ class Parser(object):
                              .format(sys.getfilesystemencoding(), str(uee)))
 
         # Check input file version
-        version = tree.getroot().get("version")
+        version = Parser._get_attr(tree.getroot(),"version")
         if (version is not None) and (not self._force):
-            version = version.strip()
             if StrictVersion(version) > StrictVersion(jube.conf.JUBE_VERSION):
                 if self._strict:
                     error_str = ("Benchmark file \"{0}\" was created using " +
@@ -340,7 +334,12 @@ class Parser(object):
     @staticmethod
     def _check_valid_tags(element, tags):
         """Check if element contains only valid tags"""
-        return jube.util.util.valid_tags(element.get("tag"), tags)
+        return jube.util.util.valid_tags(Parser._get_attr(element,"tag"), tags)
+
+    @staticmethod
+    def _get_attr(elem, key, default=None, strip = True):
+        v = elem.get(key, default)
+        return v.strip() if strip and isinstance(v, str) else v
 
     @staticmethod
     def _remove_invalid_tags(etree, tags):
@@ -363,7 +362,7 @@ class Parser(object):
             if ((child.tag == "include") and
                     Parser._check_valid_tags(child, self._tags)):
                 filename = Parser._attribute_from_element(child, "from")
-                path = child.get("path", ".")
+                path = Parser._get_attr(child, "path", ".")
                 if path == "":
                     path = "."
                 try:
@@ -401,7 +400,7 @@ class Parser(object):
         uses = jube.util.util.get_tree_elements(benchmark_etree, "use")
         files = dict()
         for use in uses:
-            from_str = use.get("from", "").strip()
+            from_str = Parser._get_attr(use, "from", "")
             if (use.text is not None) and (use.text.strip() != "") and \
                (from_str != ""):
                 hash_val = hashlib.md5(from_str.encode()).hexdigest()
@@ -424,12 +423,7 @@ class Parser(object):
                         files[hash_val].add((filename, name))
 
                 # Replace set-name with an internal one
-                new_use_str = ""
-                for name in set_names:
-                    if len(new_use_str) > 0:
-                        new_use_str += jube.conf.DEFAULT_SEPARATOR
-                    new_use_str += "jube_{0}_{1}".format(hash_val, name)
-                use.text = new_use_str
+                use.text = jube.conf.DEFAULT_SEPARATOR.join(["jube_{0}_{1}".format(hash_val, name) for name in set_names])
 
         # Create new xml elements
         for fileid in files:
@@ -526,8 +520,7 @@ class Parser(object):
         if benchmark_etree is None:
             raise ValueError("benchmark-tag not found in \"{0}\"".format(
                 self._filename))
-        name = Parser._attribute_from_element(benchmark_etree,
-                                              "name").strip()
+        name = Parser._attribute_from_element(benchmark_etree,"name")
         comment_element = benchmark_etree.find("comment")
         if comment_element is not None:
             comment = comment_element.text
@@ -618,7 +611,7 @@ class Parser(object):
             raise IOError("Workpackage database file not found: \"{0}\""
                           .format(self._filename))
         # Get all available workpackages
-        workpackages = db.select("Workpackage", None, "")
+        workpackages = db.select("Workpackage")
         max_id = -1
         for workpackage in workpackages:
             workpackage_id, iteration, cycle, step_name, status, done_time = workpackage
@@ -638,7 +631,7 @@ class Parser(object):
                 parameter_names.append(name)
                 parameter = jube.parameter.Parameter.create_parameter(
                     name, value, separator, datatype, selected,
-                    mode, export, update_mode=update_mode, idx=idx,
+                    mode, unit, export, update_mode=update_mode, idx=idx,
                     eval_helper=None, fixed=False, duplicate=duplicate)
                 parameterset.add_parameter(parameter)
 
@@ -768,12 +761,11 @@ class Parser(object):
             env_name, value, env = db.select("Environment", None, f"environment_name='{env_name}'")[0]
             if env:
                 if value is not None:
-                    set_env[env_name] = value.strip()
-                    if (set_env[env_name][0] == "'") or \
-                                ((set_env[env_name][0] == "u") and
-                                 (set_env[env_name][1] == "'")) and \
-                               (set_env[env_name][-1] == "'"):
-                                set_env[env_name] = eval(set_env[env_name])
+                    set_env[env_name] = value
+                    if ((set_env[env_name][0] == "'") or \
+                            ((set_env[env_name][0] == "u") and (set_env[env_name][1] == "'"))) and \
+                            (set_env[env_name][-1] == "'"):
+                        set_env[env_name] = ast.literal_eval(set_env[env_name])
             else:
                 unset_env.append(env_name)
         return set_env, unset_env
@@ -964,8 +956,8 @@ class Parser(object):
         workpackage_id = int(Parser._attribute_from_element(
             workpackage_etree, "id"))
         step_etree = workpackage_etree.find("step")
-        iteration = int(step_etree.get("iteration", "0").strip())
-        cycle = int(step_etree.get("cycle", "0").strip())
+        iteration = int(Parser._get_attr(step_etree, "iteration", "0"))
+        cycle = int(Parser._get_attr(step_etree, "cycle", "0"))
         step_name = step_etree.text.strip()
         parameterset_etree = workpackage_etree.find("parameterset")
         if parameterset_etree is not None:
@@ -1002,7 +994,7 @@ class Parser(object):
                             ((set_env[env_name][0] == "u") and
                              (set_env[env_name][1] == "'")) and \
                            (set_env[env_name][-1] == "'"):
-                            set_env[env_name] = eval(set_env[env_name])
+                            set_env[env_name] = ast.literal_eval(set_env[env_name])
                 elif env_etree.tag == "nonenv":
                     unset_env.append(env_name)
         return (workpackage_id, step_name, parameterset, parents,
@@ -1076,10 +1068,11 @@ class Parser(object):
         Check for given check_tags in the tree and check
         if required tags are set.
         """
+        xml_check_tags = tree.findall("check_tags")
         check_tags = ""
-        for element in tree.findall("check_tags"):
+        for element in xml_check_tags:
             check_tags += "(" + element.text + ")"
-            if element != tree.findall("check_tags")[-1]:
+            if element != xml_check_tags[-1]:
                 check_tags += " + "
 
         if check_tags != "":
@@ -1102,13 +1095,13 @@ class Parser(object):
             if check_tags:
                 self._control_check_tags(tags_tree)
 
-            forced = tags_tree.get("forced", "false").strip().lower() == "true" or forced
+            forced = Parser._get_attr(tags_tree, "forced", "false").lower() == "true" or forced
 
             # find tag documentation
             for element in tags_tree:
                 Parser._check_tag(element, valid_tags)
                 if element.tag == "tag" and element.text is not None:
-                    tag_name = Parser._attribute_from_element(element, "name").strip()
+                    tag_name = Parser._attribute_from_element(element, "name")
                     tag_docu = element.text.strip()
                     if tag_docu != "":
                         tags[tag_name] = tag_docu
@@ -1116,7 +1109,7 @@ class Parser(object):
                         raise ValueError("The following tag description is empty: {0}"
                                          .format(tag_name))
                 elif element.tag == "tag" and element.text is None:
-                    tag_name = Parser._attribute_from_element(element, "name").strip()
+                    tag_name = Parser._attribute_from_element(element, "name")
                     raise ValueError("The following tag description is empty: {0}"
                                      .format(tag_name))
 
@@ -1171,7 +1164,7 @@ class Parser(object):
         Return a benchmark
         """
         name = \
-            Parser._attribute_from_element(benchmark_etree, "name").strip()
+            Parser._attribute_from_element(benchmark_etree, "name")
 
         valid_tags = ["parameterset", "substituteset", "fileset", "step",
                       "comment", "patternset", "analyzer", "analyser",
@@ -1189,7 +1182,7 @@ class Parser(object):
         comment = re.sub(r"\s+", " ", comment).strip()
         if self._outpath is None:
             outpath = Parser._attribute_from_element(benchmark_etree,
-                                                    "outpath").strip()
+                                                    "outpath")
             outpath = os.path.expandvars(os.path.expanduser(outpath))
             # Add position of user to outpath
             outpath = os.path.normpath(os.path.join(self.file_path_ref, outpath))
@@ -1197,7 +1190,7 @@ class Parser(object):
         else:
             outpath = self._outpath
 
-        file_path_ref = benchmark_etree.get("file_path_ref")
+        file_path_ref = Parser._get_attr(benchmark_etree, "file_path_ref", ".")
 
         # Combine global and local sets
         parametersets = \
@@ -1228,12 +1221,8 @@ class Parser(object):
         results, results_order = self._extract_results(benchmark_etree)
 
         # File path reference for relative file location
-        if file_path_ref is not None:
-            file_path_ref = file_path_ref.strip()
-            file_path_ref = \
+        file_path_ref = \
                 os.path.expandvars(os.path.expanduser(file_path_ref))
-        else:
-            file_path_ref = "."
 
         # Add position of user to file_path_ref
         file_path_ref = \
@@ -1280,12 +1269,10 @@ class Parser(object):
                 do_log_file = None
             if do_log_file in ["True", "true"]:
                 do_log_file = jube.conf.DO_LOG_FILENAME
-            if shared is not None:
-                shared = shared.strip()
-                if shared == "":
-                    raise ValueError("Empty \"shared\" attribute in " +
+            if shared == "":
+                raise ValueError("Empty \"shared\" attribute in " +
                                  "<step> found.")
-            step = jube.step.Step(name.strip(), depend, iterations, work_dir,
+            step = jube.step.Step(name, depend, iterations, work_dir,
                                shared, export, max_async, active, suffix,
                                cycles, procs, do_log_file)
             # Extract related operations
@@ -1356,31 +1343,26 @@ class Parser(object):
         """
         valid_tags = ["use", "do"]
 
-        name = Parser._attribute_from_element(etree_step, "name").strip()
+        name = Parser._attribute_from_element(etree_step, "name")
         LOGGER.debug("  Parsing <step name=\"{0}\">".format(name))
-        tmp = etree_step.get("depend", "").strip()
-        iterations = int(etree_step.get("iterations", "1").strip())
-        alt_work_dir = etree_step.get("work_dir")
-        if alt_work_dir is not None:
-            alt_work_dir = alt_work_dir.strip()
-        export = etree_step.get("export", "false").strip().lower() == "true"
-        max_wps = etree_step.get("max_async", "0").strip()
-        active = etree_step.get("active", "true").strip()
-        suffix = etree_step.get("suffix", "").strip()
-        cycles = int(etree_step.get("cycles", "1").strip())
-        procs = int(etree_step.get("procs", "1").strip())
-        do_log_file = etree_step.get("do_log_file", "None").strip()
+        tmp = Parser._get_attr(etree_step, "depend", "")
+        iterations = int(Parser._get_attr(etree_step, "iterations", "1"))
+        alt_work_dir = Parser._get_attr(etree_step,"work_dir")
+        export = Parser._get_attr(etree_step, "export", "false").lower() == "true"
+        max_wps = Parser._get_attr(etree_step, "max_async", "0")
+        active = Parser._get_attr(etree_step, "active", "true")
+        suffix = Parser._get_attr(etree_step, "suffix", "")
+        cycles = int(Parser._get_attr(etree_step, "cycles", "1"))
+        procs = int(Parser._get_attr(etree_step, "procs", "1"))
+        do_log_file = Parser._get_attr(etree_step, "do_log_file", "None")
         do_log_file = None if do_log_file == "None" else do_log_file
         do_log_file = None if do_log_file == "False" else do_log_file
         do_log_file = None if do_log_file == "false" else do_log_file
         do_log_file = jube.conf.DO_LOG_FILENAME if do_log_file == "True" else do_log_file
         do_log_file = jube.conf.DO_LOG_FILENAME if do_log_file == "true" else do_log_file
-        shared_name = etree_step.get("shared")
-        if shared_name is not None:
-            shared_name = shared_name.strip()
-            if shared_name == "":
-                raise ValueError("Empty \"shared\" attribute in " +
-                                 "<step> found.")
+        shared_name = Parser._get_attr(etree_step, "shared")
+        if shared_name == "":
+            raise ValueError("Empty \"shared\" attribute in <step> found.")
         depend = set(val.strip() for val in
                      tmp.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
 
@@ -1390,26 +1372,14 @@ class Parser(object):
         for element in etree_step:
             Parser._check_tag(element, valid_tags)
             if element.tag == "do":
-                async_filename = element.get("done_file")
-                if async_filename is not None:
-                    async_filename = async_filename.strip()
-                error_filename = element.get("error_file")
-                if error_filename is not None:
-                    error_filename = error_filename.strip()
-                break_filename = element.get("break_file")
-                if break_filename is not None:
-                    break_filename = break_filename.strip()
-                stdout_filename = element.get("stdout")
-                if stdout_filename is not None:
-                    stdout_filename = stdout_filename.strip()
-                stderr_filename = element.get("stderr")
-                if stderr_filename is not None:
-                    stderr_filename = stderr_filename.strip()
-                active = element.get("active", "true").strip()
-                shared_str = element.get("shared", "false").strip()
-                alt_work_dir = element.get("work_dir")
-                if alt_work_dir is not None:
-                    alt_work_dir = alt_work_dir.strip()
+                async_filename = Parser._get_attr(element, "done_file")
+                error_filename = Parser._get_attr(element, "error_file")
+                break_filename = Parser._get_attr(element, "break_file")
+                stdout_filename = Parser._get_attr(element, "stdout")
+                stderr_filename = Parser._get_attr(element, "stderr")
+                active = Parser._get_attr(element, "active", "true")
+                shared_str = Parser._get_attr(element, "shared", "false")
+                alt_work_dir = Parser._get_attr(element, "work_dir")
                 if shared_str.lower() == "true":
                     if shared_name is None:
                         raise ValueError("<do shared=\"true\"> only allowed "
@@ -1419,7 +1389,7 @@ class Parser(object):
                         raise ValueError("<do shared=\"true\"> not allowed " +
                                          "inside a parallel <step>")
                     shared = True
-                elif shared_str == "false":
+                elif shared_str.lower() == "false":
                     shared = False
                 else:
                     raise ValueError("shared=\"{0}\" not allowed. Must be " +
@@ -1472,8 +1442,8 @@ class Parser(object):
             uses = db.select("AnalyseFilePattern", ["patternset_name"], f"analysefile_id='{iid}'")
             uses = [use for use, in uses]
             file_obj.add_uses(uses)
-            steps = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{iid}'")[0][0]
-            file_objects.append((file_obj, steps))
+            step = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{iid}'")[0][0]
+            file_objects.append((file_obj, step))
         return file_objects
 
     @staticmethod
@@ -1493,17 +1463,15 @@ class Parser(object):
     def _extract_analyser(etree_analyser):
         """Extract an analyser from etree"""
         valid_tags = ["use", "analyse"]
-        name = Parser._attribute_from_element(etree_analyser,
-                                              "name").strip()
+        name = Parser._attribute_from_element(etree_analyser,"name")
         reduce_iteration = \
-            etree_analyser.get("reduce", "true").strip().lower() == "true"
+            Parser._get_attr(etree_analyser, "reduce", "true").lower() == "true"
         analyser = jube.analyser.Analyser(name, reduce_iteration)
         LOGGER.debug("  Parsing <analyser name=\"{0}\">".format(name))
         for element in etree_analyser:
             Parser._check_tag(element, valid_tags)
             if element.tag == "analyse":
-                step_name = Parser._attribute_from_element(element,
-                                                           "step").strip()
+                step_name = Parser._attribute_from_element(element,"step")
                 # If there are no files, just add a dummy element to the list
                 if len(element) == 0:
                     analyser.add_analyse(step_name, None)
@@ -1512,7 +1480,7 @@ class Parser(object):
                             (file_etree.text.strip() == ""):
                         raise ValueError("Empty <file> found")
                     else:
-                        use_text = file_etree.get("use")
+                        use_text = Parser._get_attr(file_etree, "use")
                         if use_text is not None:
                             use_names = \
                                 [use_name.strip() for use_name in
@@ -1565,7 +1533,7 @@ class Parser(object):
         for database in databases:
             name, res_filter, file, result_id = database
             primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
-                                  f"database_name='{name} AND is_primary=1'")
+                                  f"database_name='{name}' AND is_primary=1")
             primekeys = [key for key, in primekeys]
             result = jube.result_types.database.Database(name, res_filter, primekeys, file)
             result.result_dir = result_dir
@@ -1621,10 +1589,10 @@ class Parser(object):
         results_order = list()
         valid_tags = ["use", "table", "syslog", "database", "figure"]
         for result_etree in etree.findall("result"):
-            result_dir = result_etree.get("result_dir")
+            result_dir = Parser._get_attr(result_etree, "result_dir")
             if result_dir is not None:
                 result_dir = \
-                    os.path.expandvars(os.path.expanduser(result_dir.strip()))
+                    os.path.expandvars(os.path.expanduser(result_dir))
             sub_results = dict()
             uses = list()
             for element in result_etree:
@@ -1667,26 +1635,20 @@ class Parser(object):
     @staticmethod
     def _extract_table(etree_table):
         """Extract a table from etree"""
-        name = Parser._attribute_from_element(etree_table, "name").strip()
+        name = Parser._attribute_from_element(etree_table, "name")
         separator = \
-            etree_table.get("separator", jube.conf.DEFAULT_SEPARATOR)
-        style = etree_table.get("style", "csv").strip()
+            Parser._get_attr(etree_table, "separator", jube.conf.DEFAULT_SEPARATOR, False)
+        style = Parser._get_attr(etree_table, "style", "csv")
         if style not in ["csv", "pretty", "aligned"]:
             raise ValueError("Not allowed style-type \"{0}\" "
                              "in <table name=\"{1}\">".format(style, name))
-        sort_names = etree_table.get("sort", "").split(
+        sort_names = Parser._get_attr(etree_table, "sort", "").split(
             jube.conf.DEFAULT_SEPARATOR)
         sort_names = [sort_name.strip() for sort_name in sort_names]
         sort_names = [
             sort_name for sort_name in sort_names if len(sort_name) > 0]
-        transpose = etree_table.get("transpose")
-        if transpose is not None:
-            transpose = transpose.strip().lower() == "true"
-        else:
-            transpose = False
-        res_filter = etree_table.get("filter")
-        if res_filter is not None:
-            res_filter = res_filter.strip()
+        transpose = Parser._get_attr(etree_table, "transpose","false").lower() == "true"
+        res_filter = Parser._get_attr(etree_table, "filter")
         table = jube.result_types.table.Table(name, style, separator,
                                                sort_names, transpose,
                                                res_filter)
@@ -1698,29 +1660,25 @@ class Parser(object):
             column_name = column_name.strip()
             if column_name == "":
                 raise ValueError("Empty <column> not allowed")
-            colw = element.get("colw")
+            colw = Parser._get_attr(element, "colw")
             if colw is not None:
                 colw = int(colw)
-            title = element.get("title")
-            format_string = element.get("format")
-            if format_string is not None:
-                format_string = format_string.strip()
+            title = Parser._get_attr(element, "title")
+            format_string = Parser._get_attr(element, "format")
             table.add_column(column_name, colw, format_string, title)
         return table
 
     @staticmethod
     def _extract_database(etree_database):
         """Extract a database result infos from etree"""
-        name = Parser._attribute_from_element(etree_database, "name").strip()
-        res_filter = etree_database.get("filter")
-        if res_filter is not None:
-            res_filter = res_filter.strip()
-        primekeys = etree_database.get("primekeys", "")
+        name = Parser._attribute_from_element(etree_database, "name")
+        res_filter = Parser._get_attr(etree_database, "filter")
+        primekeys = Parser._get_attr(etree_database, "primekeys", "")
         primekeys = primekeys.replace('[', '').replace(']', '').replace(
             "'", '').split(jube.conf.DEFAULT_SEPARATOR)
         primekeys = [primekey.strip() for primekey in primekeys]
         primekeys = [primekey for primekey in primekeys if len(primekey) > 0]
-        db_file = etree_database.get("file")
+        db_file = Parser._get_attr(etree_database, "file")
         database = jube.result_types.database.Database(
             name, res_filter, primekeys, db_file)
         for element in etree_database:
@@ -1731,15 +1689,9 @@ class Parser(object):
             key_name = key_name.strip()
             if key_name == "":
                 raise ValueError("Empty <key> not allowed")
-            title = element.get("title")
-            format_string = element.get("format")
-            if format_string is not None:
-                format_string = format_string.strip()
-            primekey = element.get("primekey")
-            if primekey is not None:
-                primekey = primekey.strip().lower() == "true"
-            else:
-                primekey = False
+            title = Parser._get_attr(element, "title")
+            format_string = Parser._get_attr(element, "format")
+            primekey = Parser._get_attr(element, "primekey","false").lower() == "true"
             database.add_key(key_name, format_string, title, primekey)
         return database
 
@@ -1749,22 +1701,18 @@ class Parser(object):
         valid_scale_types = ["linear", "log", "logit", "symlog"]
         valid_plot_types = ["line", "scatter", "bar", "stem", "step"]
 
-        name = Parser._attribute_from_element(etree_figure, "name").strip()
-        showfig = etree_figure.get("showfig", "true").strip().lower()
+        name = Parser._attribute_from_element(etree_figure, "name")
+        showfig = Parser._get_attr(etree_figure,"showfig", "true").lower()
         if showfig not in ["true", "false"]:
             raise ValueError("Supported values for <figure showfig>: true, false")
         showfig = showfig == "true"
-        savefig = etree_figure.get("savefig")
-        if savefig is not None:
-            savefig = savefig.strip()
-        title = etree_figure.get("title", "").strip()
-        res_filter = etree_figure.get("filter")
-        if res_filter is not None:
-            res_filter = res_filter.strip()
-        nrows = int(etree_figure.get("nrows", "0"))
+        savefig = Parser._get_attr(etree_figure,"savefig")
+        title = Parser._get_attr(etree_figure,"title", "")
+        res_filter = Parser._get_attr(etree_figure,"filter")
+        nrows = int(Parser._get_attr(etree_figure,"nrows", "0"))
         if nrows < 0:
             nrows = 0
-        ncols = int(etree_figure.get("ncols", "0"))
+        ncols = int(Parser._get_attr(etree_figure,"ncols", "0"))
         if ncols < 0:
             nrows = 0
 
@@ -1772,17 +1720,17 @@ class Parser(object):
 
         for etree_plot in etree_figure:
             Parser._check_tag(etree_plot, ["plot"])
-            legend = etree_plot.get("legend", "false").strip().lower()
+            legend = Parser._get_attr(etree_plot,"legend", "false").lower()
             if legend not in ["true", "false"]:
                 raise ValueError("Supported values for <figure legend>: true, false")
             legend = legend == "true"
-            xlabel = etree_plot.get("xlabel", "").strip()
-            ylabel = etree_plot.get("ylabel", "").strip()
-            xscale = etree_plot.get("xscale","").strip()
+            xlabel = Parser._get_attr(etree_plot,"xlabel", "")
+            ylabel = Parser._get_attr(etree_plot,"ylabel", "")
+            xscale = Parser._get_attr(etree_plot,"xscale","")
             if xscale not in valid_scale_types and xscale !="":
                 raise ValueError("Supported values for <plot xscale>: {}"
                                     .format(", ".join(valid_scale_types)))
-            yscale = etree_plot.get("yscale","").strip()
+            yscale = Parser._get_attr(etree_plot,"yscale","")
             if yscale not in valid_scale_types and xscale !="":
                 raise ValueError("Supported values for <plot yscale>: {}"
                                     .format(", ".join(valid_scale_types)))
@@ -1790,19 +1738,19 @@ class Parser(object):
             plot_data = list()
             for etree_data in etree_plot:
                 Parser._check_tag(etree_data, ["data"])
-                x = Parser._attribute_from_element(etree_data, "x").strip()
-                y = Parser._attribute_from_element(etree_data, "y").strip()
-                groupby = etree_data.get("groupby", "").split(jube.conf.DEFAULT_SEPARATOR)
+                x = Parser._attribute_from_element(etree_data, "x")
+                y = Parser._attribute_from_element(etree_data, "y")
+                groupby = Parser._get_attr(etree_data,"groupby", "").split(jube.conf.DEFAULT_SEPARATOR)
                 groupby = [g.strip() for g in groupby if g.strip() != ""]
-                data_type = etree_data.get("type", "line").strip()
+                data_type = Parser._get_attr(etree_data,"type", "line")
                 if data_type not in valid_plot_types:
                     raise ValueError("Supported values for <data type>: {}"
                                      .format(", ".join(valid_plot_types)))
-                label = etree_data.get("label", "").strip()
-                color = etree_data.get("color", "").strip()
-                marker = etree_data.get("marker", "").strip()
-                linestyle = etree_data.get("linestyle", "").strip()
-                sort_data = etree_data.get("sort", "false").strip().lower()
+                label = Parser._get_attr(etree_data,"label", "")
+                color = Parser._get_attr(etree_data,"color", "")
+                marker = Parser._get_attr(etree_data,"marker", "")
+                linestyle = Parser._get_attr(etree_data,"linestyle", "")
+                sort_data = Parser._get_attr(etree_data,"sort", "false").lower()
                 if sort_data not in ["true", "false"]:
                     raise ValueError("Supported values for <data sort_data>: true, false")
                 sort_data = sort_data == "true"
@@ -1821,29 +1769,21 @@ class Parser(object):
     @staticmethod
     def _extract_syslog(etree_syslog):
         """Extract requires syslog information from etree."""
-        name = Parser._attribute_from_element(etree_syslog, "name").strip()
+        name = Parser._attribute_from_element(etree_syslog, "name")
         # see if the host, port combination or address is given
-        syslog_address = etree_syslog.get("address")
+        syslog_address = Parser._get_attr(etree_syslog, "address")
         if syslog_address is not None:
             syslog_address = \
-                os.path.expandvars(os.path.expanduser(syslog_address.strip()))
-        syslog_host = etree_syslog.get("host")
-        if syslog_host is not None:
-            syslog_host = syslog_host.strip()
-        syslog_port = etree_syslog.get("port")
-        if syslog_port is not None:
-            syslog_port = int(syslog_port.strip())
-        syslog_fmt_string = etree_syslog.get("format")
-        if syslog_fmt_string is not None:
-            syslog_fmt_string = syslog_fmt_string.strip()
-        sort_names = etree_syslog.get("sort", "").split(
+                os.path.expandvars(os.path.expanduser(syslog_address))
+        syslog_host = Parser._get_attr(etree_syslog, "host")
+        syslog_port = Parser._get_attr(etree_syslog, "port")
+        syslog_fmt_string = Parser._get_attr(etree_syslog, "format")
+        sort_names = Parser._get_attr(etree_syslog, "sort", "").split(
             jube.conf.DEFAULT_SEPARATOR)
         sort_names = [sort_name.strip() for sort_name in sort_names]
         sort_names = [
             sort_name for sort_name in sort_names if len(sort_name) > 0]
-        res_filter = etree_syslog.get("filter")
-        if res_filter is not None:
-            res_filter = res_filter.strip()
+        res_filter = Parser._get_attr(etree_syslog, "filter")
         syslog_result = jube.result_types.syslog.SysloggedResult(
             name, syslog_address, syslog_host, syslog_port, syslog_fmt_string,
             sort_names, res_filter)
@@ -1856,10 +1796,8 @@ class Parser(object):
             key_name = key_name.strip()
             if key_name == "":
                 raise ValueError("Empty <key> not allowed")
-            title = element.get("title")
-            format_string = element.get("format")
-            if format_string is not None:
-                format_string = format_string.strip()
+            title = Parser._get_attr(element, "title")
+            format_string = Parser._get_attr(element, "format")
             syslog_result.add_key(key_name, format_string, title)
         return syslog_result
 
@@ -1918,17 +1856,18 @@ class Parser(object):
                 elements.append(element)
 
         test_duplicate=None
+        duplicate_attr = Parser._get_attr(elements[0], "duplicate")
         if duplicate == "###initiated_with_without_duplicate_mentioning###":
-            if elements[0].get("duplicate") != None:
-                duplicate = elements[0].get("duplicate")
+            if duplicate_attr != None:
+                duplicate = duplicate_attr
             else:
                 duplicate = "replace"
         if duplicate != "###initiated_with_without_duplicate_mentioning###" and duplicate != None:
             if set_type == "parameterset":
-                if elements[0].get("duplicate") == None:
+                if duplicate_attr == None:
                     test_duplicate = duplicate
                 else:
-                    test_duplicate = elements[0].get("duplicate")
+                    test_duplicate = duplicate_attr
             if duplicate != None:
                 if test_duplicate != duplicate:
                     raise ValueError("The {0} {1} is mentioned at least twice with different duplicate options.".format(set_type, name))
@@ -1943,11 +1882,11 @@ class Parser(object):
             elif len(elements) == 0:
                 raise ValueError("\"{0}\" not found in \"{1}\""
                                  .format(search_name, file_path))
-            init_with = elements[0].get("init_with")
+            init_with = Parser._get_attr(elements[0], "init_with")
 
             # recursive external file open
             if init_with is not None:
-                parts = init_with.strip().split(":")
+                parts = init_with.split(":")
                 new_filename = parts[0]
                 if len(parts) > 1:
                     new_search_name = parts[1]
@@ -2032,26 +1971,24 @@ class Parser(object):
 
         parametersets = dict()
         for element in etree.findall("parameterset"):
-            name = Parser._attribute_from_element(element, "name").strip()
+            name = Parser._attribute_from_element(element, "name")
             if name == "":
                 raise ValueError("Empty \"name\" attribute in " +
                                  "<parameterset> found.")
             LOGGER.debug("  Parsing <parameterset name=\"{0}\">".format(name))
-            duplicate = element.get("duplicate", "replace").strip()
-            if duplicate is None:
-                duplicate="replace"
-            if duplicate != "replace" and duplicate != "concat" and duplicate != "error":
+            duplicate = Parser._get_attr(element, "duplicate", "replace")
+            if duplicate not in ["replace","concat","error"]:
                 raise ValueError("Invalid \"duplicate\" attribute in " +
                                  "parameterset {0} found. Use \"replace\" (default)" +
                                  ", \"concat\" or \"error\".".format(name))
-            init_with = element.get("init_with")
+            init_with = Parser._get_attr(element, "init_with")
             if init_with is not None:
-                parts = init_with.strip().split(":")
+                parts = init_with.split(":")
                 if len(parts) > 1:
                     search_name = parts[1]
                 else:
                     search_name = None
-                if element.get("duplicate") == None:
+                if Parser._get_attr(element, "duplicate") == None:
                     duplicate = "###initiated_with_without_duplicate_mentioning###"
                 parameterset = self._extract_extern_set(parts[0],
                                                         "parameterset", name,
@@ -2074,7 +2011,7 @@ class Parser(object):
         parameters = list()
         for param in etree_parameterset:
             Parser._check_tag(param, ["parameter"])
-            name = Parser._attribute_from_element(param, "name").strip()
+            name = Parser._attribute_from_element(param, "name")
             if name == "":
                 raise ValueError(
                     "Empty \"name\" attribute in <parameter> found.")
@@ -2082,25 +2019,21 @@ class Parser(object):
                 raise ValueError(("name=\"{0}\" in <parameter> " +
                                   "contains a disallowed " +
                                   "character").format(name))
-            separator = param.get("separator",
-                                  default=jube.conf.DEFAULT_SEPARATOR)
-            parameter_type = param.get("type", default="string").strip()
-            parameter_mode = param.get("mode", default="text").strip()
-            parameter_unit = param.get("unit", default="").strip()
-            parameter_update_mode = param.get("update_mode",
-                                              default="never").strip()
+            separator = Parser._get_attr(param, "separator",jube.conf.DEFAULT_SEPARATOR,False)
+            parameter_type = Parser._get_attr(param, "type", "string")
+            parameter_mode = Parser._get_attr(param, "mode", "text")
+            parameter_unit = Parser._get_attr(param, "unit", "")
+            parameter_update_mode = Parser._get_attr(param, "update_mode",
+                                              "never")
             if parameter_update_mode not in jube.parameter.UPDATE_MODES:
                 raise ValueError(
                     ("update_mode=\"{0}\" in " +
                      "<parameter name=\"{1}\"> does not exist")
                     .format(parameter_update_mode, name))
-            export_str = param.get("export", default="false").strip()
-            export = export_str.lower() == "true"
+            export = Parser._get_attr(param, "export", "false").lower() == "true"
 
-            duplicate = param.get("duplicate", "none").strip()
-            if duplicate is None:
-                duplicate="none"
-            if duplicate != "replace" and duplicate != "concat" and duplicate != "error" and duplicate != "none":
+            duplicate = Parser._get_attr(param, "duplicate", "none")
+            if duplicate not in ["replace","concat","error","none"]:
                 raise ValueError("Invalid \"duplicate\" attribute in " +
                                  "parameter {0} found. Use \"replace\"" +
                                  ", \"concat\", \"error\" or \"none\" (default).".format(name))
@@ -2125,9 +2058,9 @@ class Parser(object):
                 selected_value = selection_etree.text
                 if selected_value is None:
                     selected_value = ""
-                idx = int(selection_etree.get("idx", "-1"))
+                idx = int(Parser._get_attr(selection_etree, "idx", "-1"))
             else:
-                selected_value = param.get("selection")
+                selected_value = Parser._get_attr(param, "selection")
                 idx = -1
             if selected_value is not None:
                 selected_value = selected_value.strip()
@@ -2168,14 +2101,14 @@ class Parser(object):
         """Return patternset from etree"""
         patternsets = dict()
         for element in etree.findall("patternset"):
-            name = Parser._attribute_from_element(element, "name").strip()
+            name = Parser._attribute_from_element(element, "name")
             if name == "":
                 raise ValueError("Empty \"name\" attribute in " +
                                  "<patternset> found.")
             LOGGER.debug("  Parsing <patternset name=\"{0}\">".format(name))
-            init_with = element.get("init_with")
+            init_with = Parser._get_attr(element, "init_with")
             if init_with is not None:
-                parts = init_with.strip().split(":")
+                parts = init_with.split(":")
                 if len(parts) > 1:
                     search_name = parts[1]
                 else:
@@ -2200,7 +2133,7 @@ class Parser(object):
         patternlist = list()
         for pattern in etree_patternset:
             Parser._check_tag(pattern, ["pattern"])
-            name = Parser._attribute_from_element(pattern, "name").strip()
+            name = Parser._attribute_from_element(pattern, "name")
             if name == "":
                 raise ValueError(
                     "Empty \"name\" attribute in <pattern> found.")
@@ -2208,20 +2141,17 @@ class Parser(object):
                 raise ValueError(("name=\"{0}\" in <pattern> " +
                                   "contains a disallowed " +
                                   "character").format(name))
-            pattern_mode = pattern.get("mode", default="pattern").strip()
+            pattern_mode = Parser._get_attr(pattern, "mode", "pattern")
             if pattern_mode not in \
                     set(["pattern", "text"]).union(
                         jube.conf.ALLOWED_SCRIPTTYPES):
                 raise ValueError(("pattern-mode \"{0}\" not allowed in " +
                                   "<pattern name=\"{1}\">").format(
                     pattern_mode, name))
-            content_type = pattern.get("type", default="string").strip()
-            unit = pattern.get("unit", "").strip()
-            dotall = \
-                pattern.get("dotall", "false").strip().lower() == "true"
-            default = pattern.get("default")
-            if default is not None:
-                default = default.strip()
+            content_type = Parser._get_attr(pattern, "type", "string")
+            unit = Parser._get_attr(pattern, "unit", "")
+            dotall = Parser._get_attr(pattern, "dotall", "false").lower() == "true"
+            default = Parser._get_attr(pattern, "default")
             if pattern.text is None:
                 value = ""
             else:
@@ -2263,12 +2193,10 @@ class Parser(object):
         prepares = db.select("Prepare", None, f"fileset_name='{fileset_name}'")
         for prepare in prepares:
             iid, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare
-            if work_dir is not None:
-                work_dir = work_dir.strip()
             active = str(active).lower()
 
-            prepare_obj = jube.fileset.Prepare(do.strip(), stdout_fn.strip(),
-                                                stderr_fn.strip(),work_dir, active)
+            prepare_obj = jube.fileset.Prepare(do, stdout_fn,
+                                                stderr_fn,work_dir, active)
             filelist.append(prepare_obj)
         return filelist
 
@@ -2276,17 +2204,17 @@ class Parser(object):
         """Return filesets from etree"""
         filesets = dict()
         for element in etree.findall("fileset"):
-            name = Parser._attribute_from_element(element, "name").strip()
+            name = Parser._attribute_from_element(element, "name")
             if name == "":
                 raise ValueError(
                     "Empty \"name\" attribute in <fileset> found.")
             LOGGER.debug("  Parsing <fileset name=\"{0}\">".format(name))
-            init_with = element.get("init_with")
+            init_with = Parser._get_attr(element, "init_with")
             filelist = Parser._extract_files(element)
             if name in filesets:
                 raise ValueError("\"{0}\" not unique".format(name))
             if init_with is not None:
-                parts = init_with.strip().split(":")
+                parts = init_with.split(":")
                 if len(parts) > 1:
                     search_name = parts[1]
                 else:
@@ -2307,23 +2235,22 @@ class Parser(object):
         for etree_file in etree_fileset:
             Parser._check_tag(etree_file, valid_tags)
             if etree_file.tag in ["copy", "link"]:
-                separator = etree_file.get(
-                    "separator", jube.conf.DEFAULT_SEPARATOR)
-                source_dir = etree_file.get("directory", default="").strip()
+                separator = Parser._get_attr(etree_file, 
+                    "separator", jube.conf.DEFAULT_SEPARATOR,False)
+                source_dir = Parser._get_attr(etree_file, "directory", "")
                 # New source_dir attribute overwrites deprecated directory
                 # attribute
-                source_dir_new = etree_file.get("source_dir")
-                target_dir = etree_file.get("target_dir", default="").strip()
+                source_dir_new = Parser._get_attr(etree_file, "source_dir")
+                target_dir = Parser._get_attr(etree_file, "target_dir", "")
                 if source_dir_new is not None:
-                    source_dir = source_dir_new.strip()
-                active = etree_file.get("active", "true").strip()
-                file_path_ref = etree_file.get("file_path_ref")
-                alt_name = etree_file.get("name")
+                    source_dir = source_dir_new
+                active = Parser._get_attr(etree_file, "active", "true")
+                file_path_ref = Parser._get_attr(etree_file, "file_path_ref")
+                alt_name = Parser._get_attr(etree_file, "name")
                 # Check if the filepath is relatively seen to working dir or the
                 # position of the xml-input-file
                 is_internal_ref = \
-                    etree_file.get("rel_path_ref",
-                                   default="external").strip() == "internal"
+                    Parser._get_attr(etree_file, "rel_path_ref", "external") == "internal"
                 if etree_file.text is None:
                     raise ValueError("Empty filelist in <{0}> found."
                                      .format(etree_file.tag))
@@ -2356,23 +2283,17 @@ class Parser(object):
                     if file_path_ref is not None:
                         file_obj.file_path_ref = \
                             os.path.expandvars(os.path.expanduser(
-                                file_path_ref.strip()))
+                                file_path_ref))
                     filelist.append(file_obj)
             elif etree_file.tag == "prepare":
                 cmd = etree_file.text
                 if cmd is None:
                     cmd = ""
                 cmd = cmd.strip()
-                stdout_filename = etree_file.get("stdout")
-                if stdout_filename is not None:
-                    stdout_filename = stdout_filename.strip()
-                stderr_filename = etree_file.get("stderr")
-                if stderr_filename is not None:
-                    stderr_filename = stderr_filename.strip()
-                alt_work_dir = etree_file.get("work_dir")
-                if alt_work_dir is not None:
-                    alt_work_dir = alt_work_dir.strip()
-                active = etree_file.get("active", "true").strip()
+                stdout_filename = Parser._get_attr(etree_file, "stdout")
+                stderr_filename = Parser._get_attr(etree_file, "stderr")
+                alt_work_dir = Parser._get_attr(etree_file, "work_dir")
+                active = Parser._get_attr(etree_file, "active", "true")
 
                 prepare_obj = jube.fileset.Prepare(cmd, stdout_filename,
                                                     stderr_filename,
@@ -2412,17 +2333,17 @@ class Parser(object):
         {"compilesub": ([iofile0,...], [sub0,...])}"""
         substitutesets = dict()
         for element in etree.findall("substituteset"):
-            name = Parser._attribute_from_element(element, "name").strip()
+            name = Parser._attribute_from_element(element, "name")
             if name == "":
                 raise ValueError("Empty \"name\" attribute in " +
                                  "<substituteset> found.")
             LOGGER.debug("  Parsing <substituteset name=\"{0}\">".format(name))
-            init_with = element.get("init_with")
+            init_with = Parser._get_attr(element, "init_with")
             files, subs = Parser._extract_subs(element)
             if name in substitutesets:
                 raise ValueError("\"{0}\" not unique".format(name))
             if init_with is not None:
-                parts = init_with.strip().split(":")
+                parts = init_with.split(":")
                 if len(parts) > 1:
                     search_name = parts[1]
                 else:
@@ -2449,10 +2370,9 @@ class Parser(object):
         for sub in etree_substituteset:
             Parser._check_tag(sub, valid_tags)
             if sub.tag == "iofile":
-                in_file = Parser._attribute_from_element(sub, "in").strip()
-                out_file = Parser._attribute_from_element(
-                    sub, "out").strip()
-                out_mode = sub.get("out_mode", "w").strip()
+                in_file = Parser._attribute_from_element(sub, "in")
+                out_file = Parser._attribute_from_element(sub, "out")
+                out_mode = Parser._get_attr(sub, "out_mode", "w")
                 if out_mode not in ["w", "a"]:
                     raise ValueError(
                         "out_mode in <iofile> must be \"w\" or \"a\"")
@@ -2461,17 +2381,16 @@ class Parser(object):
                 files.append((out_file, in_file, out_mode))
             elif sub.tag == "sub":
                 source = "" + \
-                    Parser._attribute_from_element(sub, "source").strip()
+                    Parser._attribute_from_element(sub, "source")
                 if source == "":
                     raise ValueError(
                         "Empty \"source\" attribute in <sub> found.")
-                dest = sub.get("dest")
+                dest = Parser._get_attr(sub, "dest")
                 if dest is None:
-                    dest = sub.text
+                    dest = sub.text.strip()
                     if dest is None:
                         dest = ""
-                dest = dest.strip() + ""
-                sub_type = sub.get("mode", default="text").strip()
+                sub_type = Parser._get_attr(sub, "mode", "text")
                 subs[source] = jube.substitute.Sub(source, sub_type, dest)
         return (files, subs)
 
@@ -2481,7 +2400,7 @@ class Parser(object):
         element -- etree.Element
         attribute -- string
         Raise a useful exception if value not found """
-        value = element.get(attribute)
+        value = Parser._get_attr(element, attribute)
         if value is None:
             raise ValueError("Missing attribute '{0}' in <{1}>"
                              .format(attribute, element.tag))
