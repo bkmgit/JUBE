@@ -69,8 +69,9 @@ class Figure(GenericResult):
                 # plot function calls are created dynamically because certain
                 # arguments are not mandatory and would cause an error
                 label = label if label is not None else data.label
+                x_data = sorted(table_data[data.x]) if data.sort else table_data[data.x]
                 if data.type == "line":
-                    func_args = "table_data[data.x], table_data[data.y], label=label"
+                    func_args = "x_data, table_data[data.y], label=label"
                     for attr in ['color', 'marker', 'linestyle']:
                         attr_val = getattr(data, attr)
                         if attr_val:
@@ -78,12 +79,12 @@ class Figure(GenericResult):
                     eval(f'ax.plot({func_args})')
                 elif data.type in ["bar", "stem"]:
                     plot_func = getattr(ax, data.type)
-                    plot_func(table_data[data.x], table_data[data.y],
+                    plot_func(x_data, table_data[data.y],
                                 label=label)
                 else:
                     # dynamically create plot function call (e.g. ax.scatter())
                     plot_func = getattr(ax, data.type)
-                    func_args = "table_data[data.x], table_data[data.y], label=label"
+                    func_args = "x_data, table_data[data.y], label=label"
                     for attr in ['color', 'marker', 'linestyle']:
                         attr_val = getattr(data, attr)
                         if attr_val:
@@ -163,7 +164,7 @@ class Figure(GenericResult):
         class Data():
             """Plot data"""
             def __init__(self, x, y, groupby, type, label,
-                         color, marker, linestyle):
+                         color, marker, linestyle, sort_data):
                 self._x = x
                 self._y = y
                 self._groupby = groupby
@@ -172,6 +173,7 @@ class Figure(GenericResult):
                 self._color = color
                 self._marker = marker
                 self._linestyle = linestyle
+                self._sort = sort_data
 
             @property
             def x(self):
@@ -213,6 +215,11 @@ class Figure(GenericResult):
                 """Get 'linestyle'"""
                 return self._linestyle
 
+            @property
+            def sort(self):
+                """Get 'sort'"""
+                return self._sort
+
             def __str__(self):
                 return f"Data: x: {self._x}; y: {self._y}; "\
                     f"groupby: {self._groupby}, type: {self._type}, "\
@@ -236,6 +243,8 @@ class Figure(GenericResult):
                     data["marker"] = self._marker
                 if self._linestyle:
                     data["linestyle"] = self._linestyle
+                if self._sort:
+                    data["sort"] = 1
                 data["plot_id"] = plot_id
                 db.insert("ResultFigurePlotData", data)
 
@@ -248,7 +257,7 @@ class Figure(GenericResult):
                     Figure.Plot.Data(data['x'], data['y'], data['groupby'],
                                      data['type'], data['label'],
                                      data['color'], data['marker'], 
-                                     data['linestyle']))
+                                     data['linestyle'],data['sort']))
             self._legend = legend
             self._xlabel = xlabel
             self._ylabel = ylabel
@@ -368,7 +377,7 @@ class Figure(GenericResult):
                 figure_data["savefig"] = self._savefig
             if self._showfig:
                 figure_data["showfig"] = 1
-            if self._res_filter:
+            if self._res_filter is not None:
                 figure_data["filter"] = self._res_filter
             db.insert("ResultFigure", figure_data)
             for plot in self._plots:

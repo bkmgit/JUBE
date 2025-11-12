@@ -1601,14 +1601,14 @@ class Parser(object):
                 db_data = db.select("ResultFigurePlotData", None, f"plot_id='{id}'")
                 plot_data = list()
                 for data in db_data:
-                    data_id, x, y, groupby, plot_type, label, color, marker, linestyle, plot_name = data
+                    data_id, x, y, groupby, plot_type, label, color, marker, linestyle, sort_data, plot_id = data
                     result.add_key(x)
                     result.add_key(y)
                     if groupby not in [None, ""]: result.add_key(groupby)
                     plot_data.append({'x': x, 'y': y, 'type': plot_type, 
                                     'groupby': groupby, 'label': label,
                                     'color': color, 'marker': marker,
-                                    'linestyle': linestyle})
+                                    'linestyle': linestyle, 'sort': bool(sort_data)})
                 result.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
             return result
 
@@ -1791,13 +1791,18 @@ class Parser(object):
                 color = etree_data.get("color", "").strip()
                 marker = etree_data.get("marker", "").strip()
                 linestyle = etree_data.get("linestyle", "").strip()
+                sort_data = etree_data.get("sort", "false").strip().lower()
+                if sort_data not in ["true", "false"]:
+                    raise ValueError("Supported values for <data sort_data>: true, false")
+                sort_data = sort_data == "true"
+
                 figure.add_key(x)
                 figure.add_key(y)
                 if groupby != "": figure.add_key(groupby)
                 plot_data.append({'x': x, 'y': y, 'type': data_type, 
                                   'groupby': groupby, 'label': label,
                                   'color': color, 'marker': marker,
-                                  'linestyle': linestyle})
+                                  'linestyle': linestyle, 'sort': sort_data})
             figure.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
         return figure
 

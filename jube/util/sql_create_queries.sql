@@ -459,6 +459,7 @@ CREATE TABLE IF NOT EXISTS ResultFigurePlotData
     color TEXT,
     marker TEXT,
     linestyle TEXT,
+    sort INTEGER DEFAULT 0,
     plot_id TEXT NOT NULL,
     FOREIGN KEY (plot_id) REFERENCES ResultFigurePlot(plot_id) ON DELETE CASCADE
 );
