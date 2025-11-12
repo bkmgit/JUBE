@@ -73,7 +73,7 @@ class Figure(GenericResult):
                     func_args = "table_data[data.x], table_data[data.y], label=label"
                     for attr in ['color', 'marker', 'linestyle']:
                         attr_val = getattr(data, attr)
-                        if attr_val not in [None, ""]:
+                        if attr_val:
                             func_args += f", {attr}=data.{attr}"
                     eval(f'ax.plot({func_args})')
                 elif data.type in ["bar", "stem"]:
@@ -86,7 +86,7 @@ class Figure(GenericResult):
                     func_args = "table_data[data.x], table_data[data.y], label=label"
                     for attr in ['color', 'marker', 'linestyle']:
                         attr_val = getattr(data, attr)
-                        if attr_val not in [None, ""]:
+                        if attr_val:
                             func_args += f", {attr}=data.{attr}"
                     eval(f'ax.{data.type}({func_args})')
 
@@ -118,7 +118,7 @@ class Figure(GenericResult):
                 if plot.xscale: ax.set_xscale(plot.xscale)
                 if plot.yscale: ax.set_yscale(plot.yscale)
                 for data in plot.plot_data:
-                    if data.groupby not in [None, ""]:
+                    if data.groupby:
                         for group in set(table_data[data.groupby]):
                             group_ids = [i for i, x in enumerate(table_data[data.groupby]) if x == group]
                             group_data = {data.x:list(), data.y:list()}
@@ -128,14 +128,14 @@ class Figure(GenericResult):
                             create_plot(data, group_data, ax, label=group)
                     else:
                         create_plot(data, table_data, ax)
-                if plot._legend == "true": ax.legend()
+                if plot._legend: ax.legend()
 
             # if "savefig" is set, then save figure in "savefig" file
             #    (-> use data of all benchmark ids specified on the CLI)
             # else save figure in "filename" (benchmark id result directory)
             #    (-> one figure per benchmark id)
             # Additional clauses are need to avoid multiple saving
-            if self._savefig not in [None, ""] and show:
+            if self._savefig and show:
                 file_path_ind = self._savefig.rfind('/')
                 if file_path_ind != -1:
                     # create full directory path if it doesn't exist
@@ -145,7 +145,7 @@ class Figure(GenericResult):
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
                     set(self._benchmark_ids), os.path.expanduser(self._savefig)))
-            elif self._savefig in [None, ""] and filename is not None:
+            elif not self._savefig and filename is not None:
                 fig.savefig(filename.replace(".dat", ".png"))
                 # Print Figure location to screen and result.log
                 LOGGER.info("Figure location of id {}: {}".format(
@@ -153,7 +153,7 @@ class Figure(GenericResult):
                         filename.replace(".dat", ".png"))))
 
             # show figure if "showfig" attribute isn't set to False
-            if show and self._showfig == "true":
+            if show and self._showfig:
                 plt.show()
             plt.close()
 
@@ -224,22 +224,22 @@ class Figure(GenericResult):
                 data = dict()
                 data["x"] = self._x
                 data["y"] = self._y
-                if self._groupby not in [None, ""]:
+                if self._groupby:
                     data["groupby"] = self._groupby
-                if self._type not in [None, ""]:
+                if self._type:
                     data["plot_type"] = self._type
-                if self._label not in [None, ""]:
+                if self._label:
                     data["label"] = self._label
-                if self._color not in [None, ""]:
+                if self._color:
                     data["color"] = self._color
-                if self._marker not in [None, ""]:
+                if self._marker:
                     data["marker"] = self._marker
-                if self._linestyle not in [None, ""]:
+                if self._linestyle:
                     data["linestyle"] = self._linestyle
                 data["plot_id"] = plot_id
                 db.insert("ResultFigurePlotData", data)
 
-        def __init__(self, plot_data, legend=None, xlabel=None, ylabel=None, xscale=None, yscale=None,
+        def __init__(self, plot_data, legend=False, xlabel=None, ylabel=None, xscale=None, yscale=None,
                      name=None, title=None, unit=None):
             GenericResult.DataKey.__init__(self, name, title, unit)
             self._plot_data = list()
@@ -297,21 +297,21 @@ class Figure(GenericResult):
             """Store plot information in database"""
             plot_data = dict()
             plot_data["figure_name"] = figure_name
-            if self._legend not in [None, ""]:
-                plot_data["legend"] = self._legend
-            if self._xlabel not in [None, ""]:
+            if self._legend:
+                plot_data["legend"] = 1
+            if self._xlabel:
                 plot_data["xlabel"] = self._xlabel
-            if self._ylabel not in [None, ""]:
+            if self._ylabel:
                 plot_data["ylabel"] = self._ylabel
-            if self._xscale not in [None, ""]:
+            if self._xscale:
                 plot_data["xscale"] = self._xscale
-            if self._yscale not in [None, ""]:
+            if self._yscale:
                 plot_data["yscale"] = self._yscale
             plot_id = db.insert("ResultFigurePlot", plot_data)
             for data in self._plot_data:
                 data.add_information_to_database(db, plot_id)
 
-    def __init__(self, name, showfig="true", savefig=None, title=None, res_filter=None):
+    def __init__(self, name, showfig=True, savefig=None, title=None, res_filter=None):
         GenericResult.__init__(self, name, res_filter)
         self._showfig = showfig
         self._savefig = savefig
@@ -367,7 +367,7 @@ class Figure(GenericResult):
             if self._savefig:
                 figure_data["savefig"] = self._savefig
             if self._showfig:
-                figure_data["showfig"] = self._showfig
+                figure_data["showfig"] = 1
             if self._res_filter:
                 figure_data["filter"] = self._res_filter
             db.insert("ResultFigure", figure_data)

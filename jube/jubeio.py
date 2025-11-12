@@ -1590,11 +1590,13 @@ class Parser(object):
         figures = db.select("ResultFigure", None, f"result_id='{result_id}'")
         for figure in figures:
             name, title, savefig, showfig, filter, result_id = figure
+            showfig = bool(showfig)
             result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter)
 
             plots = db.select("ResultFigurePlot", None, f"figure_name='{name}'")
             for plot in plots:
                 id, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
+                legend = bool(legend)
                 
                 db_data = db.select("ResultFigurePlotData", None, f"plot_id='{id}'")
                 plot_data = list()
@@ -1749,6 +1751,7 @@ class Parser(object):
         showfig = etree_figure.get("showfig", "true").strip().lower()
         if showfig not in ["true", "false"]:
             raise ValueError("Supported values for <figure showfig>: true, false")
+        showfig = showfig == "true"
         savefig = etree_figure.get("savefig")
         if savefig is not None:
             savefig = savefig.strip()
@@ -1762,6 +1765,7 @@ class Parser(object):
             legend = etree_plot.get("legend", "false").strip().lower()
             if legend not in ["true", "false"]:
                 raise ValueError("Supported values for <figure legend>: true, false")
+            legend = legend == "true"
             xlabel = etree_plot.get("xlabel", "").strip()
             ylabel = etree_plot.get("ylabel", "").strip()
             xscale = etree_plot.get("xscale","").strip()

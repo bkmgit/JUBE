@@ -428,7 +428,7 @@ CREATE TABLE IF NOT EXISTS ResultFigure
     figure_name TEXT NOT NULL PRIMARY KEY,
     title TEXT,
     savefig TEXT,
-    showfig TEXT,
+    showfig INTEGER DEFAULT 0,
     filter TEXT,
     result_id INTEGER NOT NULL,
     FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
@@ -438,7 +438,7 @@ CREATE TABLE IF NOT EXISTS ResultFigure
 CREATE TABLE IF NOT EXISTS ResultFigurePlot
 (
     plot_id INTEGER NOT NULL PRIMARY KEY,
-    legend TEXT,
+    legend INTEGER DEFAULT 0,
     xlabel TEXT,
     ylabel TEXT,
     xscale TEXT,
