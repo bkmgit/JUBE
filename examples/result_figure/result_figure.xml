@@ -1,62 +1,79 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <jube>
-  <benchmark name="figure_creation" outpath="bench_run">
+  <benchmark name='figure_creation' outpath='bench_run'>
     <comment>A figure creation example</comment>
-    
-    <!-- Configuration -->
-    <parameterset name="param_set">
-      <!-- Create a parameterspace with one template parameter -->
-      <parameter name="i"  type="int"              >0,1,2</parameter>
-      <parameter name="x"  type="int" mode="python">[0,1,2][$i]</parameter>
-      <parameter name="x2" type="int" mode="python">[10,11,12][$i]</parameter>
-      <parameter name="y"  type="int" mode="python">[1,2,4][$i]</parameter>
-      <parameter name="y2" type="int" mode="python">[5,5,5][$i]</parameter>
-      <parameter name="y3" type="int" mode="python">[12,10,8][$i]</parameter>
+
+    <parameterset name='param_set'>
+      <parameter name='i'>0,1,2,3</parameter>
+      <parameter name='x2' mode='python'>[0,2,4,6][$i]</parameter>
+      <parameter name='y2' mode='python'>[10,11,8,9][$i]</parameter>
+    </parameterset>
+
+    <parameterset name='groupby_params'>
+      <parameter name='type'>Typ1,Typ2,Typ3</parameter>
+      <parameter name='x'>0,1,2,3</parameter>
+      <parameter name='y' mode='python'>
+        {
+          'Typ1' : [11,12,11,13][$x],
+          'Typ2' : [19,18,19,22][$x],
+          'Typ3' : [40,20,35,25][$x],
+        }.get('${type}',0)
+      </parameter>
     </parameterset>
     
     <!-- Regex pattern -->
-    <patternset name="pattern_all">
-      <pattern name="x_pat"  type="int">x: $jube_pat_int</pattern>
-      <pattern name="x2_pat" type="int">x2: $jube_pat_int</pattern>
-      <pattern name="y_pat"  type="int">y: $jube_pat_int</pattern>
-      <pattern name="y2_pat" type="int">y2: $jube_pat_int</pattern>
-      <pattern name="y3_pat" type="int">y3: $jube_pat_int</pattern>
+    <patternset name='pattern_all'>
+      <pattern name='type_pat'>type: ${jube_pat_wrd}${jube_pat_bl}</pattern>
+      <pattern name='x_pat' type='int'>x: $jube_pat_int</pattern>
+      <pattern name='x2_pat' type='int'>x2: $jube_pat_int</pattern>
+      <pattern name='y_pat'  type='int'>y: $jube_pat_int</pattern>
+      <pattern name='y2_pat'  type='int'>y2: $jube_pat_int</pattern>
     </patternset>
     
     <!-- Operation -->
-    <step name="write_number">
+    <step name='write_numbers'>
       <use>param_set</use> <!-- use existing parameterset -->
-      <do>echo "x: $x; x2: $x2; y: $y; y2: $y2; y3: $y3"</do> <!-- shell command -->
+      <do>echo 'x2: $x2; y2: $y2'</do> <!-- shell command -->
+    </step>
+
+    <step name='write_groupby'>
+      <use>groupby_params</use> <!-- use existing parameterset -->
+      <do>echo 'type: ${type} ; x: $x; y: $y'</do> <!-- shell command -->
     </step>
     
     <!-- Analyse -->
-    <analyser name="analyse">
-      <analyse step="write_number">
-        <file use="pattern_all">stdout</file> <!-- file stdout will be scanned with pattern_all -->
+    <analyser name='analyse'>
+      <analyse step='write_numbers'>
+        <file use='pattern_all'>stdout</file> <!-- file stdout will be scanned with pattern_all -->
+      </analyse>
+      <analyse step='write_groupby'>
+        <file use='pattern_all'>stdout</file> <!-- file stdout will be scanned with pattern_all -->
       </analyse>
     </analyser>
     
     <!-- Create result figure -->
     <result>
       <use>analyse</use> <!-- use existing analyser -->
-      <figure name='1_fig' title='FIG Title' savefig='first_fig.png' showfig='True'>
-        <plot xlabel='My x label' ylabel='My y label' xscale='symlog' yscale='log' legend='True'>
-          <data x='x_pat' y='y_pat' label='NO LINE' color='green' marker='^' linestyle='dashed'/>
-          <data x='x_pat' y='y2_pat' label='NO LINE2'/>
+      <figure name='fig' title='Title' nrows='2' ncols='3'>
+        <plot legend='True'>
+          <data x='x2_pat' y='y2_pat' label='LINE' color='green' marker='^' linestyle='dashed'/>
         </plot>
         <plot>
-          <data x='x2_pat' y='y2_pat' label='SCATTER' type='scatter'/>
+          <data x='x2_pat' y='y2_pat' type='stem'/>
         </plot>
         <plot>
-          <data x='x2_pat' y='y3_pat' label='STEP' type='step' />
+          <data x='x2_pat' y='y2_pat' type='scatter'/>
         </plot>
         <plot>
-          <data x='x2_pat' y='y_pat' label='BAR' type='bar' />
+          <data x='x2_pat' y='y2_pat' type='step' />
+        </plot>
+        <plot>
+          <data x='x2_pat' y='y2_pat' type='bar' />
         </plot>
       </figure>
-      <figure name='2_fig'>
-        <plot>
-          <data x='x_pat' y='y3_pat' label='SCATTER' type='scatter' />
+      <figure name='groupby_fig' savefig='group_fig.pdf' showfig='False'>
+        <plot xlabel='x' ylabel='y' legend='True'>
+          <data x='x_pat' y='y_pat' groupby='type_pat'/>
         </plot>
       </figure>
     </result>

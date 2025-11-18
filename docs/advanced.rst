@@ -920,6 +920,45 @@ Invocating ``jube result`` a second time will update the database specified by t
 
 To have a look into a database within a python script the python modules `sqalchemy <https://www.sqlalchemy.org/>`_ or `pandas <https://pandas.pydata.org>`_ can be used.
 
+.. index:: figure
+
+.. _result_figure:
+
+Result figure
+~~~~~~~~~~~~~~~
+
+Results can also be visualized in a figure.
+
+The files used for this example can be found inside ``examples/result_figure``.
+
+The input file ``result_figure.xml``:
+
+.. literalinclude:: ../examples/result_figure/result_figure.xml
+   :language: xml
+
+The input file ``result_figure.yaml``:
+
+.. literalinclude:: ../examples/result_figure/result_figure.yaml
+   :language: yaml
+
+By default, a generated figure will be located as follows and has the ``figure`` tag name as root name concatenated with the appendix ``.png``. This location can be changed using the attribute ``savefig``.
+
+.. code-block:: none
+
+   bench_run
+   |
+   +- 000000
+      |
+      +- result
+         |
+         +- fig.png
+
+A ``figure`` consists of one or more plots, which then contain individual ``data`` elements. The layout of these plots can be specified using the attributes ``nrows`` and ``ncols``.
+
+In total, JUBE supports five different types of plots: ``line``, ``scatter``, ``stem``, ``step`` and ``bar``. For line, scatter, and bar plots, the appearance can be further customized using various style attributes like ``marker`` or ``linestyle``.
+
+In addition, data can also be grouped for plotting, as shown in the figure named ``groupby_fig``. The values of the parameter or pattern used for grouping are then automatically used as labels in a legend.
+
 .. index:: do log
 
 .. _do_log:
