@@ -431,6 +431,8 @@ CREATE TABLE IF NOT EXISTS ResultFigure
     showfig INTEGER DEFAULT 0,
     filter TEXT,
     result_id INTEGER NOT NULL,
+    nrows INTEGER DEFAULT 0,
+    ncols INTEGER DEFAULT 0,
     FOREIGN KEY (result_id) REFERENCES Result(result_id) ON DELETE CASCADE
 );
 

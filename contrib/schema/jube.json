@@ -1318,6 +1318,14 @@
 					"description": "The filter can contain a bool expression to show only specific result entries.",
 					"type": "string"
 				},
+				"nrows": {
+					"description": "can be used to specify the dimensions of subplots",
+					"type": "integer"
+				},
+				"ncols": {
+					"description": "can be used to specify the dimensions of subplots",
+					"type": "integer"
+				},
 				"tag": {
 					"$ref": "#/$defs/tag"
 				},

@@ -234,6 +234,8 @@ attlist.figure &=
   attribute savefig { text }?,
   attribute showfig { "true" | "false" | "True" | "False" }?,
   attribute filter { text }?,
+  attribute nrows { text }?,
+  attribute ncols { text }?,
   attribute tag { text }?
 plot = element plot { attlist.plot, (data | \include)* }
 attlist.plot &=

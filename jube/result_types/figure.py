@@ -23,6 +23,7 @@ from __future__ import (print_function,
 import os
 try:
     import matplotlib.pyplot as plt
+    # decision for matplotlib instead of pandas because Pandas is based on Matplotlib and therefore two dependencies would be necessary
 except ImportError:
     pass
 from pathlib import Path
@@ -44,7 +45,7 @@ class Figure(GenericResult):
 
         """Figure data"""
 
-        def __init__(self, name_or_other, plots, savefig, title, showfig):
+        def __init__(self, name_or_other, plots, savefig, title, showfig, nrows=0, ncols=0):
             if type(name_or_other) is GenericResult.KeyValuesData:
                 self._name = name_or_other.name
                 self._data = name_or_other.data
@@ -55,6 +56,8 @@ class Figure(GenericResult):
             self._savefig = savefig
             self._title = title
             self._showfig = showfig
+            self._nrows = nrows
+            self._ncols = ncols
 
         def create_result(self, show=True, filename=None, **kwargs):
             """Place for the magic: generate the figures
@@ -107,18 +110,34 @@ class Figure(GenericResult):
                 LOGGER.debug("No plotable data was found \n")
                 return
 
+            if self._nrows == 0 and self._ncols == 0:
+                rows = 1
+                cols= len(self._plots)
+            elif self._nrows == 0:
+                rows = (len(self._plots) + self._ncols - 1) // self._ncols
+                cols= self._ncols
+            elif self._ncols == 0:
+                rows = self._nrows
+                cols= (len(self._plots) + self._nrows - 1) // self._nrows
+            elif self._nrows * self._ncols >= len(self._plots):
+                rows = self._nrows
+                cols= self._ncols
+            else:
+                LOGGER.error("There are too many plots for the specified number of rows (={0}) and columns (={1})".format(self._nrows, self._ncols))
+                exit()
             try:
-                fig, ax = plt.subplots()
+                fig, axes = plt.subplots(rows, cols)
             except NameError:
                 LOGGER.error("If you want to use the figure result option, you have to install the matplotlib "
                              "package. See https://matplotlib.org/stable/install/index.html")
                 exit()
+            axes = axes.flatten() if rows*cols > 1 else [axes]
             fig.suptitle(self._title)
-            for plot in self._plots:
-                if plot.xlabel: ax.set_xlabel(plot.xlabel)
-                if plot.ylabel: ax.set_ylabel(plot.ylabel)
-                if plot.xscale: ax.set_xscale(plot.xscale)
-                if plot.yscale: ax.set_yscale(plot.yscale)
+            for i, plot in enumerate(self._plots):
+                if plot.xlabel: axes[i].set_xlabel(plot.xlabel)
+                if plot.ylabel: axes[i].set_ylabel(plot.ylabel)
+                if plot.xscale: axes[i].set_xscale(plot.xscale)
+                if plot.yscale: axes[i].set_yscale(plot.yscale)
                 for data in plot.plot_data:
                     if data.groupby:
                         groups = list(zip(*[table_data[g] for g in data.groupby]))
@@ -129,10 +148,10 @@ class Figure(GenericResult):
                                 data.y: [table_data[data.y][i] for i in group_ids]
                             }
                             label = ", ".join(f"{value}" for value in group)
-                            create_plot(data, group_data, ax, label=label)
+                            create_plot(data, group_data, axes[i], label=label)
                     else:
-                        create_plot(data, table_data, ax)
-                if plot._legend: ax.legend()
+                        create_plot(data, table_data, axes[i])
+                if plot.legend: axes[i].legend()
 
             # if "savefig" is set, then save figure in "savefig" file
             #    (-> use data of all benchmark ids specified on the CLI)
@@ -323,12 +342,14 @@ class Figure(GenericResult):
             for data in self._plot_data:
                 data.add_information_to_database(db, plot_id)
 
-    def __init__(self, name, showfig=True, savefig=None, title=None, res_filter=None):
+    def __init__(self, name, showfig=True, savefig=None, title=None, res_filter=None, nrows=0, ncols=0):
         GenericResult.__init__(self, name, res_filter)
         self._showfig = showfig
         self._savefig = savefig
         self._title = title
         self._plots = list()
+        self._nrows = nrows
+        self._ncols = ncols
 
     @property
     def showfig(self):
@@ -350,6 +371,16 @@ class Figure(GenericResult):
         """Get 'plots'"""
         return self._plots
 
+    @property
+    def nrows(self):
+        """Get 'nrows'"""
+        return self._nrows
+
+    @property
+    def ncols(self):
+        """Get 'ncols'"""
+        return self._ncols
+
     def add_key(self, name, title=None, unit=None):
         """Add an additional key to the dataset if it is not already in the set"""
         if name not in [key.name for key in self._keys]:
@@ -363,7 +394,7 @@ class Figure(GenericResult):
         """Create result data"""
         result_data = GenericResult.create_result_data(self, select, exclude)
         return Figure.FigureData(result_data, self._plots, self._savefig,
-                                 self._title, self._showfig)
+                                 self._title, self._showfig, self._nrows, self._ncols)
     
     def add_information_to_database(self, db, benchmark_id, update=False):
         """Store figure information in database"""
@@ -382,6 +413,10 @@ class Figure(GenericResult):
                 figure_data["showfig"] = 1
             if self._res_filter is not None:
                 figure_data["filter"] = self._res_filter
+            if self._nrows > 0:
+                figure_data["nrows"] = self._nrows
+            if self._ncols > 0:
+                figure_data["ncols"] = self._ncols
             db.insert("ResultFigure", figure_data)
             for plot in self._plots:
                 plot.add_information_to_database(db, self._name)

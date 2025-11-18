@@ -1589,9 +1589,9 @@ class Parser(object):
         # Extract figure results
         figures = db.select("ResultFigure", None, f"result_id='{result_id}'")
         for figure in figures:
-            name, title, savefig, showfig, filter, result_id = figure
+            name, title, savefig, showfig, filter, result_id, nrows, ncols= figure
             showfig = bool(showfig)
-            result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter)
+            result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter, nrows, ncols)
 
             plots = db.select("ResultFigurePlot", None, f"figure_name='{name}'")
             for plot in plots:
@@ -1761,8 +1761,14 @@ class Parser(object):
         res_filter = etree_figure.get("filter")
         if res_filter is not None:
             res_filter = res_filter.strip()
+        nrows = int(etree_figure.get("nrows", "0"))
+        if nrows < 0:
+            nrows = 0
+        ncols = int(etree_figure.get("ncols", "0"))
+        if ncols < 0:
+            nrows = 0
 
-        figure = jube.result_types.figure.Figure(name, showfig, savefig, title, res_filter)
+        figure = jube.result_types.figure.Figure(name, showfig, savefig, title, res_filter, nrows, ncols)
 
         for etree_plot in etree_figure:
             Parser._check_tag(etree_plot, ["plot"])

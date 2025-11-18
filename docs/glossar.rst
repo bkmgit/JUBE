@@ -751,7 +751,7 @@ Glossary
 
      .. code-block:: xml
 
-        <figure name="..." title="..." savefig="..." showfig="..." filter="..."> 
+        <figure name="..." title="..." savefig="..." showfig="..." filter="..." nrows="..." ncols="..."> 
           <plot xlabel="..." ylabel="..." legend="..." xscale="..." yscale="...">
             <data x="..." y="..." label="..." type="..."/> 
             <data x="..." y="..." label="..." type="..." color="..." marker="..." linestyle="..."/> 
@@ -762,10 +762,11 @@ Glossary
         </figure> 
 
      * ``title`` is optional: figure title
-     * ``savefig`` is optional: Here you can specify an different output file.
+     * ``savefig`` is optional: can be used to specify a different output file.
      * ``showfig`` is optional (default: ``true``)
-       Given patterntype or parametertype will be used for sorting
      * ``filter`` is optional, it can contain a bool expression to show only specific result entries
+     * ``nrows`` (default: ``1``) and ``ncols`` are optional: can be used to specify the dimensions of subplots. If only one of both is given,
+       the other value will be calculated automatically depending on the number of ``<plot>``-tags.
      * ``<plot>`` can be specified in the figure result and can contain the data that will be plotted.
 
        * ``legend`` is optional (default: ``false``)
