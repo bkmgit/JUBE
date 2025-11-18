@@ -1602,9 +1602,11 @@ class Parser(object):
                 plot_data = list()
                 for data in db_data:
                     data_id, x, y, groupby, plot_type, label, color, marker, linestyle, sort_data, plot_id = data
+                    groupby = [g.strip() for g in groupby.split(jube.conf.DEFAULT_SEPARATOR) if g.strip() != ""]
                     result.add_key(x)
                     result.add_key(y)
-                    if groupby not in [None, ""]: result.add_key(groupby)
+                    for group in groupby:
+                        result.add_key(group)
                     plot_data.append({'x': x, 'y': y, 'type': plot_type, 
                                     'groupby': groupby, 'label': label,
                                     'color': color, 'marker': marker,
@@ -1756,7 +1758,9 @@ class Parser(object):
         if savefig is not None:
             savefig = savefig.strip()
         title = etree_figure.get("title", "").strip()
-        res_filter = etree_figure.get("filter", "").strip()
+        res_filter = etree_figure.get("filter")
+        if res_filter is not None:
+            res_filter = res_filter.strip()
 
         figure = jube.result_types.figure.Figure(name, showfig, savefig, title, res_filter)
 
@@ -1782,7 +1786,8 @@ class Parser(object):
                 Parser._check_tag(etree_data, ["data"])
                 x = Parser._attribute_from_element(etree_data, "x").strip()
                 y = Parser._attribute_from_element(etree_data, "y").strip()
-                groupby = etree_data.get("groupby", "").strip()
+                groupby = etree_data.get("groupby", "").split(jube.conf.DEFAULT_SEPARATOR)
+                groupby = [g.strip() for g in groupby if g.strip() != ""]
                 data_type = etree_data.get("type", "line").strip()
                 if data_type not in valid_plot_types:
                     raise ValueError("Supported values for <data type>: {}"
@@ -1798,7 +1803,8 @@ class Parser(object):
 
                 figure.add_key(x)
                 figure.add_key(y)
-                if groupby != "": figure.add_key(groupby)
+                for group in groupby:
+                    figure.add_key(group)
                 plot_data.append({'x': x, 'y': y, 'type': data_type, 
                                   'groupby': groupby, 'label': label,
                                   'color': color, 'marker': marker,

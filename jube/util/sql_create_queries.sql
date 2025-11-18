@@ -453,7 +453,7 @@ CREATE TABLE IF NOT EXISTS ResultFigurePlotData
     data_id INTEGER NOT NULL PRIMARY KEY,
     x TEXT,
     y TEXT,
-    groupby TEXT,
+    groupby TEXT DEFAULT "",
     plot_type TEXT,
     label TEXT,
     color TEXT,

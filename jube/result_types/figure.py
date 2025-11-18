@@ -31,6 +31,7 @@ from jube.result_types.genericresult import GenericResult
 from jube.result import Result
 import xml.etree.ElementTree as ET
 import jube.log
+import jube.conf
 
 LOGGER = jube.log.get_logger(__name__)
 
@@ -120,13 +121,15 @@ class Figure(GenericResult):
                 if plot.yscale: ax.set_yscale(plot.yscale)
                 for data in plot.plot_data:
                     if data.groupby:
-                        for group in set(table_data[data.groupby]):
-                            group_ids = [i for i, x in enumerate(table_data[data.groupby]) if x == group]
-                            group_data = {data.x:list(), data.y:list()}
-                            for key in group_data.keys():
-                                for i in group_ids:
-                                    group_data[key].append(table_data[key][i])
-                            create_plot(data, group_data, ax, label=group)
+                        groups = list(zip(*[table_data[g] for g in data.groupby]))
+                        for group in sorted(set(groups)):
+                            group_ids = [i for i, x in enumerate(groups) if x == group]
+                            group_data = {
+                                data.x: [table_data[data.x][i] for i in group_ids],
+                                data.y: [table_data[data.y][i] for i in group_ids]
+                            }
+                            label = ", ".join(f"{value}" for value in group)
+                            create_plot(data, group_data, ax, label=label)
                     else:
                         create_plot(data, table_data, ax)
                 if plot._legend: ax.legend()
@@ -232,7 +235,7 @@ class Figure(GenericResult):
                 data["x"] = self._x
                 data["y"] = self._y
                 if self._groupby:
-                    data["groupby"] = self._groupby
+                    data["groupby"] = jube.conf.DEFAULT_SEPARATOR.join(self._groupby)
                 if self._type:
                     data["plot_type"] = self._type
                 if self._label:
