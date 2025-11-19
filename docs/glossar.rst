@@ -753,7 +753,7 @@ Glossary
 
         <figure name="..." title="..." savefig="..." showfig="..." filter="..." nrows="..." ncols="..."> 
           <plot xlabel="..." ylabel="..." legend="..." xscale="..." yscale="...">
-            <data x="..." y="..." label="..." type="..."/> 
+            <data x="..." y="..." label="..." type="..." sort="..."/> 
             <data x="..." y="..." label="..." type="..." color="..." marker="..." linestyle="..."/> 
             <data x="..." y="..." groupby="..."/> 
             ...
@@ -765,7 +765,7 @@ Glossary
      * ``savefig`` is optional: can be used to specify a different output file.
      * ``showfig`` is optional (default: ``true``)
      * ``filter`` is optional, it can contain a bool expression to show only specific result entries
-     * ``nrows`` (default: ``1``) and ``ncols`` are optional: can be used to specify the dimensions of subplots. If only one of both is given,
+     * ``nrows`` (default: ``1``) and ``ncols`` are optional: They can be used to specify the layout of subplots. If only one of both is given,
        the other value will be calculated automatically depending on the number of ``<plot>``-tags.
      * ``<plot>`` can be specified in the figure result and can contain the data that will be plotted.
 
@@ -774,14 +774,14 @@ Glossary
        * ``xlabel`` and ``ylabel`` are optional: They can be used to define labels for the x- and y-axis
        * ``<data>`` can contain the specific data that will be plotted.
 
-         * ``x`` and ``y`` can contain the name of a pattern or the name of a parameter
+         * ``x`` and ``y`` can contain the name of a pattern or the name of a parameter. All parameters/patterns for the attribute ``x`` of the ``<data>`` tags within a plot should either have the type ``string`` OR a numeric type (``int``, ``float``). As soon as one of the parameters/patterns for ``x`` is of type ``string``, the ``x`` values of all ``<data>`` tags are interpreted as strings (the same applies to the ``y`` attribute).
          * ``label`` is optional: It can be used to define a label for the legend
          * ``type`` is optional. Allowed plot types: ``line``, ``scatter``, ``bar``, ``stem``, ``step`` (default: ``line``)
          * ``color``, ``marker`` and ``linestyle`` are optional, but are only allowed if the types ``line``, ``scatter`` or ``bar`` are used
          * ``groupby`` is optional: It can contain the name of a pattern or the name of a parameter
+         * ``sort`` is optional (default: ``false``): It is used to sort the values of the specified parameter/pattern for the ``x`` attribute. Parameter/Pattern of type ``string`` will be sorted lexicographical and parameter/pattern of type ``int`` or ``float`` will be sorted numerically
 
-     * Unlike the result table, the unit attribute of a parameter or pattern
-       is not taken into account.
+     * Unlike the result table, the unit attribute of a parameter or pattern is not taken into account.
 
    parameter_space
      The parameter space for a specific benchmark run is the bundle of all possible parameter combinations.

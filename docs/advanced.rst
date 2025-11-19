@@ -957,7 +957,14 @@ A ``figure`` consists of one or more plots, which then contain individual ``data
 
 In total, JUBE supports five different types of plots: ``line``, ``scatter``, ``stem``, ``step`` and ``bar``. For line, scatter, and bar plots, the appearance can be further customized using various style attributes like ``marker`` or ``linestyle``.
 
+The figure named “fig” in the example therefore generates six subplots: five of them show one of the plot types and one is empty because no sixth plot was defined in the configuration file.
+
 In addition, data can also be grouped for plotting, as shown in the figure named ``groupby_fig``. The values of the parameter or pattern used for grouping are then automatically used as labels in a legend.
+
+So in the figure named ``groupby_fig`` three lines are drawn in the defined plot, one for each value of the pattern ``type_pat``
+
+Best practice: If you want to use dates/times on the x-axis, it is best to use the ISO 8601 datetime format, as the lexicographical sorting works correctly for this format.
+
 
 .. index:: do log
 
