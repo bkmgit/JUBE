@@ -92,6 +92,20 @@ class Figure(GenericResult):
                             func_args += f", {attr}=data.{attr}"
                     eval(f'ax.{data.type}({func_args})')
 
+            def prepare_axis(ax, keys, table_data, set_ticks, set_ticklabels):
+                """ensures that the x/y ticks on the x/y axis are sorted correctly without sorting the data itself"""
+                all_values = {val for k in keys for val in table_data[k]}
+                
+                if any(isinstance(v, str) for v in all_values):
+                    # one or more strings -> all values are treated as a category. They are therefore sorted lexicographically
+                    labels = sorted(all_values, key=str)
+                    label_to_pos = {lbl: idx for idx, lbl in enumerate(labels)}
+                    set_ticks(range(len(labels)))
+                    set_ticklabels(labels)
+                    return {k: [label_to_pos[val] for val in table_data[k]] for k in keys}
+                else:
+                    # # no strings -> all values are treated as numbers and are therefore automatically sorted by matplotlib
+                    return {k: table_data[k] for k in keys}
 
             table_data = {v.name:k for v,k in self._data.items()}
 
@@ -122,6 +136,7 @@ class Figure(GenericResult):
             else:
                 LOGGER.error("There are too many plots for the specified number of rows (={0}) and columns (={1})".format(self._nrows, self._ncols))
                 exit()
+
             try:
                 fig, axes = plt.subplots(rows, cols)
             except NameError:
@@ -130,24 +145,35 @@ class Figure(GenericResult):
                 exit()
             axes = axes.flatten() if rows*cols > 1 else [axes]
             fig.suptitle(self._title)
+
             for i, plot in enumerate(self._plots):
                 if plot.xlabel: axes[i].set_xlabel(plot.xlabel)
                 if plot.ylabel: axes[i].set_ylabel(plot.ylabel)
                 if plot.xscale: axes[i].set_xscale(plot.xscale)
                 if plot.yscale: axes[i].set_yscale(plot.yscale)
+
+                x_keys = {d.x for d in plot.plot_data}
+                y_keys = {d.y for d in plot.plot_data}
+                x_data = prepare_axis(axes[i], x_keys, table_data, axes[i].set_xticks, axes[i].set_xticklabels)
+                y_data = prepare_axis(axes[i], y_keys, table_data, axes[i].set_yticks, axes[i].set_yticklabels)
+
                 for data in plot.plot_data:
                     if data.groupby:
                         groups = list(zip(*[table_data[g] for g in data.groupby]))
                         for group in sorted(set(groups)):
                             group_ids = [i for i, x in enumerate(groups) if x == group]
                             group_data = {
-                                data.x: [table_data[data.x][i] for i in group_ids],
-                                data.y: [table_data[data.y][i] for i in group_ids]
+                                data.x: [x_data[data.x][i] for i in group_ids],
+                                data.y: [y_data[data.y][i] for i in group_ids]
                             }
                             label = ", ".join(f"{value}" for value in group)
                             create_plot(data, group_data, axes[i], label=label)
                     else:
-                        create_plot(data, table_data, axes[i])
+                        plot_data = {
+                            data.x: x_data[data.x],
+                            data.y: y_data[data.y]
+                        }
+                        create_plot(data, plot_data, axes[i])
                 if plot.legend: axes[i].legend()
 
             # if "savefig" is set, then save figure in "savefig" file
