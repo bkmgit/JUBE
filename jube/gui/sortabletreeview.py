@@ -39,8 +39,12 @@ class SortableTreeview(ttk.Treeview):
     def sort_by_column(self, col, descending=False):
         """Sorts the data in the column col descending/ascending"""
         data = [(self.set(child, col), child) for child in self.get_children('')]
-        data.sort(reverse=not descending, key=lambda x: x[0][1:-1] if x[0] else x[0])
-        for index, (val, child) in enumerate(data):
+        try: #needed to allow numerical sorting in the TreeView
+            data_converted =  [(float(x),y) for x,y in data]
+        except (ValueError, TypeError):
+            data_converted = data
+        data_converted.sort(reverse=not descending, key=lambda x: x[0] if x[0] else x[0])
+        for index, (val, child) in enumerate(data_converted):
             self.move(child, '', index)
         self._sort_column = col
 
@@ -71,10 +75,20 @@ class SortableTreeview(ttk.Treeview):
     def insert(self, parent, index, values):
         """Inserts a new row into the treeview"""
         iid = super().insert(parent, index, 
-                             values = [f"{value!r}" if value is not None else "" for value in values])
+                             values = [self._convert_value(value) for value in values])
         self.sort_by_column(self._sort_column, self._heading_clicked)
         self.add_tags()
         return iid
+    
+    def _convert_value(self,value):
+        """converts a value to the format that should be displayed in the TreeView. 
+        (internally the treeview saves all values as string)"""
+        if value is None:
+            return "" #shows nothing
+        elif isinstance(value, list) or isinstance(value, set):
+            return ', '.join(f"{v!r}" for v in sorted(value)) #'...','...','...'
+        else:
+            return repr(str(value))[1:-1] #escapes special characters such as \n
 
     def add_tags(self):
         """Creates alternating row colors"""

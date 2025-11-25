@@ -837,7 +837,7 @@ class WorkpackagePage(Page):
                 for parameter in parameter_list:
                     param_table.insert("","end",values=[parameter.name, 
                                                         parameter.value, 
-                                                        parameter.idx if parameter.idx != -1 else "", 
+                                                        parameter.idx if parameter.idx else 0, 
                                                         parameter.based_on_value,
                                                         parameter.based_on_mode, 
                                                         parameter.type, 

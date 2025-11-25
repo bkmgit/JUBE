@@ -519,7 +519,7 @@ class AnalyserTab(Tab):
                                              height=len(files), 
                                              style="Custom.Treeview")
                     for file in files:
-                        table.insert("","end",values=[file.path, ', '.join(f"{use!r}" for use in file.use)])
+                        table.insert("","end",values=[file.path, file.use])
                 analyse_list.append({"label": analyse_label, 
                                      "table": table})
             self.widget_dict[analyser.name] = {"label": label, 
@@ -704,15 +704,29 @@ class ResultTab(Tab):
                 if result.res_filter is not None: 
                     tree_result.insert("", "end", text="filter: " + f"{result.res_filter!r}")
                 columns = ["Plot","legend","xlabel","ylabel","xscale","yscale","x","y","groupby","type","label","color","marker","linestyle"]
+                height = sum([len(plot.plot_data) for plot in result.plots])
                 table = SortableTreeview(self._content, 
                                          columns, 
                                          selectmode="none", 
                                          show="headings", 
-                                         height=len(result.keys), 
+                                         height=height, 
                                          style="Custom.Treeview")
                 for i, plot in enumerate(result.plots):
                     for data in plot.plot_data:
-                        table.insert("","end",values=[i, plot.legend, plot.xlabel, plot.ylabel, plot.xscale, plot.yscale, data.x, data.y, data.groupby, data.type, data.label, data.color, data.marker, data.linestyle])
+                        table.insert("","end",values=[i, 
+                                                      plot.legend, 
+                                                      plot.xlabel, 
+                                                      plot.ylabel, 
+                                                      plot.xscale, 
+                                                      plot.yscale, 
+                                                      data.x, 
+                                                      data.y, 
+                                                      data.groupby, 
+                                                      data.type, 
+                                                      data.label, 
+                                                      data.color, 
+                                                      data.marker, 
+                                                      data.linestyle])
                     
             self.widget_dict[result.name] = {"label": label, 
                                              "tree_general": tree_general, 
