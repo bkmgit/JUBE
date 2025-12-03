@@ -101,16 +101,6 @@ class File(object):
         return self._path
 
     @property
-    def source_dir(self):
-        """Return file source dir"""
-        return self._source_dir
-
-    @property
-    def target_dir(self):
-        """Return file source dir"""
-        return self._target_dir
-
-    @property
     def active(self):
         """Return file active status"""
         return self._active
@@ -195,11 +185,6 @@ class File(object):
         raise NotImplementedError()
 
     @property
-    def path(self):
-        """Return filepath"""
-        return self._path
-
-    @property
     def file_path_ref(self):
         """Get file path reference"""
         return self._file_path_ref
@@ -228,11 +213,6 @@ class File(object):
     def name(self):
         """Return alternative name"""
         return self._name
-    
-    @property
-    def active(self):
-        """Return active"""
-        return self._active
 
     def __repr__(self):
         return self._path

@@ -54,11 +54,6 @@ class Substituteset(object):
         return self._substitute_dict
 
     @property
-    def files(self):
-        """Return iofiles"""
-        return self._files
-
-    @property
     def subs(self):
         """Return subs"""
         return self._substitute_dict

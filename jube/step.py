@@ -194,11 +194,6 @@ class Step(object):
         """Return alternative working directory"""
         return self._alt_work_dir
 
-    @property
-    def suffix(self):
-        """Return alternative working directory"""
-        return self._suffix
-
     def get_used_sets(self, available_sets, parameter_dict=None):
         """Get list of all used sets, which can be found in available_sets"""
         set_names = list()
@@ -447,11 +442,6 @@ class Step(object):
         return self._suffix
 
     @property
-    def operations(self):
-        """Return operations"""
-        return self._operations
-
-    @property
     def depend(self):
         """Return dependencies"""
         return self._depend
@@ -523,11 +513,6 @@ class Operation(object):
     def is_active(self):
         """Get active"""
         return self._active
-
-    @property
-    def break_filename(self):
-        """Get break filename"""
-        return self._break_filename
 
     @property
     def shared(self):
@@ -857,11 +842,6 @@ class DoLog(object):
     def log_file(self):
         """Get log file"""
         return self._log_file
-
-    @property
-    def log_path(self):
-        """Get log path"""
-        return self._log_path
 
     @property
     def work_dir(self):

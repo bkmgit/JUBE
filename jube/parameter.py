@@ -595,11 +595,6 @@ class Parameter(object):
         return self._value
     
     @property
-    def separator(self):
-        """Return separator"""
-        return self._separator
-    
-    @property
     def type(self):
         """Return datatype"""
         return self._type
