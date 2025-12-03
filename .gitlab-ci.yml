@@ -253,6 +253,15 @@ tests:substitute_tests:
 tests:database_interface_tests:
     <<: *run_test
 
+tests:python_linter:
+    dependencies: []
+    image: python:3.12
+    stage: tests
+    before_script:
+        - pip install ruff
+    script:
+        - ruff check .
+
 deploy:dist_package:
     stage: deploy
     <<: *clone_repo
