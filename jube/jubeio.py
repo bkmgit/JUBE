@@ -481,7 +481,6 @@ class Parser(object):
         if db is None:
             db = jube.util.database_interface.Database_Interface(self._filename)
         db.connect()
-        benchmarks = dict()
 
         # Extract tags out of database
         tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")

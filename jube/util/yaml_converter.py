@@ -303,5 +303,5 @@ class YAML_Converter(object):
                     return False
                 else:
                     return True
-        except Exception as parseerror:
+        except Exception:
             return False

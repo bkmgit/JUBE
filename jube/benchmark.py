@@ -873,9 +873,6 @@ class Benchmark(object):
         self.db.connect()
         try:
             self.db.start_transaction()
-            benchmark_data = {
-                "comment": self._comment
-            }
             self.db.update("Benchmark", {"comment": self._comment},
                              f"benchmark_id='{self._id}'")
             self.db.commit_transaction()
