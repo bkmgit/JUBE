@@ -156,7 +156,7 @@ class Benchmark(object):
         if self._db:
             try:
                 self._db.disconnect()
-            except:
+            except Exception:
                 pass
             self._db = None
 
