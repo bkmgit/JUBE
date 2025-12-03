@@ -647,7 +647,7 @@ class Operation(object):
                     else:
                         stdout_handle = stdout
 
-                    if dolog != None:
+                    if dolog is not None:
                         dolog.store_do(do=do, shell=shell, work_dir=os.path.abspath(
                             work_dir), parameter_dict=parameter_dict, shared=self.shared)
 
@@ -838,7 +838,7 @@ class DoLog(object):
 
     def __init__(self, log_dir, log_file, initial_env, cycle=0):
         self._log_dir = log_dir
-        if log_file != None:
+        if log_file is not None:
             if log_file[-1] == '/':
                 raise ValueError(
                     "The path of do_log_file is ending with / which is a invalid file path.")
@@ -885,10 +885,10 @@ class DoLog(object):
 
     def store_do(self, do, shell, work_dir, parameter_dict=None, shared=False):
         """Store the current execution directive to the do log and set up the environment if file does not yet exist."""
-        if self._log_file == None:
+        if self._log_file is None:
             return
 
-        if self._log_path == None:
+        if self._log_path is None:
             if parameter_dict:
                 new_log_file = jube.util.util.substitution(
                     self._log_file, parameter_dict)

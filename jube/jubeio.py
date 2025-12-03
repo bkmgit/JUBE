@@ -1509,7 +1509,7 @@ class Parser(object):
         for table in tables:
             name, style, separator, res_filter, transpose, sort, result_id = table
             transpose = bool(transpose)
-            sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
+            sort_names = [] if sort is None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.table.Table(name, style, separator,
                                                    sort_names, transpose, res_filter)
             result.result_dir = result_dir
@@ -1536,7 +1536,7 @@ class Parser(object):
         syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
         for syslog in syslogs:
             name, address, sys_format, res_filter, host, port, sort, result_id = syslog
-            sort_names = [] if sort == None else sort.split(jube.conf.DEFAULT_SEPARATOR)
+            sort_names = [] if sort is None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.syslog.SysloggedResult(
                 name, address, host, port, sys_format, sort_names, res_filter)
             keys = db.select("ResultSyslogKey", None, f"syslog_name='{name}'")
@@ -1848,17 +1848,17 @@ class Parser(object):
         test_duplicate=None
         duplicate_attr = Parser._get_attr(elements[0], "duplicate")
         if duplicate == "###initiated_with_without_duplicate_mentioning###":
-            if duplicate_attr != None:
+            if duplicate_attr is not None:
                 duplicate = duplicate_attr
             else:
                 duplicate = "replace"
-        if duplicate != "###initiated_with_without_duplicate_mentioning###" and duplicate != None:
+        if duplicate != "###initiated_with_without_duplicate_mentioning###" and duplicate is not None:
             if set_type == "parameterset":
-                if duplicate_attr == None:
+                if duplicate_attr is None:
                     test_duplicate = duplicate
                 else:
                     test_duplicate = duplicate_attr
-            if duplicate != None:
+            if duplicate is not None:
                 if test_duplicate != duplicate:
                     raise ValueError("The {0} {1} is mentioned at least twice with different duplicate options.".format(set_type, name))
         if duplicate == "###initiated_with_without_duplicate_mentioning###":
@@ -1978,7 +1978,7 @@ class Parser(object):
                     search_name = parts[1]
                 else:
                     search_name = None
-                if Parser._get_attr(element, "duplicate") == None:
+                if Parser._get_attr(element, "duplicate") is None:
                     duplicate = "###initiated_with_without_duplicate_mentioning###"
                 parameterset = self._extract_extern_set(parts[0],
                                                         "parameterset", name,
