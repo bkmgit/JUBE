@@ -1,3 +1,112 @@
+# JUBE Benchmarking Environment
+# Copyright (C) 2008-2024
+# Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre
+# http://www.fz-juelich.de/jsc/jube
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# For installation you can use:
+#
+# python setup.py install --user
+#
+# to install it into your .local folder. .local/bin must be inside your $PATH.
+# You can also change the folder by using --prefix instead of --user
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jube"
+version = "2.7.1"
+description = "JUBE Benchmarking Environment"
+readme = "README.md"
+license = "GPL-3.0-only"
+authors = [
+  { name = "Forschungszentrum Juelich GmbH", email = "jube.jsc@fz-juelich.de" },
+]
+dependencies = [
+  "pyyaml",
+]
+keywords = ['JUBE Benchmarking Environment']
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.2",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Benchmark",
+    "Topic :: Software Development :: Testing"
+]
+
+[tool.hatch.envs.test]
+dependencies = [
+"pytest",
+"pytest-cov"
+]
+
+[project.scripts]
+jube = "jube.main:main"
+
+[project.urls]
+Download = "https://www.fz-juelich.de/ias/jsc/jube"
+Homepage = "https://www.fz-juelich.de/ias/jsc/jube"
+
+# [tool.hatch.build.targets.wheel.shared-data]
+# "examples" = "examples"
+#"doc" = "docs"
+#"docs/JUBE.pdf" = "share/jube/docu/JUBE.pdf"
+#AUTHORS = "share/jube/AUTHORS"
+#LICENSE = "share/jube/LICENSE"
+#RELEASE_NOTES = "share/jube/RELEASE_NOTES"
+#"examples/cycle" = "share/jube/examples/cycle"
+#"examples/dependencies" = "share/jube/examples/dependencies"
+#"examples/do_log" = "share/jube/examples/do_log"
+#"examples/duplicate" = "share/jube/examples/duplicate"
+#"examples/environment" = "share/jube/examples/environment"
+#"examples/files_and_sub" = "share/jube/examples/files_and_sub"
+#"examples/hello_world" = "share/jube/examples/hello_world"
+#"examples/include" = "share/jube/examples/include"
+#"examples/iterations" = "share/jube/examples/iterations"
+#"examples/jobsystem" = "share/jube/examples/jobsystem"
+#"examples/parallel_workpackages" = "share/jube/examples/parallel_workpackages"
+#"examples/parameter_dependencies" = "share/jube/examples/parameter_dependencies"
+#"examples/parameter_update" = "share/jube/examples/parameter_update"
+#"examples/parameterspace" = "share/jube/examples/parameterspace"
+#"examples/result_creation" = "share/jube/examples/result_creation"
+#"examples/result_database" = "share/jube/examples/result_database"
+#"examples/scripting_parameter" = "share/jube/examples/scripting_parameter"
+#"examples/scripting_pattern" = "share/jube/examples/scripting_pattern"
+#"examples/shared" = "share/jube/examples/shared"
+#"examples/statistic" = "share/jube/examples/statistic"
+#"examples/tagging" = "share/jube/examples/tagging"
+#"examples/yaml" = "share/jube/examples/yaml"
+#"contrib/schema" = "share/jube/contrib/schema"
+#"platform/lsf" = "share/jube/platform/lsf"
+#"platform/moab" = "share/jube/platform/moab"
+#"platform/pbs" = "share/jube/platform/pbs"
+#"platform/slurm" = "share/jube/platform/slurm"
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "/jube",
+]
+
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "Q"]
 
