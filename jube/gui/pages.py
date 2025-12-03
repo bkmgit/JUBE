@@ -21,7 +21,7 @@ from tkinter import ttk
 import tkinter as tk
 import jube.gui.tabs as tabs
 import math
-from jube.conf import BLUE, LIGHT_BLUE, GREY, LIGHT_GREY, WHITE, GREEN, YELLOW, RED
+from jube.conf import BLUE, LIGHT_BLUE, GREY, LIGHT_GREY, WHITE
 from jube.gui.sortabletreeview import SortableTreeview
 
 class Page(tk.Frame):

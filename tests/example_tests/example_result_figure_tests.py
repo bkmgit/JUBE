@@ -19,7 +19,6 @@
 """Test the result figure example"""
 
 import unittest
-import sqlite3
 import os
 from examples_tests import TestCase
 

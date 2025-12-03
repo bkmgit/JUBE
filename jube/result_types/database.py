@@ -17,8 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Databasetype definition"""
 
-import sqlite3
-import ast
 import os
 
 from jube.result_types.keyvaluesresult import KeyValuesResult

@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Benchmark related tests"""
 
-import re
 import unittest
 import shutil
 import os
@@ -26,7 +25,6 @@ import jube.step
 import jube.parameter
 import jube.benchmark
 import jube.workpackage
-
 
 class TestBenchmark(unittest.TestCase):
 

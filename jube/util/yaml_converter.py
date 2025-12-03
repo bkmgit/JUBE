@@ -18,7 +18,6 @@
 """YAML to XML converter"""
 
 import xml.etree.ElementTree as etree
-import xml.dom.minidom as DOM
 try:
     import ruamel.yaml
 except ImportError:

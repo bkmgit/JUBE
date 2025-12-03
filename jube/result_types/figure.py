@@ -27,7 +27,6 @@ from pathlib import Path
 
 from jube.result_types.genericresult import GenericResult
 from jube.result import Result
-import xml.etree.ElementTree as ET
 import jube.log
 import jube.conf
 

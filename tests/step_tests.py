@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Step related tests"""
 
-import re
 import unittest
 import shutil
 import os

@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Result database related tests"""
 
-import re
 import unittest
 import sqlite3
 import os

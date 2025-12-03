@@ -18,10 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Database Interface related tests"""
 
-import re
 import unittest
-import sqlite3
-import shutil
 import os
 import jube.util.database_interface
 

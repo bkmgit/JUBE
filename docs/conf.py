@@ -28,7 +28,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, re, eralchemy2
+import sys, os, eralchemy2
 sys.path.insert(0, os.path.abspath('..'))
 import jube.util.database_interface
 

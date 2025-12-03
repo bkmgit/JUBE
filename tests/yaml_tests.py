@@ -18,10 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Test additional yaml example scripts"""
 
-import sys
-import filecmp
-import re
-import glob
 import unittest
 import os
 import shutil

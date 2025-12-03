@@ -20,7 +20,6 @@
 
 import unittest
 import os
-import jube.main
 from examples_tests import TestCase
 
 class TestSharedExample(TestCase.TestExample):

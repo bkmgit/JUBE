@@ -20,7 +20,6 @@
 import multiprocessing as mp
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as DOM
-import logging
 import os
 import re
 import stat
