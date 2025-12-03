@@ -323,7 +323,7 @@ class Prepare(jube.step.Operation):
         if self._stderr_filename is not None:
             do_data["stderr"] = self._stderr_filename
         if self._active != "true":
-            step_data["active"] = self._active
+            do_data["active"] = self._active
         if self._work_dir is not None:
             do_data["work_dir"] = self._work_dir
         db.insert("Prepare", do_data)

@@ -70,12 +70,6 @@ source_suffix = ".rst"
 # The encoding of source files.
 #source_encoding = "utf-8-sig"
 
-# The master toctree document.
-if tags.has("latex"):
-    master_doc = "index_user"
-else:
-    master_doc = "index"
-
 # General information about the project.
 project = u"JUBE"
 copyright = u"2024, JUBE Developer Team, Forschungszentrum Jülich GmbH"
@@ -98,14 +92,6 @@ release = "2.7.1"
 #today = ""
 # Else, today_fmt is used as the format for a strftime call.
 #today_fmt = "%B %d, %Y"
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ["_build"]
-if tags.has("latex"):
-    exclude_patterns += ["index.rst","jube.rst","devel.rst"]
-else:
-    exclude_patterns += ["index_user.rst"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
