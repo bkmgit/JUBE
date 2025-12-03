@@ -691,7 +691,7 @@ class Benchmark(object):
                 else:
                     workpackage.run()
 
-            if run_parallel == True:
+            if run_parallel:
                 # merge parallel run log files into the main run log file and
                 # delete the parallel logs
                 log_fname = jube.log.LOGFILE_NAME.split('/')[-1]
