@@ -32,27 +32,27 @@ class TestBenchmark(unittest.TestCase):
 
     def setUp(self):
         self.parameter = jube.parameter.StaticParameter(
-            name='i',
+            name="i",
             value='",".join(str(i) for i in range(4))',
-            separator=',',
-            parameter_type='int',
-            parameter_mode='python')
-        self.parameterset = jube.parameter.Parameterset(name='param_set')
+            separator=",",
+            parameter_type="int",
+            parameter_mode="python")
+        self.parameterset = jube.parameter.Parameterset(name="param_set")
         self.parameterset.add_parameter(self.parameter)
-        self.step = jube.step.Step(name='execution', depend=set())
-        self.step.add_uses(['param_set'])
-        self.operation = jube.step.Operation('echo "$i"', stdout_filename='stdout',
-                                              stderr_filename='stderr',
-                                              work_dir='.', error_filename='error')
+        self.step = jube.step.Step(name="execution", depend=set())
+        self.step.add_uses(["param_set"])
+        self.operation = jube.step.Operation('echo "$i"', stdout_filename="stdout",
+                                              stderr_filename="stderr",
+                                              work_dir=".", error_filename="error")
         self.step.add_operation(self.operation)
         self.benchmark = jube.benchmark.Benchmark(
-            name='workpackages',
-            outpath='bench_run',
-            parametersets={'param_set': self.parameterset},
+            name="workpackages",
+            outpath="bench_run",
+            parametersets={"param_set": self.parameterset},
             substitutesets={},
             filesets={},
             patternsets={},
-            steps={'execution': self.step},
+            steps={"execution": self.step},
             analyser={},
             results={},
             results_order=[])
@@ -60,13 +60,13 @@ class TestBenchmark(unittest.TestCase):
     def test_benchmark_execution(self):
         """Test benchmark execution"""
         if os.path.isdir("bench_run"):
-            shutil.rmtree('bench_run')
+            shutil.rmtree("bench_run")
         self.benchmark.new_run()
         for i in ["000000", "000001", "000002", "000003"]:
             for j in ["stdout", "stderr"]:
                 self.assertTrue(os.path.isfile(
                     "bench_run/000000/"+i+"_execution/work/"+j))
-        shutil.rmtree('bench_run')
+        shutil.rmtree("bench_run")
 
 
 if __name__ == "__main__":

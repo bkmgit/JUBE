@@ -37,7 +37,7 @@ class Page(tk.Frame):
         self.bind_all("<Button-5>", self.on_y_mousewheel)
         self.bind_all("<Shift-Button-4>", self.on_x_mousewheel)
         self.bind_all("<Shift-Button-5>", self.on_x_mousewheel)
-        self.bind('<Configure>', self.configure_scrollregion)
+        self.bind("<Configure>", self.configure_scrollregion)
 
     def step_clicked(self, name):
         """Open the step page for the specified step"""
@@ -58,9 +58,9 @@ class Page(tk.Frame):
         while parent:
             if isinstance(parent, tk.Canvas) and parent not in self._y_stay:
                 if event.num == 4:
-                    parent.yview_scroll(-1, 'units')
+                    parent.yview_scroll(-1, "units")
                 elif event.num == 5:
-                    parent.yview_scroll(1, 'units')
+                    parent.yview_scroll(1, "units")
                 break
             else:
                 parent = parent.master
@@ -72,9 +72,9 @@ class Page(tk.Frame):
         while parent:
             if isinstance(parent, tk.Canvas) and parent not in self._x_stay:
                 if event.num == 4:
-                    parent.xview_scroll(-1, 'units')
+                    parent.xview_scroll(-1, "units")
                 elif event.num == 5:
-                    parent.xview_scroll(1, 'units')
+                    parent.xview_scroll(1, "units")
                 break
             else:
                 parent = parent.master
@@ -106,7 +106,7 @@ class MainPage(Page):
         self._tree_tag_docu = ttk.Treeview(self, 
                                       selectmode="none", 
                                       show="tree", 
-                                      style='Custom.Treeview')
+                                      style="Custom.Treeview")
         self._label_tag = tk.Label(self, 
                                    text="\nUsed Tags:", 
                                    font=("Arial", 11, "bold"), 
@@ -114,7 +114,7 @@ class MainPage(Page):
         self._tree_tag = ttk.Treeview(self, 
                                       selectmode="none", 
                                       show="tree", 
-                                      style='Custom.Treeview')
+                                      style="Custom.Treeview")
         self._label_comment = tk.Label(self, 
                                        bg=WHITE)
         self._notebook = ttk.Notebook(self)
@@ -785,9 +785,9 @@ class WorkpackagePage(Page):
         # pack the widgets for the step information into the layout
         self._step_frame_label.pack(anchor="w", fill="both")
         self._step_label.pack(side="left", anchor="center")
-        self._step_button.pack(side='left', anchor="center")
+        self._step_button.pack(side="left", anchor="center")
         self._status.create_oval(1,1,21,21, fill=self._wp.status_color())
-        self._status.pack(side='left', anchor="center", padx=(20,0))
+        self._status.pack(side="left", anchor="center", padx=(20,0))
         self._step_tree.pack(anchor="w", fill="both", expand="True")
 
         # pack the widgets for the parametersets into the layout and fill the notebook

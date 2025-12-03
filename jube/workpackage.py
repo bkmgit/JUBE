@@ -802,7 +802,7 @@ class Workpackage(object):
                 break
         return continue_op, continue_cycle
 
-    def run(self, mode='s'):
+    def run(self, mode="s"):
         """Run step and use current parameter space
             mode: s = serial (default); p = parallel
         """
@@ -811,10 +811,10 @@ class Workpackage(object):
         # create individual log files for each processor in a parallel run
         if mode == "p":
             proc_id = mp.current_process()._identity[0]
-            log_fname = jube.log.LOGFILE_NAME.split('/')[-1]
+            log_fname = jube.log.LOGFILE_NAME.split("/")[-1]
             jube.log.change_logfile_name(os.path.join(
                 self.benchmark.bench_dir,
-                log_fname.replace('.', '_{}.').format(proc_id) if (('_'+str(proc_id)) not in log_fname) else log_fname))
+                log_fname.replace(".", "_{}.").format(proc_id) if (("_"+str(proc_id)) not in log_fname) else log_fname))
 
         # Workpackage already done or error?
         if self.done or self.error:
@@ -989,7 +989,7 @@ class Workpackage(object):
         # usage when the data is sent back to the main process.
         # It happens here, that these parameters are static and
         # therefore not changed within this workpackage execution.
-        if mode == 'p':
+        if mode == "p":
             parameterDeletionList = list()
             for p in self._parameterset.all_parameters:
                 if(p.search_method(propertyString="eval_helper",

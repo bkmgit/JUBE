@@ -79,7 +79,7 @@ class Parser(object):
         """Return a benchmark out of xml- or database- configuration"""
         # Get benchmark out of xml configuration
         # DEPRECATED (BEGIN): Future versions will only use the database
-        if self._filename.endswith('xml'):
+        if self._filename.endswith("xml"):
             info_str = "The existing XML files used to store the " + \
                        "configuration of the benchmark will be " + \
                        "replaced by a database, which is the new " + \
@@ -110,7 +110,7 @@ class Parser(object):
             return benchmark
         # DEPRECATED (END): Future versions will only use the database
         # Get benchmark out of database configuration
-        elif self._filename.endswith('db'):
+        elif self._filename.endswith("db"):
             return self.benchmark_from_database(db)
         else:
             raise IOError("Configuration file \"{0}\" not valid."
@@ -464,11 +464,11 @@ class Parser(object):
         """Return benchmark info out of xml- or database- configuration"""
         # Get benchmark out of xml configuration
         # DEPRECATED (BEGIN): Future versions will only use the database
-        if self._filename.endswith('xml'):
+        if self._filename.endswith("xml"):
             return self.benchmark_info_from_xml()
         # DEPRECATED (END): Future versions will only use the database
         # Get benchmark out of database configuration
-        elif self._filename.endswith('db'):
+        elif self._filename.endswith("db"):
             return self.benchmark_info_from_database(benchmark_id)
         else:
             raise IOError("Configuration file \"{0}\" not valid."
@@ -571,7 +571,7 @@ class Parser(object):
         """Read existing workpackage data out of xml- or database- configuration"""
         # Get workpackages out of xml configuration
         # DEPRECATED (BEGIN): Future versions will only use the database
-        if self._filename.endswith('xml'):
+        if self._filename.endswith("xml"):
             workpackages, work_stat = self.workpackages_from_xml(benchmark)
             # Store workpackage information to delete xml-file
             for step_name, step_workpackages in workpackages.items():
@@ -581,7 +581,7 @@ class Parser(object):
             return workpackages, work_stat
         # DEPRECATED (END): Future versions will only use the database
         # Get workpackages out of database configuration
-        elif self._filename.endswith('db'):
+        elif self._filename.endswith("db"):
             return self.workpackages_from_database(benchmark, db)
         else:
             raise IOError("Configuration file \"{0}\" not valid."
@@ -1067,9 +1067,9 @@ class Parser(object):
         if check_tags != "":
             if not jube.util.util.valid_tags(check_tags, self._tags):
                 raise ValueError("The following tag combination is required: "
-                                 "{0}".format(check_tags.replace('|', ' or ')\
-                                 .replace('+', ' and ').replace('!', ' not ')\
-                                 .replace('^', ' xor ')))
+                                 "{0}".format(check_tags.replace("|", " or ")\
+                                 .replace("+", " and ").replace("!", " not ")\
+                                 .replace("^", " xor ")))
 
     def _extract_tags(self, tree, check_tags=True):
         """
@@ -1108,7 +1108,7 @@ class Parser(object):
             found_tag = re.findall(r"[\w'-]+", element.attrib["tag"])
             all_tags.extend(found_tag)
         unused_tag_docu = list(set(tags.keys()) - set(all_tags))
-        if len(unused_tag_docu) and self._command_name == 'run':
+        if len(unused_tag_docu) and self._command_name == "run":
             raise ValueError("Tag descriptions are only allowed for used tags. Tag: "
                              "'{0}' isn't used in the input file."
                              .format(", ".join(unused_tag_docu)))
@@ -1564,10 +1564,10 @@ class Parser(object):
                     result.add_key(y)
                     for group in groupby:
                         result.add_key(group)
-                    plot_data.append({'x': x, 'y': y, 'type': plot_type, 
-                                    'groupby': groupby, 'label': label,
-                                    'color': color, 'marker': marker,
-                                    'linestyle': linestyle, 'sort': bool(sort_data)})
+                    plot_data.append({"x": x, "y": y, "type": plot_type, 
+                                    "groupby": groupby, "label": label,
+                                    "color": color, "marker": marker,
+                                    "linestyle": linestyle, "sort": bool(sort_data)})
                 result.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
             return result
 
@@ -1663,8 +1663,8 @@ class Parser(object):
         name = Parser._attribute_from_element(etree_database, "name")
         res_filter = Parser._get_attr(etree_database, "filter")
         primekeys = Parser._get_attr(etree_database, "primekeys", "")
-        primekeys = primekeys.replace('[', '').replace(']', '').replace(
-            "'", '').split(jube.conf.DEFAULT_SEPARATOR)
+        primekeys = primekeys.replace("[", "").replace("]", "").replace(
+            "'", "").split(jube.conf.DEFAULT_SEPARATOR)
         primekeys = [primekey.strip() for primekey in primekeys]
         primekeys = [primekey for primekey in primekeys if len(primekey) > 0]
         db_file = Parser._get_attr(etree_database, "file")
@@ -1748,10 +1748,10 @@ class Parser(object):
                 figure.add_key(y)
                 for group in groupby:
                     figure.add_key(group)
-                plot_data.append({'x': x, 'y': y, 'type': data_type, 
-                                  'groupby': groupby, 'label': label,
-                                  'color': color, 'marker': marker,
-                                  'linestyle': linestyle, 'sort': sort_data})
+                plot_data.append({"x": x, "y": y, "type": data_type, 
+                                  "groupby": groupby, "label": label,
+                                  "color": color, "marker": marker,
+                                  "linestyle": linestyle, "sort": sort_data})
             figure.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
         return figure
 

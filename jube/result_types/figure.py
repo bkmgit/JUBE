@@ -72,11 +72,11 @@ class Figure(GenericResult):
                 x_data = sorted(table_data[data.x]) if data.sort else table_data[data.x]
                 if data.type == "line":
                     func_args = "x_data, table_data[data.y], label=label"
-                    for attr in ['color', 'marker', 'linestyle']:
+                    for attr in ["color", "marker", "linestyle"]:
                         attr_val = getattr(data, attr)
                         if attr_val:
                             func_args += f", {attr}=data.{attr}"
-                    eval(f'ax.plot({func_args})')
+                    eval(f"ax.plot({func_args})")
                 elif data.type in ["bar", "stem"]:
                     plot_func = getattr(ax, data.type)
                     plot_func(x_data, table_data[data.y],
@@ -85,11 +85,11 @@ class Figure(GenericResult):
                     # dynamically create plot function call (e.g. ax.scatter())
                     plot_func = getattr(ax, data.type)
                     func_args = "x_data, table_data[data.y], label=label"
-                    for attr in ['color', 'marker', 'linestyle']:
+                    for attr in ["color", "marker", "linestyle"]:
                         attr_val = getattr(data, attr)
                         if attr_val:
                             func_args += f", {attr}=data.{attr}"
-                    eval(f'ax.{data.type}({func_args})')
+                    eval(f"ax.{data.type}({func_args})")
 
             def prepare_axis(ax, keys, table_data, set_ticks, set_ticklabels):
                 """ensures that the x/y ticks on the x/y axis are sorted correctly without sorting the data itself"""
@@ -181,7 +181,7 @@ class Figure(GenericResult):
             #    (-> one figure per benchmark id)
             # Additional clauses are need to avoid multiple saving
             if self._savefig and show:
-                file_path_ind = self._savefig.rfind('/')
+                file_path_ind = self._savefig.rfind("/")
                 if file_path_ind != -1:
                     # create full directory path if it doesn't exist
                     path = os.path.expanduser(self._savefig[:file_path_ind])
@@ -298,10 +298,10 @@ class Figure(GenericResult):
             self._plot_data = list()
             for data in plot_data:
                 self._plot_data.append(
-                    Figure.Plot.Data(data['x'], data['y'], data['groupby'],
-                                     data['type'], data['label'],
-                                     data['color'], data['marker'], 
-                                     data['linestyle'],data['sort']))
+                    Figure.Plot.Data(data["x"], data["y"], data["groupby"],
+                                     data["type"], data["label"],
+                                     data["color"], data["marker"], 
+                                     data["linestyle"],data["sort"]))
             self._legend = legend
             self._xlabel = xlabel
             self._ylabel = ylabel

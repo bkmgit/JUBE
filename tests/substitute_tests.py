@@ -40,8 +40,8 @@ class TestSubstitute(unittest.TestCase):
 
         Create the required paths
         '''
-        cls._path = os.path.join(PATH_PREFIX, 'substitute_test_scripts')
-        cls._input_path = os.path.join(cls._path, 'main.xml')
+        cls._path = os.path.join(PATH_PREFIX, "substitute_test_scripts")
+        cls._input_path = os.path.join(cls._path, "main.xml")
         cls._bench_run_path = os.path.join(cls._path, "bench_run")
         cls._run_path = os.path.join(cls._bench_run_path, "000000")
         cls._wp_path = os.path.join(cls._run_path, "000000_run")
@@ -53,8 +53,8 @@ class TestSubstitute(unittest.TestCase):
     def test_regex_substitute(self):
         """Test standard and regex substitute"""
         #Create file.in 
-        with open('file.in', 'w') as file:
-            file.write('Number: #NUMBER#')
+        with open("file.in", "w") as file:
+            file.write("Number: #NUMBER#")
         self.std_files_data = [["std_file.out", "file.in", "w"]]
         self.std_sub = jube.substitute.Sub("#NUMBER#", "text", "1")
         self.std_sub_set = jube.substitute.Substituteset("sub_set",
@@ -70,13 +70,13 @@ class TestSubstitute(unittest.TestCase):
         #Do std substitute
         self.std_sub_set.substitute({})
         #Get content of stdout
-        with open("std_file.out", 'r') as file:
+        with open("std_file.out", "r") as file:
             std_output = file.read().strip()
 
         #Do regex substitute
         self.regex_sub_set.substitute({})
         #Get content of regex
-        with open("regex_file.out", 'r') as file:
+        with open("regex_file.out", "r") as file:
             regex_output = file.read().strip()
 
         #test if output equal
@@ -84,10 +84,10 @@ class TestSubstitute(unittest.TestCase):
 
     def test_init_with_substitution(self):
         """Testing for existing files and content"""
-        jube.main.main(('run -e '+ self._input_path).split())
+        jube.main.main(("run -e "+ self._input_path).split())
         # DEPRECATED (BEGIN): Future versions will not use done_files
         # Test for done file
-        done_file = os.path.join(self._wp_path, 'done')
+        done_file = os.path.join(self._wp_path, "done")
         exist = os.path.exists(done_file)
         # DEPRECATED (END): Future versions will not use done_files
         status = ""
@@ -101,36 +101,36 @@ class TestSubstitute(unittest.TestCase):
                         "complete workpackage with id 0: Missing done file in "
                         "workpackage directory {0}".format(self._wp_path))
         # Test for error file
-        error_file_path = os.path.join(self._wp_path, 'error')
+        error_file_path = os.path.join(self._wp_path, "error")
         self.assertFalse(os.path.exists(error_file_path), "Failed to "
                          "successfully complete workpackage with id 0: Missing "
                          "done file in workpackage  directory {0}"
                          .format(self._wp_path))
         # Test for stderr (empty?)
-        stderr_file = os.path.join(self._work_path, 'stderr')
-        with open(stderr_file, 'r') as file:
+        stderr_file = os.path.join(self._work_path, "stderr")
+        with open(stderr_file, "r") as file:
             stderr_output = file.read().strip()
         self.assertEqual(stderr_output, "", "Error: stderr file for workpackage "
                          "with id 0 in work directory {0} has not the right "
                          "content".format(self._work_path))
         # Test for same submit.job.in
         original_submit_file = os.path.join(PATH_PREFIX,
-                                            '../platform/slurm/submit.job.in')
-        with open(original_submit_file, 'r') as file:
+                                            "../platform/slurm/submit.job.in")
+        with open(original_submit_file, "r") as file:
             origin_submit_output = file.read().strip()
-        check_submit_file = os.path.join (self._work_path, 'submit.job.in')
-        with open(check_submit_file, 'r') as file:
+        check_submit_file = os.path.join (self._work_path, "submit.job.in")
+        with open(check_submit_file, "r") as file:
             check_submit_output = file.read().strip()
         self.assertEqual(origin_submit_output, check_submit_output, "Error: "
                          "submit.job.in file for workpackage with id 0 in "
                          "work directory {0} has not the right content"
                          .format(self._work_path))
         # Test for submit.job substitute
-        stdout_file = os.path.join(self._work_path, 'stdout')
-        with open(stdout_file, 'r') as file:
+        stdout_file = os.path.join(self._work_path, "stdout")
+        with open(stdout_file, "r") as file:
             stdout_output = file.read().strip()
-        submit_file = os.path.join(self._work_path, 'submit.job')
-        with open(submit_file, 'r') as file:
+        submit_file = os.path.join(self._work_path, "submit.job")
+        with open(submit_file, "r") as file:
             submit_output = file.read().strip()
         self.assertEqual(stdout_output, submit_output, "Error: submit.job file "
                          "for workpackage with id 0 in work directory {0} has "
@@ -146,8 +146,8 @@ class TestSubstitute(unittest.TestCase):
                          "for the submit job file for workpackage with id 0 in "
                          "work directory {0}".format(self._work_path))
         # Compare both submit.job files
-        check_file = os.path.join(self._path, 'submit.job')
-        with open(check_file, 'r') as file:
+        check_file = os.path.join(self._path, "submit.job")
+        with open(check_file, "r") as file:
             check_output = file.read().strip()
         self.assertEqual(check_output, submit_output, "Error: The substitution "
                          "in the submit.job for workpackage with id 0 in work "

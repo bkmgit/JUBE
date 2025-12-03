@@ -837,16 +837,16 @@ def gen_parser_conf():
           "default": 0}),
         (("--debug",),
          {"action": "store_true",
-          "help": 'use debugging mode'}),
+          "help": "use debugging mode"}),
         (("--force",),
          {"action": "store_true",
-          "help": 'skip version check'}),
+          "help": "skip version check"}),
         (("--strict",),
          {"action": "store_true",
-          "help": 'force need for correct version'}),
+          "help": "force need for correct version"}),
         (("--devel",),
          {"action": "store_true",
-          "help": 'show development related information'})
+          "help": "show development related information"})
     )
 
     return config
@@ -953,7 +953,7 @@ def gen_subparser_conf():
             ("--include-path",):
                 {"nargs": "+", "help": "directory containing include files"},
             ("-t", "--tag"):
-                {"nargs": '+', "help": "select tags"},
+                {"nargs": "+", "help": "select tags"},
             ("-o", "--only"):
                 {"nargs": "+", "metavar": "RESULT_NAME",
                  "help": "only create results given by specific name"},
@@ -980,7 +980,7 @@ def gen_subparser_conf():
         "help": "benchmark information",
         "func": info,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1006,7 +1006,7 @@ def gen_subparser_conf():
         "help": "show benchmark status",
         "func": status,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1020,7 +1020,7 @@ def gen_subparser_conf():
         "help": "show tag documentation",
         "func": tag,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "PATH", "nargs": "?",
                  "help": "path to input file or benchmark directory",
                  "default": "."},
@@ -1035,7 +1035,7 @@ def gen_subparser_conf():
         "help": "show benchmark data in gui",
         "func": gui,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1049,7 +1049,7 @@ def gen_subparser_conf():
         "help": "show filename of output",
         "func": output,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1073,9 +1073,9 @@ def gen_subparser_conf():
         "help": "comment handling",
         "func": manipulate_comments,
         "arguments": {
-            ('comment',):
+            ("comment",):
                 {"help": "comment"},
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1083,7 +1083,7 @@ def gen_subparser_conf():
                  "nargs": "+"},
             ("-a", "--append"):
                 {"help": "append comment to existing one",
-                 "action": 'store_true'}
+                 "action": "store_true"}
         }
     }
 
@@ -1092,7 +1092,7 @@ def gen_subparser_conf():
         "help": "remove benchmark or workpackages",
         "func": remove_benchmarks,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
@@ -1118,10 +1118,10 @@ def gen_subparser_conf():
         "help": "show benchmark logs",
         "func": show_log,
         "arguments": {
-            ('dir',):
+            ("dir",):
                 {"metavar": "DIRECTORY", "nargs": "?",
                  "help": "benchmark directory", "default": "."},
-            ('--command', "-c"):
+            ("--command", "-c"):
                 {"nargs": "+", "help": "show log for this command"},
             ("-i", "--id"):
                 {"help": "use benchmarks given by id",
@@ -1134,7 +1134,7 @@ def gen_subparser_conf():
         "help": "generate shell completion ",
         "func": complete,
         "arguments": {
-            ('--command-name', "-c"):
+            ("--command-name", "-c"):
                 {"nargs": 1,
                  "help": "name of command to be completed",
                  "default": [os.path.basename(sys.argv[0])]},
@@ -1151,7 +1151,7 @@ def _get_args_parser():
     for args, kwargs in gen_parser_conf():
         parser.add_argument(*args, **kwargs)
 
-    subparsers = parser.add_subparsers(dest="subparser", help='subparsers')
+    subparsers = parser.add_subparsers(dest="subparser", help="subparsers")
 
     subparser_configuration = gen_subparser_conf()
 
@@ -1183,11 +1183,11 @@ def _get_args_parser():
     # help subparser
     subparser["help"] = \
         subparsers.add_parser(
-            'help', help='command help',
+            "help", help="command help",
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description="available commands or info elements: \n" +
             help_overview)
-    subparser["help"].add_argument('command', nargs='?',
+    subparser["help"].add_argument("command", nargs="?",
                                    help="command or info element")
     subparser["help"].set_defaults(func=command_help)
 

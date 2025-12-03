@@ -66,7 +66,7 @@ class Database(KeyValuesResult):
                 file_handle.write(self._db_file)
                 file_handle.close()
                 # create directory path to db file, if it does not exist
-                file_path_ind = self._db_file.rfind('/')
+                file_path_ind = self._db_file.rfind("/")
                 if file_path_ind != -1:
                     # modify when Python2.7 support is dropped (potential race condition)
                     if not os.path.exists(os.path.expanduser(self._db_file[:file_path_ind])):
@@ -87,7 +87,7 @@ class Database(KeyValuesResult):
                 db.start_transaction()
                 # create a dictionary of keys and their data type to create the database table
                 key_dtypes = {keys[i]: type(self.data[0][i]).__name__.replace(
-                              'str', 'text') for i in range(len(self.keys))}
+                              "str", "text") for i in range(len(self.keys))}
 
                 # Add key with primekey=true to primekeys and use set to remove duplicates
                 self._primekeys = list(set(self._primekeys + [k.resulting_name for k in self._keys if k.primekey]))

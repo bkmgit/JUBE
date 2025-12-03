@@ -33,7 +33,7 @@ class TestCycleExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         '''
         cls._name = "cycle"
-        cls._stdout = [['0\n1\n2\n3'], ['0\n1\n2\n3']]
+        cls._stdout = [["0\n1\n2\n3"], ["0\n1\n2\n3"]]
         super(TestCycleExample, cls).setUpClass()
         super(TestCycleExample, cls)._execute_commands()
 

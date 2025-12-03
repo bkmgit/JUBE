@@ -38,14 +38,14 @@ class SortableTreeview(ttk.Treeview):
 
     def sort_by_column(self, col, descending=False):
         """Sorts the data in the column col descending/ascending"""
-        data = [(self.set(child, col), child) for child in self.get_children('')]
+        data = [(self.set(child, col), child) for child in self.get_children("")]
         try: #needed to allow numerical sorting in the TreeView
             data_converted =  [(float(x),y) for x,y in data]
         except (ValueError, TypeError):
             data_converted = data
         data_converted.sort(reverse=not descending, key=lambda x: x[0] if x[0] else x[0])
         for index, (val, child) in enumerate(data_converted):
-            self.move(child, '', index)
+            self.move(child, "", index)
         self._sort_column = col
 
         for column in self._columns:
@@ -63,7 +63,7 @@ class SortableTreeview(ttk.Treeview):
         if region == "heading":
             col = self.identify_column(event.x)
             if col:
-                col = self._columns[int(col.lstrip('#')) - 1]
+                col = self._columns[int(col.lstrip("#")) - 1]
                 if self._sort_column == col and self._heading_clicked:
                     self._heading_clicked = False
                     self.sort_by_column(col, self._heading_clicked)
@@ -86,7 +86,7 @@ class SortableTreeview(ttk.Treeview):
         if value is None:
             return "" #shows nothing
         elif isinstance(value, list) or isinstance(value, set):
-            return ', '.join(f"{v!r}" for v in sorted(value)) #'...','...','...'
+            return ", ".join(f"{v!r}" for v in sorted(value)) #'...','...','...'
         else:
             return repr(str(value))[1:-1] #escapes special characters such as \n
 

@@ -103,19 +103,19 @@ class Step(object):
             fileset_names = self.get_used_sets(benchmark.filesets,
                                                parameter_dict)
             for fileset in fileset_names:
-                db.insert('UsedFileset',{"fileset_name": fileset,
+                db.insert("UsedFileset",{"fileset_name": fileset,
                           "step_name": self._name}, addition="REPLACE")
             # Get substituteset names and add to database
             subset_names = self.get_used_sets(benchmark.substitutesets,
                                               parameter_dict)
             for subset in subset_names:
-                db.insert('UsedSubstituteset',{"substituteset_name": subset,
+                db.insert("UsedSubstituteset",{"substituteset_name": subset,
                           "step_name": self._name}, addition="REPLACE")
             # Get parameterset names and add to database
             paramset_names = self.get_used_sets(benchmark.parametersets,
                                                 parameter_dict)
             for paramset in paramset_names:
-                db.insert('UsedParameterset',{"parameterset_name": paramset,
+                db.insert("UsedParameterset",{"parameterset_name": paramset,
                           "step_name": self._name}, addition="REPLACE")
             db.commit_transaction()
         except Exception as e:
@@ -606,7 +606,7 @@ class Operation(object):
 
             if pid is not None:
                 env_file_name = jube.conf.ENVIRONMENT_INFO.replace(
-                    '.', '_{}.'.format(pid))
+                    ".", "_{}.".format(pid))
             else:
                 env_file_name = jube.conf.ENVIRONMENT_INFO
             abs_info_file_path = \
@@ -797,7 +797,7 @@ class Operation(object):
         last = None
         if pid is not None:
             env_file_name = jube.conf.ENVIRONMENT_INFO.replace(
-                '.', '_{}.'.format(pid))
+                ".", "_{}.".format(pid))
         else:
             env_file_name = jube.conf.ENVIRONMENT_INFO
         env_file_path = os.path.join(work_dir, env_file_name)
@@ -824,7 +824,7 @@ class DoLog(object):
     def __init__(self, log_dir, log_file, initial_env, cycle=0):
         self._log_dir = log_dir
         if log_file is not None:
-            if log_file[-1] == '/':
+            if log_file[-1] == "/":
                 raise ValueError(
                     "The path of do_log_file is ending with / which is a invalid file path.")
         self._log_file = log_file
@@ -855,12 +855,12 @@ class DoLog(object):
 
     def initialiseFile(self, shell):
         """Initialise file if not yet existent."""
-        fdologout = open(self.log_path, 'a')
-        fdologout.write('#!'+shell+'\n\n')
+        fdologout = open(self.log_path, "a")
+        fdologout.write("#!"+shell+"\n\n")
         for envVarName, envVarValue in self.initial_env.items():
-            fdologout.write('set '+envVarName+"='" +
-                            envVarValue.replace('\n', '\\n')+"'\n")
-        fdologout.write('\n')
+            fdologout.write("set "+envVarName+"='" +
+                            envVarValue.replace("\n", "\\n")+"'\n")
+        fdologout.write("\n")
         fdologout.close()
 
     def store_do(self, do, shell, work_dir, parameter_dict=None, shared=False):
@@ -880,9 +880,9 @@ class DoLog(object):
                                    "JUBE or environment variable.").format(
                         self._log_file))
 
-            if self._log_file[0] == '/':
+            if self._log_file[0] == "/":
                 self._log_path = self._log_file
-            elif '/' not in self._log_file:
+            elif "/" not in self._log_file:
                 self._log_path = os.path.join(self._log_dir, self._log_file)
             else:
                 self._log_path = os.path.join(os.getcwd(), self._log_file)
@@ -894,12 +894,12 @@ class DoLog(object):
         if not os.path.exists(self.log_path):
             self.initialiseFile(shell)
 
-        fdologout = open(self.log_path, 'a')
+        fdologout = open(self.log_path, "a")
         if work_dir != self.work_dir:
-            fdologout.write('cd '+work_dir+'\n')
+            fdologout.write("cd "+work_dir+"\n")
             self._work_dir = work_dir
         fdologout.write(do)
         if shared:
-            fdologout.write(' # shared execution')
-        fdologout.write('\n')
+            fdologout.write(" # shared execution")
+        fdologout.write("\n")
         fdologout.close()

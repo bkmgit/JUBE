@@ -31,71 +31,71 @@ class TestXMLScripts(unittest.TestCase):
     def test_duplicate_replace_and_unequal_options_for_parameters(self):
         """Testing duplicate option replace and unequal options for duplicate parameters"""
         thisfiledir = os.path.dirname(__file__)
-        if os.path.exists(os.path.join(thisfiledir, 'xml_test_scripts', 'bench_run')):
+        if os.path.exists(os.path.join(thisfiledir, "xml_test_scripts", "bench_run")):
             shutil.rmtree(os.path.join(os.path.dirname(__file__),
-                          'xml_test_scripts', 'bench_run'))
-        jube.main.main(('run -e '+os.path.join(thisfiledir,
-                        'xml_test_scripts/parameter_duplicate_example_with_init_with.xml')).split())
+                          "xml_test_scripts", "bench_run"))
+        jube.main.main(("run -e "+os.path.join(thisfiledir,
+                        "xml_test_scripts/parameter_duplicate_example_with_init_with.xml")).split())
         errorFileExistent = False
-        if os.path.exists(os.path.join(thisfiledir, 'xml_test_scripts', 'bench_run', '000000', '000000_perform_iterations', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "xml_test_scripts", "bench_run", "000000", "000000_perform_iterations", "error")):
             errorFileExistent = True
         self.assertFalse(errorFileExistent)
 
         stdoutFileExistent = True
-        if not os.path.exists(os.path.join(thisfiledir, 'xml_test_scripts', 'bench_run', '000000', '000000_perform_iterations', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "xml_test_scripts", "bench_run", "000000", "000000_perform_iterations", "work", "stdout")):
             stdoutFileExistent = False
         self.assertTrue(stdoutFileExistent)
 
         shutil.rmtree(os.path.join(os.path.dirname(__file__),
-                      'xml_test_scripts', 'bench_run'))
+                      "xml_test_scripts", "bench_run"))
 
     def test_xml_test_01(self):
         """Testing the example xml script xml-test-01.xml"""
         thisfiledir = os.path.dirname(__file__)
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs')):
-            shutil.rmtree(os.path.join(os.path.dirname(__file__), 'benchmark_runs'))
-        jube.main.main(('run -e '+os.path.join(thisfiledir,
-                        'xml-test-01.xml')).split())
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs")):
+            shutil.rmtree(os.path.join(os.path.dirname(__file__), "benchmark_runs"))
+        jube.main.main(("run -e "+os.path.join(thisfiledir,
+                        "xml-test-01.xml")).split())
         errorFileExistent = False
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000000_compile', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000000_compile", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000001_compile', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000001_compile", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000002_execute_p0', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000002_execute_p0", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000003_execute_p0', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000003_execute_p0", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000004_execute_p0', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000004_execute_p0", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000005_execute_p1', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000005_execute_p1", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000006_execute_p1', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000006_execute_p1", "error")):
             errorFileExistent = True
-        if os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000007_execute_p1', 'error')):
+        if os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000007_execute_p1", "error")):
             errorFileExistent = True
         self.assertFalse(errorFileExistent)
 
         stdoutFileExistent = True
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000000_compile', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000000_compile", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000001_compile', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000001_compile", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000002_execute_p0', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000002_execute_p0", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000003_execute_p0', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000003_execute_p0", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000004_execute_p0', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000004_execute_p0", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000005_execute_p1', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000005_execute_p1", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000006_execute_p1', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000006_execute_p1", "work", "stdout")):
             stdoutFileExistent = False
-        if not os.path.exists(os.path.join(thisfiledir, 'benchmark_runs', '000000', '000007_execute_p1', 'work', 'stdout')):
+        if not os.path.exists(os.path.join(thisfiledir, "benchmark_runs", "000000", "000007_execute_p1", "work", "stdout")):
             stdoutFileExistent = False
         self.assertTrue(stdoutFileExistent)
 
         shutil.rmtree(os.path.join(os.path.dirname(__file__),
-                      'benchmark_runs'))
+                      "benchmark_runs"))
 
 
 if __name__ == "__main__":

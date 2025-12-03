@@ -129,7 +129,7 @@ class StrictVersion(Version):
     """
 
     version_re = re.compile(
-        r'^(\d+) \. (\d+) (\. (\d+))? ([ab](\d+))?$', re.VERBOSE | re.ASCII
+        r"^(\d+) \. (\d+) (\. (\d+))? ([ab](\d+))?$", re.VERBOSE | re.ASCII
     )
 
     def parse(self, vstring):
@@ -151,9 +151,9 @@ class StrictVersion(Version):
 
     def __str__(self):
         if self.version[2] == 0:
-            vstring = '.'.join(map(str, self.version[0:2]))
+            vstring = ".".join(map(str, self.version[0:2]))
         else:
-            vstring = '.'.join(map(str, self.version))
+            vstring = ".".join(map(str, self.version))
 
         if self.prerelease:
             vstring = vstring + self.prerelease[0] + str(self.prerelease[1])

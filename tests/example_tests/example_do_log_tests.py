@@ -49,7 +49,7 @@ class TestDoLogExample(TestCase.TestExample):
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
                 #Check for the existence of the do_log files
-                do_log_path = os.path.join(wp_path, 'do_log')
+                do_log_path = os.path.join(wp_path, "do_log")
                 self.assertTrue(self._existing_file(do_log_path),
                                 "Error: do_log file for workpackage with "
                                 "id {0} in directory {1} does not exist"

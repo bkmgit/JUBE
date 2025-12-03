@@ -35,31 +35,31 @@ class TestDatabaseInterface(unittest.TestCase):
     def test_database_commands(self):
         """Test database commands"""
         # Test INSERT
-        check_content = [('BeispielName', 'BeispielKommentar')]
-        self.db.insert('Benchmark', {'name': 'BeispielName',
-                                     'comment': 'BeispielKommentar',
-                                     'outpath': '/path',
-                                     'file_path_ref': '/path',
-                                     'version': '1'})
-        actual_content = self.db.select('Benchmark', ['name', 'comment'])
+        check_content = [("BeispielName", "BeispielKommentar")]
+        self.db.insert("Benchmark", {"name": "BeispielName",
+                                     "comment": "BeispielKommentar",
+                                     "outpath": "/path",
+                                     "file_path_ref": "/path",
+                                     "version": "1"})
+        actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 
         # Test UPDATE
-        check_content = [('BeispielName2', 'BeispielKommentar')]
-        self.db.update('Benchmark', {'name': 'BeispielName2'}, "name='BeispielName'")
-        actual_content = self.db.select('Benchmark', ['name', 'comment'])
+        check_content = [("BeispielName2", "BeispielKommentar")]
+        self.db.update("Benchmark", {"name": "BeispielName2"}, "name='BeispielName'")
+        actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 
         # Test DELETE
         check_content = []
-        self.db.delete('Benchmark', "name='BeispielName2'")
-        actual_content = self.db.select('Benchmark', ['name', 'comment'])
+        self.db.delete("Benchmark", "name='BeispielName2'")
+        actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 
     def tearDown(self):
         """Disconnect and remove database"""
         self.db.disconnect()
-        os.remove('database.db')
+        os.remove("database.db")
 
 if __name__ == "__main__":
     unittest.main()

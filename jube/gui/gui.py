@@ -72,12 +72,12 @@ class Gui(tk.Tk):
 
         # Configure the style for a ttk.Treeview
         self._style.map("Treeview.Heading", 
-                        background = [('pressed', '!focus', LIGHT_BLUE),
-                                      ('active', LIGHT_BLUE),
-                                      ('disabled', LIGHT_BLUE)])
+                        background = [("pressed", "!focus", LIGHT_BLUE),
+                                      ("active", LIGHT_BLUE),
+                                      ("disabled", LIGHT_BLUE)])
         self._style.layout("Custom.Treeview", 
-                           [('Treeview.treearea', {'sticky': 'nswe'})])
-        self._style.configure('Custom.Treeview.Heading', 
+                           [("Treeview.treearea", {"sticky": "nswe"})])
+        self._style.configure("Custom.Treeview.Heading", 
                               background=LIGHT_BLUE, 
                               activebackground=LIGHT_BLUE, 
                               bordercolor=BLUE, 
@@ -111,7 +111,7 @@ class Gui(tk.Tk):
 
     def place_widgets(self):
         """Places all tkinter widgets in the gui layout"""
-        self.bind('<Configure>', self.configure_scrollregion)
+        self.bind("<Configure>", self.configure_scrollregion)
         self._top.pack(fill="x")
         self._labelTop.pack(side="right", fill="both", expand="True")
         self._button_back.pack(side="left", fill="both")

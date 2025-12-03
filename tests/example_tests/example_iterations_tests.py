@@ -55,7 +55,7 @@ class TestIterationsExample(TestCase.TestExample):
                                             self._name, "result.dat")
             origin_result_file = open(result_file_path)
             origin_result_content = \
-                [re.findall(r'(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)'
+                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)"
                             ,line) for line in origin_result_file]
             origin_result_file.close()
 
@@ -63,7 +63,7 @@ class TestIterationsExample(TestCase.TestExample):
             run_result_file = open(os.path.join(run_path, "result",
                                                 "result.dat"))
             run_result_content = \
-                [re.findall(r'(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)'
+                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)"
                             ,line) for line in run_result_file]
             run_result_file.close()
 

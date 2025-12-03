@@ -28,7 +28,7 @@ class Database_Interface(object):
 
     """Interface to run all database options"""
 
-    def __init__(self, name='database.db'):
+    def __init__(self, name="database.db"):
         """Initialize the database object with given name"""
         self._name = name
 
@@ -47,7 +47,7 @@ class Database_Interface(object):
     def create_database(self):
         """Running queries to create all tables in the database"""
         path = os.path.join(jube.util.__path__[0], "sql_create_queries.sql")
-        with open(path, 'r') as sql_file:
+        with open(path, "r") as sql_file:
             sql_queries = sql_file.read()
 
         try:
@@ -60,8 +60,8 @@ class Database_Interface(object):
     def create_database_table(self, name, data, primekeys):
         """Create database table and fill with given data"""
         # Create execute query
-        columns = ', '.join([f'{k} {t}' for k, t in data.items()])
-        primary_key = ', '.join(primekeys)
+        columns = ", ".join([f"{k} {t}" for k, t in data.items()])
+        primary_key = ", ".join(primekeys)
         query = f"CREATE TABLE IF NOT EXISTS {name} ({columns}"
         if primary_key:
             query += f", PRIMARY KEY ({primary_key})"
@@ -134,7 +134,7 @@ class Database_Interface(object):
 
     def start_transaction(self):
         """Start the transaction"""
-        self._connection.execute('BEGIN')
+        self._connection.execute("BEGIN")
 
     def commit_transaction(self):
         """Finish the transaction and submit the changes"""

@@ -150,7 +150,7 @@ class TestCase:
 
         def _get_stdout_file(self, file_path):
             '''Returns the path of the stdout file for the given path'''
-            return os.path.join(file_path, 'stdout')
+            return os.path.join(file_path, "stdout")
 
         def _get_work_path(self, file_path):
             '''Returns the working folder path for the given path'''
@@ -167,7 +167,7 @@ class TestCase:
             '''
             # DEPRECATED (BEGIN): Future versions will not use done_files
             #check for done file (old version)
-            done_file_path = os.path.join(file_path, 'done')
+            done_file_path = os.path.join(file_path, "done")
             exist = self._existing_file(done_file_path)
             # DEPRECATED (END): Future versions will not use done_files
             status = ""
@@ -184,7 +184,7 @@ class TestCase:
             Checks if the error file exists in the given path or
             the workpackage status in database is done
             '''
-            error_file_path = os.path.join(file_path, 'error')
+            error_file_path = os.path.join(file_path, "error")
             exist = self._existing_file(error_file_path)
             status = ""
             database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
@@ -197,7 +197,7 @@ class TestCase:
 
         def _content_of_file(self, file_path):
             '''Returns the contents of the given file'''
-            with open(file_path, 'r') as file:
+            with open(file_path, "r") as file:
                 output = file.read().strip()
             return output
 
@@ -211,7 +211,7 @@ class TestCase:
             '''
             shutil.rmtree(cls._bench_run_path)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     '''Import all example tests to run all tests at once'''
     #import to run all example tests
     from example_tests.example_cycle_tests import TestCycleExample

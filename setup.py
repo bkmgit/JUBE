@@ -28,7 +28,7 @@ add_opt = dict()
 try:
     from setuptools import setup
     import sys
-    add_opt["install_requires"] = ['pyyaml']
+    add_opt["install_requires"] = ["pyyaml"]
     if sys.hexversion < 0x02070000:
         add_opt["install_requires"].append("argparse")
 except ImportError:
@@ -60,26 +60,26 @@ def rel_path(directory, new_root=""):
     return result
 
 
-config = {'name': 'JUBE',
-          'description': 'JUBE Benchmarking Environment',
-          'author': 'Forschungszentrum Juelich GmbH',
-          'url': 'www.fz-juelich.de/ias/jsc/jube',
-          'download_url': 'www.fz-juelich.de/ias/jsc/jube',
-          'author_email': 'jube.jsc@fz-juelich.de',
-          'version': '2.7.1',
-          'packages': ['jube','jube.result_types','jube.util','jube.gui'],
-          'package_data': {'jube': ['help.txt'],
-                           'jube.util': ['sql_create_queries.sql']},
-          'data_files': ([(os.path.join(SHARE_PATH, 'docu'),
-                           ['docs/JUBE.pdf']),
+config = {"name": "JUBE",
+          "description": "JUBE Benchmarking Environment",
+          "author": "Forschungszentrum Juelich GmbH",
+          "url": "www.fz-juelich.de/ias/jsc/jube",
+          "download_url": "www.fz-juelich.de/ias/jsc/jube",
+          "author_email": "jube.jsc@fz-juelich.de",
+          "version": "2.7.1",
+          "packages": ["jube","jube.result_types","jube.util","jube.gui"],
+          "package_data": {"jube": ["help.txt"],
+                           "jube.util": ["sql_create_queries.sql"]},
+          "data_files": ([(os.path.join(SHARE_PATH, "docu"),
+                           ["docs/JUBE.pdf"]),
                           (SHARE_PATH,
-                          ['AUTHORS','LICENSE','RELEASE_NOTES','CITATION.cff',
-                           'CODE_OF_CONDUCT.md', 'CONTRIBUTING.md'])] +
+                          ["AUTHORS","LICENSE","RELEASE_NOTES","CITATION.cff",
+                           "CODE_OF_CONDUCT.md", "CONTRIBUTING.md"])] +
                          rel_path("examples", SHARE_PATH) +
                          rel_path("contrib", SHARE_PATH) +
                          rel_path("platform", SHARE_PATH)),
-          'scripts': ['bin/jube', 'bin/jube-autorun'],
-          'long_description': (
+          "scripts": ["bin/jube", "bin/jube-autorun"],
+          "long_description": (
               "Automating benchmarks is important for reproducibility and "
               "hence comparability which is the major intent when "
               "performing benchmarks. Furthermore managing different "
@@ -99,9 +99,9 @@ config = {'name': 'JUBE',
               "on different computer systems and evaluate the results. It "
               "is actively developed by the Juelich Supercomputing Centre "
               "of Forschungszentrum Juelich, Germany."),
-          'license': 'GPLv3',
-          'platforms': 'Linux',
-          'classifiers': [
+          "license": "GPLv3",
+          "platforms": "Linux",
+          "classifiers": [
               "Development Status :: 5 - Production/Stable",
               "Environment :: Console",
               "Intended Audience :: End Users/Desktop",
@@ -114,7 +114,7 @@ config = {'name': 'JUBE',
               "Topic :: System :: Monitoring",
               "Topic :: System :: Benchmark",
               "Topic :: Software Development :: Testing"],
-          'keywords': 'JUBE Benchmarking Environment'}
+          "keywords": "JUBE Benchmarking Environment"}
 config.update(add_opt)
 
 setup(**config)

@@ -673,7 +673,7 @@ class Benchmark(object):
 
                     # add wps to the parallel pool as long as they have the same name
                     while True:
-                        pool.apply_async(workpackage.run, args=('p',),
+                        pool.apply_async(workpackage.run, args=("p",),
                                          callback=collect_result, error_callback=log_e)
 
                         if not self._work_stat.empty():
@@ -694,14 +694,14 @@ class Benchmark(object):
             if run_parallel:
                 # merge parallel run log files into the main run log file and
                 # delete the parallel logs
-                log_fname = jube.log.LOGFILE_NAME.split('/')[-1]
+                log_fname = jube.log.LOGFILE_NAME.split("/")[-1]
                 filenames = [file for file in os.listdir(self.bench_dir)
-                             if file.startswith(log_fname.split('.')[0]) and
+                             if file.startswith(log_fname.split(".")[0]) and
                              file != log_fname]
-                filenames.sort(key=lambda o: int(re.split(r'_|\.', o)[1]))
-                with open(current_logfile_name, 'a') as outfile:
+                filenames.sort(key=lambda o: int(re.split(r"_|\.", o)[1]))
+                with open(current_logfile_name, "a") as outfile:
                     for fname in filenames:
-                        with open(os.path.join(self.bench_dir, fname), 'r') as infile:
+                        with open(os.path.join(self.bench_dir, fname), "r") as infile:
                             contents = infile.read()
                             outfile.write(contents)
                         os.remove(os.path.join(self.bench_dir, fname))

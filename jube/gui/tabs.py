@@ -63,7 +63,7 @@ class Tab(tk.Frame):
                                    width=0, 
                                    height=len(self._data), 
                                    listvariable=list_var)
-        self._listbox.bind('<<ListboxSelect>>', self.item_selected)
+        self._listbox.bind("<<ListboxSelect>>", self.item_selected)
         self._menu_x = tk.Scrollbar(self._menu, 
                                     orient=tk.HORIZONTAL, 
                                     command=self._listbox.xview)
@@ -84,11 +84,11 @@ class Tab(tk.Frame):
         self._window.add(self._page, minsize=220)
         self._window.pack(fill="both", expand="True")
         self._window.bind("<B1-ButtonRelease>", lambda e: self.event_generate("<Configure>"))
-        self.bind('<Configure>', self.configure_scrollregion)
+        self.bind("<Configure>", self.configure_scrollregion)
 
         # Pack the menu region of the PanedWindow into the layout
         self._menu_x.pack(side="bottom", fill="x")
-        self._listbox['xscrollcommand'] = self._menu_x.set
+        self._listbox["xscrollcommand"] = self._menu_x.set
         self._title.pack(padx=10, pady=10, anchor="nw")
         self._listbox.pack(fill="both", padx=10, pady=10, anchor="nw")
 
@@ -595,7 +595,7 @@ class ResultTab(Tab):
                 tree_result.insert("", "end", text="style: " + f"{result.style!r}")
                 if len(result.sort) != 0: 
                     tree_result.insert("", "end", text="sort: " + 
-                                                        ', '.join(f"{sort!r}" for sort in result.sort))
+                                                        ", ".join(f"{sort!r}" for sort in result.sort))
                 tree_result.insert("", "end", text="separator: " + f"{result.separator!r}")
                 tree_result.insert("", "end", text="transpose: " + f"{result.transpose!r}")
                 if result.res_filter is not None: 
@@ -636,7 +636,7 @@ class ResultTab(Tab):
                     tree_result.insert("", "end", text="port: " + result.port)
                 if len(result.sort) != 0: 
                     tree_result.insert("", "end", text="sort: " + 
-                                                        ', '.join(f"{sort!r}" for sort in result.sort))
+                                                        ", ".join(f"{sort!r}" for sort in result.sort))
                 if result.syslog_string is not None: 
                     tree_result.insert("", "end", text="format: " + result.syslog_string)
                 if result.res_filter is not None: 

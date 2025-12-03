@@ -33,29 +33,29 @@ class TestMultiprocessing(unittest.TestCase):
 
     def setUp(self):
         self.parallelParameter = jube.parameter.StaticParameter(
-            name='i',
+            name="i",
             value='",".join(str(i) for i in range(4))',
-            separator=',',
-            parameter_type='int',
-            parameter_mode='python')
+            separator=",",
+            parameter_type="int",
+            parameter_mode="python")
         self.parallelParameterset = jube.parameter.Parameterset(
-            name='param_set')
+            name="param_set")
         self.parallelParameterset.add_parameter(self.parallelParameter)
         self.parallelStep = jube.step.Step(
-            name='parallel_execution', depend=set(), procs=2)
-        self.parallelStep.add_uses(['param_set'])
-        self.parallelOperation = jube.step.Operation('echo "$i"', stdout_filename='stdout',
-                                                      stderr_filename='stderr',
-                                                      work_dir='.', error_filename='error')
+            name="parallel_execution", depend=set(), procs=2)
+        self.parallelStep.add_uses(["param_set"])
+        self.parallelOperation = jube.step.Operation('echo "$i"', stdout_filename="stdout",
+                                                      stderr_filename="stderr",
+                                                      work_dir=".", error_filename="error")
         self.parallelStep.add_operation(self.parallelOperation)
         self.parallelBenchmark = jube.benchmark.Benchmark(
-            name='parallel_workpackages',
-            outpath='bench_run',
-            parametersets={'param_set': self.parallelParameterset},
+            name="parallel_workpackages",
+            outpath="bench_run",
+            parametersets={"param_set": self.parallelParameterset},
             substitutesets={},
             filesets={},
             patternsets={},
-            steps={'parallel_execution': self.parallelStep},
+            steps={"parallel_execution": self.parallelStep},
             analyser={},
             results={},
             results_order=[])
@@ -63,13 +63,13 @@ class TestMultiprocessing(unittest.TestCase):
     def test_multiprocess_benchmark_execution(self):
         """Test multiprocessing execution"""
         if os.path.isdir("bench_run"):
-            shutil.rmtree('bench_run')
+            shutil.rmtree("bench_run")
         self.parallelBenchmark.new_run()
         for i in ["000000", "000001", "000002", "000003"]:
             for j in ["stdout", "stderr"]:
                 self.assertTrue(os.path.isfile(
                     "bench_run/000000/"+i+"_parallel_execution/work/"+j))
-        shutil.rmtree('bench_run')
+        shutil.rmtree("bench_run")
 
 
 if __name__ == "__main__":

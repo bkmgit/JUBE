@@ -111,12 +111,12 @@ class YAML_Converter(object):
 
         # Read the yaml file and create an xml tree
         with open(self._path, "r") as file_handle:
-            xmltree = etree.Element('jube')
+            xmltree = etree.Element("jube")
             data = yaml.load(file_handle.read(), Loader=yaml.Loader)
             YAML_Converter.create_headtags(data, xmltree, self._include_path)
             xml = jube.util.output.element_tree_tostring(
                 xmltree, encoding="UTF-8")
-            self._int_file.write(xml.encode('UTF-8'))
+            self._int_file.write(xml.encode("UTF-8"))
         LOGGER.debug("  YAML Conversion finalized")
 
     def read(self):
@@ -222,7 +222,7 @@ class YAML_Converter(object):
     def create_headtags(data, parent_node, include_paths):
         """ Search for the headtags in given dictionary """
         if type(data) is not dict:
-            data = {'benchmark': data}
+            data = {"benchmark": data}
         to_delete = list()
         for tag in data.keys():
             # Override include-path with parsed include-path

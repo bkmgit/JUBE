@@ -69,7 +69,7 @@ class TestUtil(unittest.TestCase):
 
     def test_substitution(self):
         """Test substitution"""
-        test_substitution_dict={'test1':'test2','test3':'test4'}
+        test_substitution_dict={"test1":"test2","test3":"test4"}
         test_text=[]
         test_result_text=[]
 
