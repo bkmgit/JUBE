@@ -212,7 +212,7 @@ class TestCase:
             shutil.rmtree(cls._bench_run_path)
 
 if __name__ == "__main__":
-    '''Import all example tests to run all tests at once'''
+    """Import all example tests to run all tests at once"""
     #import to run all example tests
     from example_tests.example_cycle_tests import TestCycleExample
     from example_tests.example_dependencies_tests import TestDependenciesExample
