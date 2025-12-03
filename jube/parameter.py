@@ -831,12 +831,12 @@ class StaticParameter(Parameter):
                     value = pre_script_value
                 else:
                     try:
-                        raise RuntimeError(("Cannot evaluate \"{0}\" for " +
-                                            "parameter \"{1}\": {2}").format(
+                        raise RuntimeError(('Cannot evaluate "{0}" for ' +
+                                            'parameter "{1}": {2}').format(
                             value, self.name, str(exception)))
                     except UnicodeDecodeError:
-                        raise RuntimeError(("Cannot evaluate \"{0}\" for " +
-                                            "parameter \"{1}\"").format(
+                        raise RuntimeError(('Cannot evaluate "{0}" for ' +
+                                            'parameter "{1}"').format(
                             value, self.name))
 
         # Run evaluation helper functions
@@ -871,13 +871,13 @@ class StaticParameter(Parameter):
         for var_name, var_value in re.findall(
                 r"^export (.+?)\s*=\s*?(.+?)?\s*?$", value, re.MULTILINE):
             if not var_value: # Exporting empty variables
-                env_str += "export {0}=\"\"\n".format(var_name)
+                env_str += 'export {0}=""\n'.format(var_name)
             elif (var_value[0] == "'" and var_value[-1] == "'") or \
-                    (var_value[0] == "\"" and var_value[-1] == "\""):
+                    (var_value[0] == '"' and var_value[-1] == '"'):
                 env_str += "export {0}={1}\n".format(var_name, var_value)
             else:
-                env_str += "export {0}=\"{1}\"\n".format(
-                    var_name, var_value.replace("\"", "\\\""))
+                env_str += 'export {0}="{1}"\n'.format(
+                    var_name, var_value.replace('"', '\\"'))
         return env_str
 
 

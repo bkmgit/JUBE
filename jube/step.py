@@ -135,7 +135,7 @@ class Step(object):
         """Add use"""
         for use_name in use_names:
             if any([use_name in use_list for use_list in self._use]):
-                raise ValueError(("Element \"{0}\" can only be used once")
+                raise ValueError(('Element "{0}" can only be used once')
                                  .format(use_name))
         self._use.append(use_names)
 
@@ -352,7 +352,7 @@ class Step(object):
                 # Maybe new templates were created
                 if parameterset.has_templates:
                     LOGGER.debug("Expand parameter templates:\n{0}".format(
-                        "\n".join("    \"{0}\": {1}".format(i, j.value)
+                        "\n".join('    "{0}": {1}'.format(i, j.value)
                                   for i, j in parameterset.
                                   template_parameter_dict.items())))
                     new_parametersets += \
@@ -638,7 +638,7 @@ class Operation(object):
 
                     sub = subprocess.Popen(
                         [shell, "-c",
-                         "{0} && env > \"{1}\"".format(do,
+                         '{0} && env > "{1}"'.format(do,
                                                        abs_info_file_path)],
                         cwd=work_dir, stdout=stdout_handle,
                         stderr=stderr, shell=False,
@@ -647,8 +647,8 @@ class Operation(object):
                     stdout.close()
                     stderr.close()
                     raise RuntimeError(("Error (returncode <> 0) while " +
-                                        "running \"{0}\" in " +
-                                        "directory \"{1}\"")
+                                        'running "{0}" in ' +
+                                        'directory "{1}"')
                                        .format(do, os.path.abspath(work_dir)))
 
                 # stdout verbose output
@@ -698,8 +698,8 @@ class Operation(object):
                         stderr_msg = ""
                     try:
                         raise RuntimeError(
-                            ("Error (returncode <> 0) while running \"{0}\" " +
-                             "in directory \"{1}\"\nMessage in \"{2}\":" +
+                            ('Error (returncode <> 0) while running "{0}" ' +
+                             'in directory "{1}"\nMessage in "{2}":' +
                              "{3}\n{4}").format(
                                 do,
                                 os.path.abspath(work_dir),
@@ -710,8 +710,8 @@ class Operation(object):
                                     -jube.conf.ERROR_MSG_LINES:])))
                     except UnicodeDecodeError:
                         raise RuntimeError(
-                            ("Error (returncode <> 0) while running \"{0}\" " +
-                             "in directory \"{1}\"").format(
+                            ('Error (returncode <> 0) while running "{0}" ' +
+                             'in directory "{1}"').format(
                                 do,
                                 os.path.abspath(work_dir)))
 
@@ -725,7 +725,7 @@ class Operation(object):
             break_filename = \
                 os.path.expandvars(os.path.expanduser(break_filename))
             if os.path.exists(os.path.join(work_dir, break_filename)):
-                LOGGER.debug(("\"{0}\" was found, workpackage execution and "
+                LOGGER.debug(('"{0}" was found, workpackage execution and '
                               " further loop continuation was stopped.")
                              .format(break_filename))
                 continue_cycle = False
@@ -737,7 +737,7 @@ class Operation(object):
             async_filename = \
                 os.path.expandvars(os.path.expanduser(async_filename))
             if not os.path.exists(os.path.join(work_dir, async_filename)):
-                LOGGER.debug("Waiting for file \"{0}\" ..."
+                LOGGER.debug('Waiting for file "{0}" ...'
                              .format(async_filename))
                 if jube.conf.DEBUG_MODE:
                     LOGGER.debug("  skip waiting")
@@ -751,14 +751,14 @@ class Operation(object):
             error_filename = \
                 os.path.expandvars(os.path.expanduser(error_filename))
             if os.path.exists(os.path.join(work_dir, error_filename)):
-                LOGGER.debug("Checking for error file \"{0}\" ..."
+                LOGGER.debug('Checking for error file "{0}" ...'
                              .format(error_filename))
                 if jube.conf.DEBUG_MODE:
                     LOGGER.debug("  skip error")
                 else:
                     do = jube.util.util.substitution(self._do, parameter_dict)
-                    raise(RuntimeError(("Error file \"{0}\" found after " +
-                                        "running the command \"{1}\".").format(
+                    raise(RuntimeError(('Error file "{0}" found after ' +
+                                        'running the command "{1}".').format(
                                             error_filename, do)))
 
         return continue_op, continue_cycle

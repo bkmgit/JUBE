@@ -31,7 +31,7 @@ def print_benchmarks_info(path):
     """Print list of all benchmarks, found in given directory"""
     # Get list of all files and directories in given path
     if not os.path.isdir(path):
-        raise OSError("Not a directory: \"{0}\"".format(path))
+        raise OSError('Not a directory: "{0}"'.format(path))
     dir_list = os.listdir(path)
     benchmark_info = list()
     # Search for possible benchmark dirs
@@ -76,13 +76,13 @@ def print_benchmarks_info(path):
     benchmark_info = [("id", "name", "started", "last change",
                        "comment", "tags")] + benchmark_info
     if len(benchmark_info) > 1:
-        infostr = (jube.util.output.text_boxed("Benchmarks found in \"{0}\":".
+        infostr = (jube.util.output.text_boxed('Benchmarks found in "{0}":'.
                                                 format(path)) + "\n" +
                    jube.util.output.text_table(benchmark_info,
                                                 use_header_line=True))
         print(infostr)
     else:
-        print("No Benchmarks found in \"{0}\"".format(path))
+        print('No Benchmarks found in "{0}"'.format(path))
 
 
 def print_benchmark_info(benchmark):
@@ -387,7 +387,7 @@ def print_step_info(benchmark, step_name, parametrization_only=False,
                     parametrization_only_csv=False):
     """Print information concerning a single step in a specific benchmark"""
     if step_name not in benchmark.workpackages:
-        print("Step \"{0}\" not found in benchmark \"{1}\"."
+        print('Step "{0}" not found in benchmark "{1}".'
               .format(step_name, benchmark.name))
         return
 

@@ -116,7 +116,7 @@ class Substituteset(object):
                 outfile = os.path.join(work_dir, outfile)
                 # Check not existing files
                 if not (os.path.exists(infile) and os.path.isfile(infile)):
-                    raise RuntimeError(("File \"{0}\" not found while "
+                    raise RuntimeError(('File "{0}" not found while '
                                         "running substitution").format(infile))
                 # Read in-file
                 file_handle = codecs.open(infile, "r", "utf-8")

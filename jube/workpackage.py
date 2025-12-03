@@ -902,7 +902,7 @@ class Workpackage(object):
                     raise IOError(("Given work directory {0} contains a " +
                                    "unknown JUBE or environment variable.")
                                   .format(alt_work_dir))
-                LOGGER.debug("  switch to alternative work dir: \"{0}\""
+                LOGGER.debug('  switch to alternative work dir: "{0}"'
                              .format(alt_work_dir))
 
                 if not jube.conf.DEBUG_MODE and \

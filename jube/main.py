@@ -383,7 +383,7 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
             LOGGER.warning(str(exception))
             return None
     else:
-        raise IOError("Benchmark configuration file not found in \"{0}\""
+        raise IOError('Benchmark configuration file not found in "{0}"'
                       .format(benchmark_folder))
 
     found_workpackage = _workpackage_exists(benchmark_folder)
@@ -398,7 +398,7 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
             return None
         benchmark.set_workpackage_information(workpackages, work_stat)
     elif not found_workpackage and restore_workpackages:
-        raise IOError("Workpackage configuration file not found in \"{0}\""
+        raise IOError('Workpackage configuration file not found in "{0}"'
                       .format(benchmark_folder))
 
     db.disconnect()
@@ -431,7 +431,7 @@ def search_for_benchmarks(args):
     """Search for existing benchmarks"""
     found_benchmarks = list()
     if not os.path.isdir(args.dir):
-        raise OSError("Not a directory: \"{0}\"".format(args.dir))
+        raise OSError('Not a directory: "{0}"'.format(args.dir))
     all_benchmarks = [
         os.path.join(args.dir, directory)
         for directory in os.listdir(args.dir)
@@ -449,11 +449,11 @@ def search_for_benchmarks(args):
             benchmark_folder = jube.util.util.id_dir(args.dir, benchmark_id)
             found_configuration = _configuration_exists(benchmark_folder)
             if not os.path.isdir(benchmark_folder):
-                raise OSError("Benchmark directory not found: \"{0}\""
+                raise OSError('Benchmark directory not found: "{0}"'
                               .format(benchmark_folder))
             if not found_configuration:
-                LOGGER.warning(("Configuration file \"{0}\" or \"{1}\" not "
-                                "found in \"{2}\" or directory not readable.")
+                LOGGER.warning(('Configuration file "{0}" or "{1}" not '
+                                'found in "{2}" or directory not readable.')
                                .format(jube.conf.CONFIGURATION_FILENAME,
                                        jube.conf.DATABASE_FILENAME,
                                        benchmark_folder))
@@ -474,7 +474,7 @@ def search_for_benchmarks(args):
                 if benchmark_folder not in found_benchmarks:
                     found_benchmarks.append(benchmark_folder)
             else:
-                raise OSError("No benchmark directory found in \"{0}\""
+                raise OSError('No benchmark directory found in "{0}"'
                               .format(args.dir))
 
     found_benchmarks.sort()
@@ -496,8 +496,8 @@ def search_for_workpackage(args, search_for_step=False):
                                        "workpackages are selected by their ID "
                                        "using '-w'.")
                     if benchmark.workpackage_by_id(int(wp_id)) is None:
-                        raise RuntimeError(("Workpackage ID \"{0}\" not " +
-                                            "found in benchmark \"{1}\".")
+                        raise RuntimeError(('Workpackage ID "{0}" not ' +
+                                            'found in benchmark "{1}".')
                                            .format(wp_id, benchmark.id))
                     else:
                         found_workpackages.append(
@@ -505,8 +505,8 @@ def search_for_workpackage(args, search_for_step=False):
             elif search_for_step and args.step:
                 for step_name in args.step:
                     if step_name not in benchmark.workpackages:
-                        LOGGER.warning("Step \"{0}\" not found in benchmark "
-                                     "\"{1}\".".format(step_name,
+                        LOGGER.warning('Step "{0}" not found in benchmark '
+                                     '"{1}".'.format(step_name,
                                                        benchmark.name))
                     else:
                         for wp in benchmark.workpackages[step_name]:
@@ -659,7 +659,7 @@ def _analyse_benchmark(benchmark_folder, args):
         benchmark_folder, jube.conf.LOGFILE_ANALYSE_NAME))
 
     LOGGER.info(jube.util.output.text_boxed(
-        ("Analyse benchmark \"{0}\" id: {1}").format(benchmark.name,
+        ('Analyse benchmark "{0}" id: {1}').format(benchmark.name,
                                                      benchmark.id)))
     benchmark.analyse()
     if os.path.isfile(
@@ -667,7 +667,7 @@ def _analyse_benchmark(benchmark_folder, args):
         LOGGER.info(">>> Analyse data storage: {0}".format(os.path.join(
             benchmark_folder, jube.conf.ANALYSE_FILENAME)))
     else:
-        LOGGER.info(">>> Analyse data storage \"{0}\" not created!".format(
+        LOGGER.info('>>> Analyse data storage "{0}" not created!'.format(
             os.path.join(benchmark_folder, jube.conf.ANALYSE_FILENAME)))
     LOGGER.info(jube.util.output.text_line())
 
@@ -751,7 +751,7 @@ def _remove_benchmark(benchmark_folder, args):
     """Remove existing benchmark"""
     remove = True
     if not args.force:
-        inp = input("Really remove \"{0}\" (y/n):"
+        inp = input('Really remove "{0}" (y/n):'
                         .format(benchmark_folder))
         remove = inp.startswith("y")
     if remove:
@@ -765,7 +765,7 @@ def _remove_workpackage(workpackage, args):
     # Ignore deleted/unstarted workpackages
     if workpackage.started:
         if not args.force:
-            inp = input(("Really remove \"{0}\" and its dependent " +
+            inp = input(('Really remove "{0}" and its dependent ' +
                              "workpackages (y/n):")
                             .format(workpackage.workpackage_dir))
             remove = inp.startswith("y")

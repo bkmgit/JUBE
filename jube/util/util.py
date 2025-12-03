@@ -263,11 +263,11 @@ def convert_type(name, value_type, value, stop=True):
             result_value = value
     except ValueError:
         if stop:
-            raise ValueError(f"\"{value}\" from \"{name}\" cannot be represented as a \"{value_type}\"")
+            raise ValueError(f'"{value}" from "{name}" cannot be represented as a "{value_type}"')
         else:
             result_value = value
     if value_type_incorrect:
-        LOGGER.debug(f"Warning: \"{value}\" from \"{name}\" was converted to type \"{value_type}\": {result_value}.\n")
+        LOGGER.debug(f'Warning: "{value}" from "{name}" was converted to type "{value_type}": {result_value}.\n')
     return result_value
 
 
@@ -277,7 +277,7 @@ def script_evaluation(cmd, script_type):
         return str(eval(cmd))
     elif script_type in ["perl", "shell"]:
         if script_type == "perl":
-            cmd = "perl -e \"print " + cmd + "\""
+            cmd = 'perl -e "print ' + cmd + '"'
 
         # Select unix shell
         shell = jube.conf.STANDARD_SHELL
@@ -297,7 +297,7 @@ def script_evaluation(cmd, script_type):
         else:
             if len(stderr.strip()) > 0:
                 try:
-                    LOGGER.debug((" The command \"{0}\" was executed with a "
+                    LOGGER.debug((' The command "{0}" was executed with a '
                                   "successful error code,\n  but the "
                                   "following error message was produced "
                                   "during its execution: {1}")
@@ -318,7 +318,7 @@ def eval_bool(cmd):
             return bool(eval(cmd))
         except SyntaxError as se:
             raise ValueError(
-                ("\"{0}\" could not be evaluated and handled as boolean "
+                ('"{0}" could not be evaluated and handled as boolean '
                  "value. Check if all parameter were correctly replaced and "
                  "the syntax of the expression is well formed ({1}).").format(
                      cmd, str(se)))
@@ -446,15 +446,15 @@ def check_and_get_group_id():
         try:
             group_id = grp.getgrnam(group_name).gr_gid
         except KeyError:
-            raise ValueError(("Failed to get group ID, group \"{0}\" " +
+            raise ValueError(('Failed to get group ID, group "{0}" ' +
                               "does not exist").format(group_name))
         user = pwd.getpwuid(os.getuid()).pw_name
         grp_members = grp.getgrgid(group_id).gr_mem
         if user in grp_members:
             return group_id
         else:
-            raise ValueError(("User \"{0}\" is not in " +
-                              "group \"{1}\"").format(user, group_name))
+            raise ValueError(('User "{0}" is not in ' +
+                              'group "{1}"').format(user, group_name))
     else:
         return None
 

@@ -134,7 +134,7 @@ class YAML_Converter(object):
             if os.path.exists(file_path):
                 break
         else:
-            raise ValueError(("\"{0}\" not found in possible " +
+            raise ValueError(('"{0}" not found in possible ' +
                               "include paths").format(filename))
 
         return file_path
@@ -203,7 +203,7 @@ class YAML_Converter(object):
                 try:
                     _ = yaml.load(inputfile.read(), Loader=loader)
                 except yaml.parser.ParserError:
-                    LOGGER.error(("Including data from \"{0}\" into \"{1}\" " +
+                    LOGGER.error(('Including data from "{0}" into "{1}" ' +
                                   "raised an error.").format(file, self._path))
                     raise
                 inputfile.close()

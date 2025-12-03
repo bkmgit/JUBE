@@ -95,7 +95,7 @@ class Database(KeyValuesResult):
                 if len(self._primekeys) > 0:
                     LOGGER.warning("The `primekeys` attribute of the `<database>`-tag is deprecated. "
                                    "Instead, use the new `primekey` attribute of the `<key>`-tag. "
-                                   "(<key primekey=\"true\"|\"false\">..</key>)")
+                                   '(<key primekey="true"|"false">..</key>)')
 
                 # create new table with a name of stored in variable self.name if it does not exists
                 db.create_database_table(self.name, key_dtypes, self._primekeys)

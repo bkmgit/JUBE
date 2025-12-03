@@ -788,7 +788,7 @@ class Benchmark(object):
         if self._id < 0:
             self._id = jube.util.util.get_current_id(self._outpath) + 1
         if os.path.exists(self.bench_dir):
-            raise RuntimeError("Benchmark directory \"{0}\" already exists"
+            raise RuntimeError('Benchmark directory "{0}" already exists'
                                .format(self.bench_dir))
 
         os.makedirs(self.bench_dir)

@@ -154,7 +154,7 @@ class File(object):
         # Shell expansion
         paths = glob.glob(pathname)
         if (len(paths) == 0) and (not jube.conf.DEBUG_MODE):
-            raise RuntimeError("no files found using \"{0}\""
+            raise RuntimeError('no files found using "{0}"'
                                .format(pathname))
         for path in paths:
             # When using shell extensions, alternative filenames are not
@@ -229,7 +229,7 @@ class Link(File):
             target_path = path
         else:
             target_path = os.path.relpath(path, os.path.dirname(new_file_path))
-        LOGGER.debug("  link \"{0}\" <- \"{1}\"".format(target_path, name))
+        LOGGER.debug('  link "{0}" <- "{1}"'.format(target_path, name))
         if not jube.conf.DEBUG_MODE and not os.path.exists(new_file_path):
             os.symlink(target_path, new_file_path)
 
@@ -263,7 +263,7 @@ class Copy(File):
 
     def create_action(self, path, name, new_file_path):
         """Copy file/directory to work_dir"""
-        LOGGER.debug("  copy \"{0}\" -> \"{1}\"".format(path, name))
+        LOGGER.debug('  copy "{0}" -> "{1}"'.format(path, name))
         if not jube.conf.DEBUG_MODE and not os.path.exists(new_file_path):
             if os.path.isdir(path):
                 shutil.copytree(path, new_file_path, symlinks=True)

@@ -47,7 +47,7 @@ class Analyser(object):
             """Add an additional patternset name"""
             for use_name in use_names:
                 if use_name in self._use:
-                    raise ValueError(("Element \"{0}\" can only be used once")
+                    raise ValueError(('Element "{0}" can only be used once')
                                      .format(use_name))
                 self._use.add(use_name)
 
@@ -136,7 +136,7 @@ class Analyser(object):
         """Add an additional patternset name"""
         for use_name in use_names:
             if use_name in self._use:
-                raise ValueError(("Element \"{0}\" can only be used once")
+                raise ValueError(('Element "{0}" can only be used once')
                                  .format(use_name))
             self._use.add(use_name)
 
@@ -183,13 +183,13 @@ class Analyser(object):
         """Combine patternsets given by uses and check compatibility"""
         for use in uses:
             if use not in self._benchmark.patternsets:
-                raise RuntimeError(("<patternset name=\"{0}\"> used but not " +
+                raise RuntimeError(('<patternset name="{0}"> used but not ' +
                                     "found").format(use))
             if not patternset.is_compatible(self._benchmark.patternsets[use]):
                 incompatible_names = patternset.get_incompatible_pattern(
                     self._benchmark.patternsets[use])
-                raise RuntimeError(("Cannot use patternset \"{0}\" " +
-                                    "in analyser \"{1}\", because there are " +
+                raise RuntimeError(('Cannot use patternset "{0}" ' +
+                                    'in analyser "{1}", because there are ' +
                                     "incompatible pattern name combinations: "
                                     "{2}")
                                    .format(use, self._name,
@@ -198,7 +198,7 @@ class Analyser(object):
 
     def analyse(self):
         """Run the analyser"""
-        LOGGER.debug("Run analyser \"{0}\"".format(self._name))
+        LOGGER.debug('Run analyser "{0}"'.format(self._name))
         if self._benchmark is None:
             raise RuntimeError("No benchmark found using analyser {0}"
                                .format(self._name))
@@ -230,10 +230,10 @@ class Analyser(object):
 
         for stepname in self._analyse:
             result[stepname] = dict()
-            LOGGER.debug("  analyse step \"{0}\"".format(stepname))
+            LOGGER.debug('  analyse step "{0}"'.format(stepname))
             if stepname not in self._benchmark.steps:
-                raise RuntimeError(("Could not find <step name=\"{0}\"> "
-                                    "when using analyser \"{1}\"").format(
+                raise RuntimeError(('Could not find <step name="{0}"> '
+                                    'when using analyser "{1}"').format(
                                         stepname, self._name))
             step = self._benchmark.steps[stepname]
             workpackages = set(self._benchmark.workpackages[stepname])
@@ -385,9 +385,9 @@ class Analyser(object):
                 local_patternset.pattern_storage)
             incompatible_names.update(parameterset.get_incompatible_parameter(
                 local_patternset.derived_pattern_storage))
-            raise RuntimeError(("A pattern and a parameter (\"{0}\") "
+            raise RuntimeError(('A pattern and a parameter ("{0}") '
                                 "using the same name in "
-                                "analyser \"{1}\"").format(
+                                'analyser "{1}"').format(
                                     ",".join(incompatible_names), self._name))
 
         # Get jube patternset
@@ -411,8 +411,8 @@ class Analyser(object):
                     mode += re.DOTALL
                 regex = re.compile(pattern.value, mode)
             except re.error as ree:
-                raise RuntimeError(("Error inside pattern \"{0}\" : " +
-                                    "\"{1}\" : {2}")
+                raise RuntimeError(('Error inside pattern "{0}" : ' +
+                                    '"{1}" : {2}')
                                    .format(pattern.name, pattern.value, ree))
             # Run regular expression
             matches = re.findall(regex, data)
@@ -440,8 +440,8 @@ class Analyser(object):
                     else:
                         new_match_list.append(match)
                 except ValueError:
-                    LOGGER.warning(("\"{0}\" cannot be represented " +
-                                    "as a \"{1}\"")
+                    LOGGER.warning(('"{0}" cannot be represented ' +
+                                    'as a "{1}"')
                                    .format(match, pattern.content_type))
             match_list = new_match_list
 
@@ -502,7 +502,7 @@ class Analyser(object):
 
                 match_dict[pattern.name]["last"] = match_list[-1]
 
-        info_str = "      file \"{0}\" scanned pattern found:\n".format(
+        info_str = '      file "{0}" scanned pattern found:\n'.format(
             os.path.basename(file_path))
         info_str += jube.util.output.text_table(
             [(_name, ", ".join(["{0}:{1}".format(key, con)

@@ -102,7 +102,7 @@ class Result(object):
         """Add an additional analyser name"""
         for use_name in use_names:
             if use_name in self._use:
-                raise ValueError(("Element \"{0}\" can only be used once")
+                raise ValueError(('Element "{0}" can only be used once')
                                  .format(use_name))
             self._use.add(use_name)
 
@@ -117,7 +117,7 @@ class Result(object):
             analyse = analyser.analyse_result
             # Ignore empty analyse results
             if analyse is None:
-                LOGGER.debug(("No data found for analyser \"{0}\" "
+                LOGGER.debug(('No data found for analyser "{0}" '
                               "in benchmark run {1}. "
                               "Run analyse step automatically.")
                              .format(analyser_name, self._benchmark.id))
@@ -128,7 +128,7 @@ class Result(object):
 
             # Check if analyse is still empty
             if analyse is None:
-                LOGGER.warning(("No data found for analyser \"{0}\" "
+                LOGGER.warning(('No data found for analyser "{0}" '
                                 "in benchmark run {1}.")
                                .format(analyser_name, self._benchmark.id))
                 continue
@@ -214,7 +214,7 @@ class Result(object):
         for analyser_name in self._use:
             if analyser_name not in self._benchmark.analyser:
                 raise RuntimeError(
-                    "<analyser name=\"{0}\"> not found".format(analyser_name))
+                    '<analyser name="{0}"> not found'.format(analyser_name))
             patternset_names = \
                 self._benchmark.analyser[analyser_name].use.copy()
             for analyse_files in \

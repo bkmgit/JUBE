@@ -113,7 +113,7 @@ class Parser(object):
         elif self._filename.endswith("db"):
             return self.benchmark_from_database(db)
         else:
-            raise IOError("Configuration file \"{0}\" not valid."
+            raise IOError('Configuration file "{0}" not valid.'
                           .format(self._filename))
 
     def benchmark_from_database(self, db):
@@ -161,7 +161,7 @@ class Parser(object):
         LOGGER.debug("Parsing {0}".format(self._filename))
 
         if not os.path.isfile(self._filename):
-            raise IOError("Benchmark configuration file not found: \"{0}\""
+            raise IOError('Benchmark configuration file not found: "{0}"'
                           .format(self._filename))
 
         tree = self._tree_from_file(self._filename)
@@ -183,7 +183,7 @@ class Parser(object):
         if (version is not None) and (not self._force):
             if StrictVersion(version) > StrictVersion(jube.conf.JUBE_VERSION):
                 if self._strict:
-                    error_str = ("Benchmark file \"{0}\" was created using " +
+                    error_str = ('Benchmark file "{0}" was created using ' +
                                  "a newer version of JUBE ({1}).\nCurrent " +
                                  "JUBE version ({2}) might not be compatible" +
                                  ". Due to strict mode, further execution " +
@@ -192,7 +192,7 @@ class Parser(object):
                                      jube.conf.JUBE_VERSION)
                     raise ValueError(error_str)
                 else:
-                    info_str = ("Benchmark file \"{0}\" was created using a " +
+                    info_str = ('Benchmark file "{0}" was created using a ' +
                                 "newer version of JUBE ({1}).\nCurrent JUBE " +
                                 "version ({2}) might not be compatible." +
                                 "\nContinue? (y/n):").format(
@@ -287,7 +287,7 @@ class Parser(object):
             raise ValueError(("Remaining include element found, which " +
                               "was not replaced (e.g. due to a missing " +
                               "include-path):\n" +
-                              "<include from=\"{0}\" ... />")
+                              '<include from="{0}" ... />')
                              .format(node.attrib["from"]))   
 
         # DEPRECATED: check_tags no longer allowed at global level, only in tags
@@ -433,14 +433,14 @@ class Parser(object):
             if os.path.exists(file_path):
                 break
         else:
-            raise ValueError(("\"{0}\" not found in possible " +
+            raise ValueError(('"{0}" not found in possible ' +
                               "include paths").format(filename))
         return file_path
 
     def _find_set_type(self, filename, name):
         """Search for the set-type inside given file"""
         LOGGER.debug(
-            "    Searching for type of \"{0}\" in {1}".format(name, filename))
+            '    Searching for type of "{0}" in {1}'.format(name, filename))
         file_path = self._find_include_file(filename)
         etree = self._tree_from_file(file_path).getroot()
         Parser._remove_invalid_tags(etree, self._tags)
@@ -452,11 +452,11 @@ class Parser(object):
                                           "fileset", "patternset")]
 
         if len(found_set) > 1:
-            raise ValueError(("name=\"{0}\" can be found multiple times " +
-                              "inside \"{1}\"").format(name, file_path))
+            raise ValueError(('name="{0}" can be found multiple times ' +
+                              'inside "{1}"').format(name, file_path))
         elif len(found_set) == 0:
-            raise ValueError(("name=\"{0}\" not found inside " +
-                              "\"{1}\"").format(name, file_path))
+            raise ValueError(('name="{0}" not found inside ' +
+                              '"{1}"').format(name, file_path))
         else:
             return found_set[0].tag
 
@@ -471,7 +471,7 @@ class Parser(object):
         elif self._filename.endswith("db"):
             return self.benchmark_info_from_database(benchmark_id)
         else:
-            raise IOError("Configuration file \"{0}\" not valid."
+            raise IOError('Configuration file "{0}" not valid.'
                           .format(self._filename))
 
     def benchmark_info_from_database(self, benchmark_id, db=None):
@@ -507,7 +507,7 @@ class Parser(object):
                                      jube.conf.DEFAULT_SEPARATOR)]))
         benchmark_etree = jube.util.util.get_tree_element(tree, "benchmark")
         if benchmark_etree is None:
-            raise ValueError("benchmark-tag not found in \"{0}\"".format(
+            raise ValueError('benchmark-tag not found in "{0}"'.format(
                 self._filename))
         name = Parser._attribute_from_element(benchmark_etree,"name")
         comment_element = benchmark_etree.find("comment")
@@ -584,7 +584,7 @@ class Parser(object):
         elif self._filename.endswith("db"):
             return self.workpackages_from_database(benchmark, db)
         else:
-            raise IOError("Configuration file \"{0}\" not valid."
+            raise IOError('Configuration file "{0}" not valid.'
                           .format(self._filename))
 
     def workpackages_from_database(self, benchmark, db):
@@ -597,7 +597,7 @@ class Parser(object):
         iteration_siblings_tmp = dict()
         found_workpackages = dict()
         if not os.path.isfile(self._filename):
-            raise IOError("Workpackage database file not found: \"{0}\""
+            raise IOError('Workpackage database file not found: "{0}"'
                           .format(self._filename))
         # Get all available workpackages
         workpackages = db.select("Workpackage")
@@ -771,7 +771,7 @@ class Parser(object):
         work_list = Queue()
         LOGGER.debug("Parsing {0}".format(self._filename))
         if not os.path.isfile(self._filename):
-            raise IOError("Workpackage configuration file not found: \"{0}\""
+            raise IOError('Workpackage configuration file not found: "{0}"'
                           .format(self._filename))
         tree = ET.parse(self._filename)
         max_id = -1
@@ -1030,10 +1030,10 @@ class Parser(object):
             Parser._check_tag(element, valid_tags)
             path = element.text
             if path is None:
-                raise ValueError("Empty \"<path>\" found")
+                raise ValueError('Empty "<path>" found')
             path = path.strip()
             if len(path) == 0:
-                raise ValueError("Empty \"<path>\" found")
+                raise ValueError('Empty "<path>" found')
             paths.append(path)
         for path in paths:
             path = os.path.expandvars(os.path.expanduser(path))
@@ -1231,7 +1231,7 @@ class Parser(object):
         """Combine global and local sets """
         result_sets = dict(global_sets)
         if set(result_sets) & set(local_sets):
-            raise ValueError("\"{0}\" not unique"
+            raise ValueError('"{0}" not unique'
                              .format(",".join([name for name in
                                                (set(result_sets) &
                                                 set(local_sets))])))
@@ -1259,7 +1259,7 @@ class Parser(object):
             if do_log_file in ["True", "true"]:
                 do_log_file = jube.conf.DO_LOG_FILENAME
             if shared == "":
-                raise ValueError("Empty \"shared\" attribute in " +
+                raise ValueError('Empty "shared" attribute in ' +
                                  "<step> found.")
             step = jube.step.Step(name, depend, iterations, work_dir,
                                shared, export, max_async, active, suffix,
@@ -1320,7 +1320,7 @@ class Parser(object):
         for element in etree.findall("step"):
             step = Parser._extract_step(element)
             if step.name in steps:
-                raise ValueError("\"{0}\" not unique".format(step.name))
+                raise ValueError('"{0}" not unique'.format(step.name))
             steps[step.name] = step
         return steps
 
@@ -1333,7 +1333,7 @@ class Parser(object):
         valid_tags = ["use", "do"]
 
         name = Parser._attribute_from_element(etree_step, "name")
-        LOGGER.debug("  Parsing <step name=\"{0}\">".format(name))
+        LOGGER.debug('  Parsing <step name="{0}">'.format(name))
         tmp = Parser._get_attr(etree_step, "depend", "")
         iterations = int(Parser._get_attr(etree_step, "iterations", "1"))
         alt_work_dir = Parser._get_attr(etree_step,"work_dir")
@@ -1351,7 +1351,7 @@ class Parser(object):
         do_log_file = jube.conf.DO_LOG_FILENAME if do_log_file == "true" else do_log_file
         shared_name = Parser._get_attr(etree_step, "shared")
         if shared_name == "":
-            raise ValueError("Empty \"shared\" attribute in <step> found.")
+            raise ValueError('Empty "shared" attribute in <step> found.')
         depend = set(val.strip() for val in
                      tmp.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
 
@@ -1371,18 +1371,18 @@ class Parser(object):
                 alt_work_dir = Parser._get_attr(element, "work_dir")
                 if shared_str.lower() == "true":
                     if shared_name is None:
-                        raise ValueError("<do shared=\"true\"> only allowed "
+                        raise ValueError('<do shared="true"> only allowed '
                                          "inside a <step> which has a shared "
                                          "region")
                     if procs != 1:
-                        raise ValueError("<do shared=\"true\"> not allowed " +
+                        raise ValueError('<do shared="true"> not allowed ' +
                                          "inside a parallel <step>")
                     shared = True
                 elif shared_str.lower() == "false":
                     shared = False
                 else:
-                    raise ValueError("shared=\"{0}\" not allowed. ".format(shared_str) +
-                                     "Must be \"true\" or \"false\"")
+                    raise ValueError('shared="{0}" not allowed. '.format(shared_str) +
+                                     'Must be "true" or "false"')
 
                 cmd = element.text
                 if cmd is None:
@@ -1444,7 +1444,7 @@ class Parser(object):
         for element in analyser_tags:
             analyser = Parser._extract_analyser(element)
             if analyser.name in analysers:
-                raise ValueError("\"{0}\" not unique".format(analyser.name))
+                raise ValueError('"{0}" not unique'.format(analyser.name))
             analysers[analyser.name] = analyser
         return analysers
 
@@ -1456,7 +1456,7 @@ class Parser(object):
         reduce_iteration = \
             Parser._get_attr(etree_analyser, "reduce", "true").lower() == "true"
         analyser = jube.analyser.Analyser(name, reduce_iteration)
-        LOGGER.debug("  Parsing <analyser name=\"{0}\">".format(name))
+        LOGGER.debug('  Parsing <analyser name="{0}">'.format(name))
         for element in etree_analyser:
             Parser._check_tag(element, valid_tags)
             if element.tag == "analyse":
@@ -1602,7 +1602,7 @@ class Parser(object):
                 if element.tag in ["table", "syslog", "database", "figure"]:
                     if result.name in sub_results:
                         raise ValueError(
-                            ("Result name \"{0}\" is used " +
+                            ('Result name "{0}" is used ' +
                              "multiple times").format(result.name))
                     sub_results[result.name] = result
                     if result.name not in results_order:
@@ -1613,7 +1613,7 @@ class Parser(object):
             if len(set(results.keys()).intersection(
                     set(sub_results.keys()))) > 0:
                 raise ValueError(
-                    ("Result name(s) \"{0}\" is/are used " +
+                    ('Result name(s) "{0}" is/are used ' +
                      "multiple times").format(
                         ",".join(set(results.keys()).intersection(
                             set(sub_results.keys())))))
@@ -1629,8 +1629,8 @@ class Parser(object):
             Parser._get_attr(etree_table, "separator", jube.conf.DEFAULT_SEPARATOR, False)
         style = Parser._get_attr(etree_table, "style", "csv")
         if style not in ["csv", "pretty", "aligned"]:
-            raise ValueError("Not allowed style-type \"{0}\" "
-                             "in <table name=\"{1}\">".format(style, name))
+            raise ValueError('Not allowed style-type "{0}" '
+                             'in <table name="{1}">'.format(style, name))
         sort_names = Parser._get_attr(etree_table, "sort", "").split(
             jube.conf.DEFAULT_SEPARATOR)
         sort_names = [sort_name.strip() for sort_name in sort_names]
@@ -1826,7 +1826,7 @@ class Parser(object):
         """Load a parameter-/file-/substituteset from a given file"""
         if search_name is None:
             search_name = name
-        LOGGER.debug("    Searching for <{0} name=\"{1}\"> in {2}"
+        LOGGER.debug('    Searching for <{0} name="{1}"> in {2}'
                      .format(set_type, search_name, filename))
         file_path = self._find_include_file(filename)
         etree = self._tree_from_file(file_path).getroot()
@@ -1866,10 +1866,10 @@ class Parser(object):
 
         if elements is not None:
             if len(elements) > 1:
-                raise ValueError("\"{0}\" found multiple times in \"{1}\""
+                raise ValueError('"{0}" found multiple times in "{1}"'
                                  .format(search_name, file_path))
             elif len(elements) == 0:
-                raise ValueError("\"{0}\" not found in \"{1}\""
+                raise ValueError('"{0}" not found in "{1}"'
                                  .format(search_name, file_path))
             init_with = Parser._get_attr(elements[0], "init_with")
 
@@ -1883,8 +1883,8 @@ class Parser(object):
                     new_search_name = search_name
                 if (new_filename == filename) and \
                         (new_search_name == search_name):
-                    raise ValueError(("Cannot init <{0} name=\"{1}\"> by "
-                                      "itself inside \"{2}\"").format(
+                    raise ValueError(('Cannot init <{0} name="{1}"> by '
+                                      'itself inside "{2}"').format(
                                           set_type, search_name, file_path))
                 result_set = self._extract_extern_set(new_filename,
                                                       set_type, name,
@@ -1924,7 +1924,7 @@ class Parser(object):
                     result_set.add_pattern(pattern)
             return result_set
         else:
-            raise ValueError("\"{0}\" not found in \"{1}\""
+            raise ValueError('"{0}" not found in "{1}"'
                              .format(name, file_path))
 
     def _extract_parametersets_from_database(self, db, benchmark_id):
@@ -1962,15 +1962,15 @@ class Parser(object):
         for element in etree.findall("parameterset"):
             name = Parser._attribute_from_element(element, "name")
             if name == "":
-                raise ValueError("Empty \"name\" attribute in " +
+                raise ValueError('Empty "name" attribute in ' +
                                  "<parameterset> found.")
-            LOGGER.debug("  Parsing <parameterset name=\"{0}\">".format(name))
+            LOGGER.debug('  Parsing <parameterset name="{0}">'.format(name))
             duplicate = Parser._get_attr(element, "duplicate", "replace")
             if duplicate not in ["replace","concat","error"]:
-                raise ValueError("Invalid \"duplicate\" attribute in " +
+                raise ValueError('Invalid "duplicate" attribute in ' +
                                  "parameterset {0} found. ".format(name) +
-                                 "Use \"replace\" (default)" +
-                                 ", \"concat\" or \"error\".")
+                                 'Use "replace" (default)' +
+                                 ', "concat" or "error".')
             init_with = Parser._get_attr(element, "init_with")
             if init_with is not None:
                 parts = init_with.split(":")
@@ -1989,7 +1989,7 @@ class Parser(object):
                 parameterset.add_parameter(parameter)
             if parameterset.name in parametersets:
                 raise ValueError(
-                    "\"{0}\" not unique".format(parameterset.name))
+                    '"{0}" not unique'.format(parameterset.name))
             parametersets[parameterset.name] = parameterset
         return parametersets
 
@@ -2004,9 +2004,9 @@ class Parser(object):
             name = Parser._attribute_from_element(param, "name")
             if name == "":
                 raise ValueError(
-                    "Empty \"name\" attribute in <parameter> found.")
+                    'Empty "name" attribute in <parameter> found.')
             if not re.match(r"^[^\d\W]\w*$", name, re.UNICODE):
-                raise ValueError(("name=\"{0}\" in <parameter> " +
+                raise ValueError(('name="{0}" in <parameter> ' +
                                   "contains a disallowed " +
                                   "character").format(name))
             separator = Parser._get_attr(param, "separator",jube.conf.DEFAULT_SEPARATOR,False)
@@ -2017,21 +2017,21 @@ class Parser(object):
                                               "never")
             if parameter_update_mode not in jube.parameter.UPDATE_MODES:
                 raise ValueError(
-                    ("update_mode=\"{0}\" in " +
-                     "<parameter name=\"{1}\"> does not exist")
+                    ('update_mode="{0}" in ' +
+                     '<parameter name="{1}"> does not exist')
                     .format(parameter_update_mode, name))
             export = Parser._get_attr(param, "export", "false").lower() == "true"
 
             duplicate = Parser._get_attr(param, "duplicate", "none")
             if duplicate not in ["replace","concat","error","none"]:
-                raise ValueError("Invalid \"duplicate\" attribute in " +
+                raise ValueError('Invalid "duplicate" attribute in ' +
                                  "parameter {0} found.".format(name) + 
-                                 "Use \"replace\", \"concat\", " +
-                                 "\"error\" or \"none\" (default).")
+                                 'Use "replace", "concat", ' +
+                                 '"error" or "none" (default).')
             if parameter_mode not in jube.conf.ALLOWED_MODETYPES:
                 raise ValueError(
-                    ("parameter-mode \"{0}\" not allowed in " +
-                     "<parameter name=\"{1}\">").format(parameter_mode,
+                    ('parameter-mode "{0}" not allowed in ' +
+                     '<parameter name="{1}">').format(parameter_mode,
                                                         name))
             value_etree = param.find("value")
             if value_etree is not None:
@@ -2094,9 +2094,9 @@ class Parser(object):
         for element in etree.findall("patternset"):
             name = Parser._attribute_from_element(element, "name")
             if name == "":
-                raise ValueError("Empty \"name\" attribute in " +
+                raise ValueError('Empty "name" attribute in ' +
                                  "<patternset> found.")
-            LOGGER.debug("  Parsing <patternset name=\"{0}\">".format(name))
+            LOGGER.debug('  Parsing <patternset name="{0}">'.format(name))
             init_with = Parser._get_attr(element, "init_with")
             if init_with is not None:
                 parts = init_with.split(":")
@@ -2112,7 +2112,7 @@ class Parser(object):
             for pattern in Parser._extract_pattern(element):
                 patternset.add_pattern(pattern)
             if patternset.name in patternsets:
-                raise ValueError("\"{0}\" not unique".format(patternset.name))
+                raise ValueError('"{0}" not unique'.format(patternset.name))
             patternsets[patternset.name] = patternset
         return patternsets
 
@@ -2127,17 +2127,17 @@ class Parser(object):
             name = Parser._attribute_from_element(pattern, "name")
             if name == "":
                 raise ValueError(
-                    "Empty \"name\" attribute in <pattern> found.")
+                    'Empty "name" attribute in <pattern> found.')
             if not re.match(r"^[^\d\W]\w*$", name, re.UNICODE):
-                raise ValueError(("name=\"{0}\" in <pattern> " +
+                raise ValueError(('name="{0}" in <pattern> ' +
                                   "contains a disallowed " +
                                   "character").format(name))
             pattern_mode = Parser._get_attr(pattern, "mode", "pattern")
             if pattern_mode not in \
                     set(["pattern", "text"]).union(
                         jube.conf.ALLOWED_SCRIPTTYPES):
-                raise ValueError(("pattern-mode \"{0}\" not allowed in " +
-                                  "<pattern name=\"{1}\">").format(
+                raise ValueError(('pattern-mode "{0}" not allowed in ' +
+                                  '<pattern name="{1}">').format(
                     pattern_mode, name))
             content_type = Parser._get_attr(pattern, "type", "string")
             unit = Parser._get_attr(pattern, "unit", "")
@@ -2198,12 +2198,12 @@ class Parser(object):
             name = Parser._attribute_from_element(element, "name")
             if name == "":
                 raise ValueError(
-                    "Empty \"name\" attribute in <fileset> found.")
-            LOGGER.debug("  Parsing <fileset name=\"{0}\">".format(name))
+                    'Empty "name" attribute in <fileset> found.')
+            LOGGER.debug('  Parsing <fileset name="{0}">'.format(name))
             init_with = Parser._get_attr(element, "init_with")
             filelist = Parser._extract_files(element)
             if name in filesets:
-                raise ValueError("\"{0}\" not unique".format(name))
+                raise ValueError('"{0}" not unique'.format(name))
             if init_with is not None:
                 parts = init_with.split(":")
                 if len(parts) > 1:
@@ -2326,13 +2326,13 @@ class Parser(object):
         for element in etree.findall("substituteset"):
             name = Parser._attribute_from_element(element, "name")
             if name == "":
-                raise ValueError("Empty \"name\" attribute in " +
+                raise ValueError('Empty "name" attribute in ' +
                                  "<substituteset> found.")
-            LOGGER.debug("  Parsing <substituteset name=\"{0}\">".format(name))
+            LOGGER.debug('  Parsing <substituteset name="{0}">'.format(name))
             init_with = Parser._get_attr(element, "init_with")
             files, subs = Parser._extract_subs(element)
             if name in substitutesets:
-                raise ValueError("\"{0}\" not unique".format(name))
+                raise ValueError('"{0}" not unique'.format(name))
             if init_with is not None:
                 parts = init_with.split(":")
                 if len(parts) > 1:
@@ -2366,7 +2366,7 @@ class Parser(object):
                 out_mode = Parser._get_attr(sub, "out_mode", "w")
                 if out_mode not in ["w", "a"]:
                     raise ValueError(
-                        "out_mode in <iofile> must be \"w\" or \"a\"")
+                        'out_mode in <iofile> must be "w" or "a"')
                 in_file = os.path.expandvars(os.path.expanduser(in_file))
                 out_file = os.path.expandvars(os.path.expanduser(out_file))
                 files.append((out_file, in_file, out_mode))
@@ -2375,7 +2375,7 @@ class Parser(object):
                     Parser._attribute_from_element(sub, "source")
                 if source == "":
                     raise ValueError(
-                        "Empty \"source\" attribute in <sub> found.")
+                        'Empty "source" attribute in <sub> found.')
                 dest = Parser._get_attr(sub, "dest")
                 if dest is None:
                     dest = sub.text.strip()
