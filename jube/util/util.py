@@ -540,7 +540,7 @@ def safe_split(text, separator):
 
 
 def ensure_list(element):
-    if type(element)!=list:
+    if not isinstance(element,list):
         return [element]
     else:
         return element
