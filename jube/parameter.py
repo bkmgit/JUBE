@@ -752,7 +752,7 @@ class StaticParameter(Parameter):
         depending templates or unevaluated parameter inside"""
         return all([(param_name not in parameterset) or
                     ((not parameterset[param_name].is_template) and
-                     (not parameterset[param_name].mode in
+                     (parameterset[param_name].mode not in
                       jube.conf.ALLOWED_SCRIPTTYPES.union(
                           jube.conf.ALLOWED_ADVANCED_MODETYPES)))
                     for param_name in self._depending_parameter])

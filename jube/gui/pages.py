@@ -56,7 +56,7 @@ class Page(tk.Frame):
         It moves the content up/down"""
         parent = event.widget
         while parent:
-            if isinstance(parent, tk.Canvas) and not parent in self._y_stay:
+            if isinstance(parent, tk.Canvas) and parent not in self._y_stay:
                 if event.num == 4:
                     parent.yview_scroll(-1, 'units')
                 elif event.num == 5:
@@ -70,7 +70,7 @@ class Page(tk.Frame):
         It moves the content left/right"""
         parent = event.widget
         while parent:
-            if isinstance(parent, tk.Canvas) and not parent in self._x_stay:
+            if isinstance(parent, tk.Canvas) and parent not in self._x_stay:
                 if event.num == 4:
                     parent.xview_scroll(-1, 'units')
                 elif event.num == 5:
