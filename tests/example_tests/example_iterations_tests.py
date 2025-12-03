@@ -29,11 +29,11 @@ class TestIterationsExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "iterations"
         cls._stdout = [ foo + " iter:"+ iter for foo in ["1", "2", "4"]
                         for iter in ["0", "1"]]
@@ -44,10 +44,10 @@ class TestIterationsExample(TestCase.TestExample):
         super(TestIterationsExample, cls)._execute_commands(["-r"])
 
     def test_for_equal_result_data(self):
-        '''
+        """
         Overwrites the original test (TestExample.test_for_equal_result_data())
         for the result output to allow an example specific test.
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             #Get content of target result output
             result_file_path = os.path.join(os.path.dirname(__file__),

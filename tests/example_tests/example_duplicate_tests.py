@@ -27,11 +27,11 @@ class TestDuplicateExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "duplicate"
         cls._stdout = [["1"], ["1"], ["1", "3", "6", "10"],
                         ["1", "3", "6", "10"],

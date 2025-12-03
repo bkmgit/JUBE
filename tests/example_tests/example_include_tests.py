@@ -28,11 +28,11 @@ class TestIncludeExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "include"
         cls._stdout = [["bar\nTest\n1", "bar\nTest\n2", "bar\nTest\n4"],
                        ["bar\nTest\n1", "bar\nTest\n2", "bar\nTest\n4"]]

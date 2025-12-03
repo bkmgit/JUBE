@@ -28,11 +28,11 @@ class TestTaggingExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "tagging"
         cls._stdout = [["Hallo $world_str"] , ["Hallo $world_str"],
                        ["Hello World"], ["Hello World"],
@@ -47,9 +47,9 @@ class TestTaggingExample(TestCase.TestExample):
         super(TestTaggingExample, cls)._execute_commands(run_args)
 
     def test_continue(self):
-        '''
+        """
         Additional test to check that the continue command is executed successfully.
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
                 jube.main.main(["continue", self._bench_run_path, "--id", f"{wp_id}"])

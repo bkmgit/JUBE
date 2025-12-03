@@ -29,11 +29,11 @@ class TestResultDatabaseExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "result_database"
         cls._stdout = ["Number: "+ number for number in ["1", "2", "4"]]
         cls._stdout = [cls._stdout, cls._stdout]
@@ -41,10 +41,10 @@ class TestResultDatabaseExample(TestCase.TestExample):
         super(TestResultDatabaseExample, cls)._execute_commands(["-r"])
 
     def test_for_equal_result_data(self):
-        '''
+        """
         Overwrites the original test (TestExample.test_for_equal_result_data())
         for the result output to allow an example specific test.
-        '''
+        """
         key_names = ["number", "NUM"]
         keys = [[1, 2, 4], [1, 2, 4]]
         for run_path, command_wps in self._wp_paths.items():

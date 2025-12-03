@@ -28,11 +28,11 @@ class TestResultFigureExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "result_figure"
         cls._stdout = ["x: 0; x2: 10; y: 1; y2: 5; y3: 12", "x: 1; x2: 11; y: 2; y2: 5; y3: 10", "x: 2; x2: 12; y: 4; y2: 5; y3: 8"]
         cls._stdout = [cls._stdout, cls._stdout]
@@ -40,10 +40,10 @@ class TestResultFigureExample(TestCase.TestExample):
         super(TestResultFigureExample, cls)._execute_commands(["-r"])
 
     def test_for_equal_result_data(self):
-        '''
+        """
         Overwrites the original test (TestExample.test_for_equal_result_data())
         for the result output to allow an example specific test.
-        '''
+        """
         fig_names = ["../../../../first_fig.png", "result/2_fig.png"]
         for run_path, command_wps in self._wp_paths.items():
             for fig_name in fig_names:

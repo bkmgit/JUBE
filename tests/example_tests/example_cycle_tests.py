@@ -27,21 +27,21 @@ class TestCycleExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "cycle"
         cls._stdout = [["0\n1\n2\n3"], ["0\n1\n2\n3"]]
         super(TestCycleExample, cls).setUpClass()
         super(TestCycleExample, cls)._execute_commands()
 
     def test_for_status_files_in_work_folders(self):
-        '''
+        """
         Additional test to check that there is a done file and
         no error files in the working directories.
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
                 #get work directory

@@ -28,11 +28,11 @@ class TestDoLogExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "do_log"
         cls._stdout = [["", "", "", "", ""],
                        ["", "", "", "", ""]]
@@ -40,12 +40,12 @@ class TestDoLogExample(TestCase.TestExample):
         super(TestDoLogExample, cls)._execute_commands()
 
     def test_for_do_log_and_stdout_files(self):
-        '''
+        """
         Additional test to check the existence of the do_log files,
         the contents of the stdout files in the shared directory
         and the existence and contents of the loreipsum files
         in the shared directory.
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
                 #Check for the existence of the do_log files

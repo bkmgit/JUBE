@@ -28,11 +28,11 @@ class TestFilesAndSubExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "files_and_sub"
         cls._stdout = ["Number: "+i+ "\nZahl: "+j
                        for i in ["1", "2", "4"]
@@ -42,9 +42,9 @@ class TestFilesAndSubExample(TestCase.TestExample):
         super(TestFilesAndSubExample, cls)._execute_commands()
 
     def test_for_file_in_and_file_out(self):
-        '''
+        """
         Additional test to check the content of the file.in and file.out files
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             command_id = int(run_path[-2:])
             #Check for content in work directory

@@ -27,11 +27,11 @@ class TestScriptingParameterExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "scripting_parameter"
         cls._stdout = ["number: "+str(i)+", additional_number: "+str(i*a)+
                        "\nnumber_mult: "+str(i*a*i)+", text: Number: "

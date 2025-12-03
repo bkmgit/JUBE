@@ -27,11 +27,11 @@ class TestParameterspaceExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "parameterspace"
         cls._stdout = [text + number for number in ["1", "2", "4"]
                         for text in ["Hello ", "World "]]

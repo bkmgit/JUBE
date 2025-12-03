@@ -28,20 +28,20 @@ class TestResultCreationExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "result_creation"
         cls._stdout = [["", "", ""], ["", "", ""]]
         super(TestResultCreationExample, cls).setUpClass()
         super(TestResultCreationExample, cls)._execute_commands(["-r"])
 
     def test_for_de_and_en_files(self):
-        '''
+        """
         Additional test to check the content of the de and en files
-        '''
+        """
         origin_stdout = [[text + ": "+ number for text in ["Zahl", "Number"]]
                         for number in ["1", "2", "4"]]
         for run_path, command_wps in self._wp_paths.items():

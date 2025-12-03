@@ -27,11 +27,11 @@ class TestHelloWorldExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "hello_world"
         cls._stdout = [["Hello World"], ["Hello World"]]
         super(TestHelloWorldExample, cls).setUpClass()

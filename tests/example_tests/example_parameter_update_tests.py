@@ -27,11 +27,11 @@ class TestParameterUpdateExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "parameter_update"
         cls._stdout = [["iter_never: 0\niter_use: 0\niter_step: 0",
                         "iter_never: 0\niter_use: 1\niter_step: 1",

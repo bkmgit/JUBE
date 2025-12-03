@@ -36,11 +36,11 @@ class TestCase:
 
         @classmethod
         def setUpClass(cls):
-            '''
+            """
             Automatically called method before tests in the class are run.
 
             Create the required paths
-            '''
+            """
             #Path to example directory, input files and run directory
             cls._path = os.path.join(EXAMPLES_PREFIX, cls._name)
             cls._xml_file = os.path.join(cls._path, cls._name + ".xml")
@@ -49,10 +49,10 @@ class TestCase:
 
         @classmethod
         def _execute_commands(cls, run_args=[""]):
-            '''
+            """
             Executes all commands to check the output
             of the examples for correctness.
-            '''
+            """
             #Delete all existing example runs first
             if os.path.exists(cls._bench_run_path):
                 shutil.rmtree(cls._bench_run_path)
@@ -73,10 +73,10 @@ class TestCase:
             cls._run_args = run_args
 
         def test_for_wp_status(self):
-            '''
+            """
             Checks that there is a done file or done status and
             no error files in the workpackage directories.
-            '''
+            """
             for run_path, command_wps in self._wp_paths.items():
                 for wp_id, wp_path in command_wps.items():
                     self.assertTrue(self._is_status_done(run_path, wp_id, wp_path),
@@ -91,10 +91,10 @@ class TestCase:
                                     .format(wp_id, wp_path))
 
         def test_for_stdout_content_in_work_folders(self):
-            '''
+            """
             Checks that the contents of the stdout files in the working
             directories matches the expected contents.
-            '''
+            """
             for run_path, command_wps in self._wp_paths.items():
                 command_id = int(run_path[-2:])
                 for wp_id, wp_path in command_wps.items():
@@ -107,7 +107,7 @@ class TestCase:
                                      "right content".format(wp_id, stdout_path))
 
         def test_for_equal_result_data(self):
-            '''Checks that the result output matches the target result output'''
+            """Checks that the result output matches the target result output"""
             #Checks only if a result output has been processed
             if "-r" in self._run_args:
                 for run_path, command_wps in self._wp_paths.items():
@@ -149,22 +149,22 @@ class TestCase:
             return workpackages
 
         def _get_stdout_file(self, file_path):
-            '''Returns the path of the stdout file for the given path'''
+            """Returns the path of the stdout file for the given path"""
             return os.path.join(file_path, "stdout")
 
         def _get_work_path(self, file_path):
-            '''Returns the working folder path for the given path'''
+            """Returns the working folder path for the given path"""
             return os.path.join(file_path, "work")
 
         def _existing_file(self, file_path):
-            '''Checks if the file exists in the given path'''
+            """Checks if the file exists in the given path"""
             return os.path.exists(file_path)
 
         def _is_status_done(self, run_path, wp_id, file_path):
-            '''
+            """
             Checks if the done file exists in the given path or
             the workpackage status in database is done
-            '''
+            """
             # DEPRECATED (BEGIN): Future versions will not use done_files
             #check for done file (old version)
             done_file_path = os.path.join(file_path, "done")
@@ -180,10 +180,10 @@ class TestCase:
             return (exist or status == "done")
 
         def _is_status_error(self, run_path, wp_id, file_path):
-            '''
+            """
             Checks if the error file exists in the given path or
             the workpackage status in database is done
-            '''
+            """
             error_file_path = os.path.join(file_path, "error")
             exist = self._existing_file(error_file_path)
             status = ""
@@ -196,19 +196,19 @@ class TestCase:
             return (exist or status == "error")
 
         def _content_of_file(self, file_path):
-            '''Returns the contents of the given file'''
+            """Returns the contents of the given file"""
             with open(file_path, "r") as file:
                 output = file.read().strip()
             return output
 
         @classmethod
         def tearDownClass(cls):
-            '''
+            """
             Automatically called method after all tests in the class have run.
 
             Deletes the run folder and with it all of the
             output from the examples.
-            '''
+            """
             shutil.rmtree(cls._bench_run_path)
 
 if __name__ == "__main__":

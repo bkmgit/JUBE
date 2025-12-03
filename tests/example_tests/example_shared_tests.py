@@ -28,20 +28,20 @@ class TestSharedExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "shared"
         cls._stdout = [["", "", ""], ["", "", ""]]
         super(TestSharedExample, cls).setUpClass()
         super(TestSharedExample, cls)._execute_commands()
 
     def test_for_shared_directories(self):
-        '''
+        """
         Additional test to check the content of the shared directories
-        '''
+        """
         for run_path, command_wps in self._wp_paths.items():
             #Check the content of the files in shared directory
             shared_path = os.path.join(run_path, "a_step_shared")

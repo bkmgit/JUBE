@@ -27,11 +27,11 @@ class TestParameterDependenciesExample(TestCase.TestExample):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the necessary variables and paths for the specific example
-        '''
+        """
         cls._name = "parameter_dependencies"
         cls._stdout = [["hello 3 10", "hello 5 10", "world 1 20",
                         "world 2 20", "world 4 20"],

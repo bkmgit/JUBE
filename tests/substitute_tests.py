@@ -35,11 +35,11 @@ class TestSubstitute(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        '''
+        """
         Automatically called method before tests in the class are run.
 
         Create the required paths
-        '''
+        """
         cls._path = os.path.join(PATH_PREFIX, "substitute_test_scripts")
         cls._input_path = os.path.join(cls._path, "main.xml")
         cls._bench_run_path = os.path.join(cls._path, "bench_run")
@@ -156,11 +156,11 @@ class TestSubstitute(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        '''
+        """
         Automatically called method after all tests in the class have run.
 
         Deletes the run folder and all created files.
-        '''
+        """
         shutil.rmtree(cls._bench_run_path)
         if os.path.exists("file.in"):
             os.remove("file.in")

@@ -34,33 +34,33 @@ LOGGER = jube.log.get_logger(__name__)
 
 
 class Queue:
-    '''
+    """
     Queue based on collections.dequeue
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Initialize this queue to the empty queue.
-        '''
+        """
 
         self._queue = deque()
 
     def put(self, item):
-        '''
+        """
         Add this item to the left of this queue.
-        '''
+        """
 
         self._queue.appendleft(item)
 
     def put_first(self, item):
-        '''
+        """
         Add this item to the left of this queue.
-        '''
+        """
 
         self._queue.append(item)
 
     def get_nowait(self):
-        '''
+        """
         Dequeues (i.e., removes) the item from the right side of this queue *and*
         returns this item.
 
@@ -68,14 +68,14 @@ class Queue:
         ----------
         IndexError
             If this queue is empty.
-        '''
+        """
 
         return self._queue.pop()
 
     def empty(self):
-        '''
+        """
         Return True if the queue is empty, False otherwise
-        '''
+        """
 
         return False if len(self._queue) > 0 else True
 
