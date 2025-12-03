@@ -287,11 +287,11 @@ def info(args):
                         else:
                             LOGGER.warning("Workpackage with ID is ignored for "
                                            "further execution. It was not found in "
-                                           "the specified steps.".format(wp_id))
+                                           "the specified steps.")
                     else:
                         LOGGER.warning("Workpackage with ID is ignored for "
                                        "further execution. It was not found in "
-                                       "the specified benchmark.".format(wp_id))
+                                       "the specified benchmark.")
 
 def update_check(args):
     """Check if a newer JUBE version is available."""

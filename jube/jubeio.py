@@ -1382,9 +1382,9 @@ class Parser(object):
                 elif shared_str.lower() == "false":
                     shared = False
                 else:
-                    raise ValueError("shared=\"{0}\" not allowed. Must be " +
-                                     "\"true\" or \"false\"".format(
-                                         shared_str))
+                    raise ValueError("shared=\"{0}\" not allowed. ".format(shared_str) +
+                                     "Must be \"true\" or \"false\"")
+
                 cmd = element.text
                 if cmd is None:
                     cmd = ""
@@ -1969,8 +1969,9 @@ class Parser(object):
             duplicate = Parser._get_attr(element, "duplicate", "replace")
             if duplicate not in ["replace","concat","error"]:
                 raise ValueError("Invalid \"duplicate\" attribute in " +
-                                 "parameterset {0} found. Use \"replace\" (default)" +
-                                 ", \"concat\" or \"error\".".format(name))
+                                 "parameterset {0} found. ".format(name) +
+                                 "Use \"replace\" (default)" +
+                                 ", \"concat\" or \"error\".")
             init_with = Parser._get_attr(element, "init_with")
             if init_with is not None:
                 parts = init_with.split(":")
@@ -2025,8 +2026,9 @@ class Parser(object):
             duplicate = Parser._get_attr(param, "duplicate", "none")
             if duplicate not in ["replace","concat","error","none"]:
                 raise ValueError("Invalid \"duplicate\" attribute in " +
-                                 "parameter {0} found. Use \"replace\"" +
-                                 ", \"concat\", \"error\" or \"none\" (default).".format(name))
+                                 "parameter {0} found.".format(name) + 
+                                 "Use \"replace\", \"concat\", " +
+                                 "\"error\" or \"none\" (default).")
             if parameter_mode not in jube.conf.ALLOWED_MODETYPES:
                 raise ValueError(
                     ("parameter-mode \"{0}\" not allowed in " +
