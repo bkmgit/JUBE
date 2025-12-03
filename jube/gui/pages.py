@@ -219,7 +219,8 @@ class MainPage(Page):
                 level = level_len - 1
                 while(level >= 0 and depend not in [step.name for step in levels[level]]):
                     level = level -1
-                if level > j: j = level
+                if level > j: 
+                    j = level
             if j + 1== level_len:
                 levels[j + 1] = [step]
                 level_len = level_len + 1
@@ -244,7 +245,8 @@ class MainPage(Page):
                                   bg=LIGHT_BLUE)
                 self.bind_widget(label, self.step_clicked, i[1].name)
                 column = math.floor(max_columns/2)+2*(i[0]-math.floor(length/2))
-                if length % 2 == 0: column = column + 1
+                if length % 2 == 0: 
+                    column = column + 1
                 self._frames_steps[i[1].name] = self._canvas_steps.create_window(
                     column * 150, 2 * level * 50, 
                     window = label, 
@@ -484,7 +486,8 @@ class StepPage(Page):
         """Plots the dependent steps in the layout"""
         children = list()
         for step in self._benchmark._steps.values():
-            if (self._step.name in step.depend): children.append(step)
+            if (self._step.name in step.depend): 
+                children.append(step)
         for i, step in enumerate(children):
             label = tk.Button(self._children_canvas, 
                               text=step.name, 
@@ -556,7 +559,8 @@ class StepPage(Page):
                                     self._do_tree.winfo_reqwidth(),
                                     self._mid_canvas.winfo_width()-50) / 175)
         self._step_canvas.delete("all")
-        if wp_per_row == 0: wp_per_row+=1
+        if wp_per_row == 0:
+            wp_per_row+=1
         for i, wp in enumerate(self._benchmark._workpackages[self._step.name]):
             label = tk.Button(self._step_canvas, 
                               text="Workpackage " +str(wp.id), 
@@ -917,7 +921,8 @@ class WorkpackagePage(Page):
     def plot_frames(self):
         """Plots the iteration siblings of the current workpackage in the wp_canvas"""
         wp_per_row = math.floor((self._mid_canvas.winfo_width()-50)/175)
-        if wp_per_row == 0: wp_per_row += 1
+        if wp_per_row == 0: 
+            wp_per_row += 1
         self._wp_canvas.delete("all")
         for i, wp in enumerate([wp for wp in self._wp.iteration_siblings if wp.id != self._wp.id]):
             label = tk.Button(self._wp_canvas, 

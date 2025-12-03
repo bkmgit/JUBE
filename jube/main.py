@@ -797,11 +797,13 @@ def _configuration_exists(benchmark_folder):
     # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_config = os.path.join(benchmark_folder,
                               jube.conf.CONFIGURATION_FILENAME)
-    if os.path.isfile(xml_config): return xml_config
+    if os.path.isfile(xml_config): 
+        return xml_config
     # DEPRECATED (END): Future versions will no longer support XML files
     database_config = os.path.join(benchmark_folder,
                                    jube.conf.DATABASE_FILENAME)
-    if os.path.isfile(database_config): return database_config
+    if os.path.isfile(database_config): 
+        return database_config
     # No configuration file found
     return False
 
@@ -812,11 +814,13 @@ def _workpackage_exists(benchmark_folder):
     # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_workpackage = os.path.join(benchmark_folder,
                                    jube.conf.WORKPACKAGES_FILENAME)
-    if os.path.isfile(xml_workpackage): return xml_workpackage
+    if os.path.isfile(xml_workpackage): 
+        return xml_workpackage
     # DEPRECATED (END): Future versions will no longer support XML files
     database_workpackage = os.path.join(benchmark_folder,
                                         jube.conf.DATABASE_FILENAME)
-    if os.path.isfile(database_workpackage): return database_workpackage
+    if os.path.isfile(database_workpackage): 
+        return database_workpackage
     # No configuration file found
     return False
 

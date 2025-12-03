@@ -146,10 +146,14 @@ class Figure(GenericResult):
             fig.suptitle(self._title)
 
             for i, plot in enumerate(self._plots):
-                if plot.xlabel: axes[i].set_xlabel(plot.xlabel)
-                if plot.ylabel: axes[i].set_ylabel(plot.ylabel)
-                if plot.xscale: axes[i].set_xscale(plot.xscale)
-                if plot.yscale: axes[i].set_yscale(plot.yscale)
+                if plot.xlabel: 
+                    axes[i].set_xlabel(plot.xlabel)
+                if plot.ylabel: 
+                    axes[i].set_ylabel(plot.ylabel)
+                if plot.xscale: 
+                    axes[i].set_xscale(plot.xscale)
+                if plot.yscale: 
+                    axes[i].set_yscale(plot.yscale)
 
                 x_keys = {d.x for d in plot.plot_data}
                 y_keys = {d.y for d in plot.plot_data}
@@ -173,7 +177,8 @@ class Figure(GenericResult):
                             data.y: y_data[data.y]
                         }
                         create_plot(data, plot_data, axes[i])
-                if plot.legend: axes[i].legend()
+                if plot.legend: 
+                    axes[i].legend()
 
             # if "savefig" is set, then save figure in "savefig" file
             #    (-> use data of all benchmark ids specified on the CLI)

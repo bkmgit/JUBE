@@ -562,10 +562,14 @@ class ResultTab(Tab):
 
         # Create the widgets for each result
         for result in self._data.values():
-            if isinstance(result, Table): text = "Table: "
-            elif isinstance(result, SysloggedResult): text = "Syslog: "
-            elif isinstance(result, Database): text = "Database: "
-            elif isinstance(result, Figure): text = "Figure: "
+            if isinstance(result, Table): 
+                text = "Table: "
+            elif isinstance(result, SysloggedResult): 
+                text = "Syslog: "
+            elif isinstance(result, Database): 
+                text = "Database: "
+            elif isinstance(result, Figure): 
+                text = "Figure: "
             label = tk.Label(self._content, 
                              text = text + result.name, 
                              bg=WHITE, 
