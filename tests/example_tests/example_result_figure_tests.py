@@ -45,11 +45,10 @@ class TestResultFigureExample(TestCase.TestExample):
         Overwrites the original test (TestExample.test_for_equal_result_data())
         for the result output to allow an example specific test.
         """
-        fig_names = ["../../../../group_fig.png", "result/fig.png"]
         for run_path, command_wps in self._wp_paths.items():
-            for fig_name in fig_names:
+            fig_paths = [os.path.join(os.getcwd(), "group_fig.png"), os.path.join(run_path, "result/fig.png")]
+            for fig_path in fig_paths:
                 # Test if result figure exists
-                fig_path = os.path.join(run_path, fig_name)
                 self.assertTrue(os.path.isfile(fig_path), "Error: Figure in path {0} "
                                "does not exist".format(fig_path))
 
@@ -60,8 +59,7 @@ class TestResultFigureExample(TestCase.TestExample):
 
         Deletes the group_fig.png
         """
-        base_dir = os.path.dirname(__file__)
-        fig_path = os.path.abspath(os.path.join(base_dir, "../../group_fig.png"))
+        fig_path = os.path.abspath(os.path.join(os.getcwd(), "group_fig.png"))
         os.remove(fig_path)
 
 if __name__ == "__main__":
