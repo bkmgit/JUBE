@@ -34,7 +34,8 @@ class TestResultFigureExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "result_figure"
-        cls._stdout = ["x: 0; x2: 10; y: 1; y2: 5; y3: 12", "x: 1; x2: 11; y: 2; y2: 5; y3: 10", "x: 2; x2: 12; y: 4; y2: 5; y3: 8"]
+        cls._stdout = ["x2: 0; y2: 10","x2: 2; y2: 11","x2: 4; y2: 8","x2: 6; y2: 9",
+                       "type: Typ1 ; x: 0; y: 11","type: Typ1 ; x: 1; y: 12","type: Typ1 ; x: 2; y: 11","type: Typ1 ; x: 3; y: 13","type: Typ2 ; x: 0; y: 19","type: Typ2 ; x: 1; y: 18","type: Typ2 ; x: 2; y: 19","type: Typ2 ; x: 3; y: 22","type: Typ3 ; x: 0; y: 40","type: Typ3 ; x: 1; y: 20","type: Typ3 ; x: 2; y: 35","type: Typ3 ; x: 3; y: 25"]
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestResultFigureExample, cls).setUpClass()
         super(TestResultFigureExample, cls)._execute_commands(["-r"])
@@ -44,13 +45,24 @@ class TestResultFigureExample(TestCase.TestExample):
         Overwrites the original test (TestExample.test_for_equal_result_data())
         for the result output to allow an example specific test.
         """
-        fig_names = ["../../../../first_fig.png", "result/2_fig.png"]
+        fig_names = ["../../../../group_fig.png", "result/fig.png"]
         for run_path, command_wps in self._wp_paths.items():
             for fig_name in fig_names:
                 # Test if result figure exists
                 fig_path = os.path.join(run_path, fig_name)
                 self.assertTrue(os.path.isfile(fig_path), "Error: Figure in path {0} "
                                "does not exist".format(fig_path))
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Automatically called method after all tests in the class have run.
+
+        Deletes the group_fig.png
+        """
+        base_dir = os.path.dirname(__file__)
+        fig_path = os.path.abspath(os.path.join(base_dir, "../../group_fig.png"))
+        os.remove(fig_path)
 
 if __name__ == "__main__":
     unittest.main()

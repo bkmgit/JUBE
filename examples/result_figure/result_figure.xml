@@ -71,7 +71,7 @@
           <data x='x2_pat' y='y2_pat' type='bar' />
         </plot>
       </figure>
-      <figure name='groupby_fig' savefig='group_fig.pdf' showfig='False'>
+      <figure name='groupby_fig' savefig='group_fig.png' showfig='False'>
         <plot xlabel='x' ylabel='y' legend='True'>
           <data x='x_pat' y='y_pat' groupby='type_pat'/>
         </plot>

@@ -57,7 +57,8 @@ classifiers = [
 [tool.hatch.envs.test]
 dependencies = [
 "pytest",
-"pytest-cov"
+"pytest-cov",
+"matplotlib"
 ]
 
 [project.scripts]
