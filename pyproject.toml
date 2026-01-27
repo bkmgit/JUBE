@@ -39,6 +39,8 @@ authors = [
 ]
 dependencies = [
   "pyyaml",
+  "ruamel.yaml",
+  "matplotlib"
 ]
 keywords = ['JUBE Benchmarking Environment']
 classifiers = [
