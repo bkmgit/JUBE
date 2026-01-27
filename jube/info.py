@@ -25,6 +25,7 @@ import os
 import time
 import textwrap
 import operator
+import jube.main
 
 
 def print_benchmarks_info(path):
@@ -37,13 +38,12 @@ def print_benchmarks_info(path):
     # Search for possible benchmark dirs
     for dir_name in dir_list:
         dir_path = os.path.join(path, dir_name)
-        configuration_file = \
-            os.path.join(dir_path, jube.conf.CONFIGURATION_FILENAME)
+        configuration_file = jube.main._configuration_exists(dir_path)
         if os.path.isdir(dir_path) and os.path.exists(configuration_file):
             try:
                 id_number = int(dir_name)
                 parser = jube.jubeio.Parser(configuration_file)
-                name_str, comment_str, tags = parser.benchmark_info_from_xml()
+                name_str, comment_str, tags = parser.load_benchmark_info(id_number)
                 tags_str = jube.conf.DEFAULT_SEPARATOR.join(tags)
 
                 # Read timestamps from timestamps file
@@ -263,15 +263,21 @@ def print_benchmark_info(benchmark):
 
                     # Read timestamp from done_file if it is available otherwise
                     # use mtime
+
+                    # DEPRECATED (BEGIN): Future versions will no longer support XML files
                     done_file = os.path.join(workpackage.workpackage_dir,
                                             jube.conf.WORKPACKAGE_DONE_FILENAME)
-                    done_file_f = open(done_file, "r")
-                    done_str = done_file_f.read().strip()
-                    done_file_f.close()
-                    try:
-                        done_time = time.strptime(done_str, "%Y-%m-%d %H:%M:%S")
-                    except ValueError:
-                        done_time = time.localtime(os.path.getmtime(done_file))
+                    if os.path.exists(done_file):
+                        done_file_f = open(done_file, "r")
+                        done_str = done_file_f.read().strip()
+                        done_file_f.close()
+                        try:
+                            done_time = time.strptime(done_str, "%Y-%m-%d %H:%M:%S")
+                        except ValueError:
+                            done_time = time.localtime(os.path.getmtime(done_file))
+                    # DEPRECATED (END): Future versions will no longer support XML files
+                    else:
+                        done_time = time.strptime(workpackage.done_time, "%Y-%m-%d %H:%M:%S")
                     last_finish = max(last_finish, done_time)
                 if workpackage.error:
                     cnt_error += 1
