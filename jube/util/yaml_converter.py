@@ -71,9 +71,8 @@ class YAML_Converter(object):
         try:
             yaml.add_constructor("!include", self.__yaml_include)
         except NameError:
-            raise NameError("yaml module not available; either install it " +
-                            "(https://pyyaml.org), or switch to .xml input " +
-                            "files.")
+            LOGGER.error("yaml module not available; either install it (https://pyyaml.org), or switch to .xml input files.")
+            exit()
         self._ignore_search_errors = True
         self._tags.update(self.__search_for_tags())
         old_tags = set(self._tags)

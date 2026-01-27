@@ -31,7 +31,10 @@ import os
 import re
 import shutil
 from jube.util.version import StrictVersion
-from jube.gui.gui import Gui
+try:
+    from jube.gui.gui import Gui
+except ModuleNotFoundError:
+    pass
 
 from urllib.request import urlopen
 
@@ -72,8 +75,12 @@ def gui(args):
                                              load_analyse=False)
         if benchmark is None:
             return
-        gui = Gui(benchmark)
-        gui.mainloop()
+        try:
+            gui = Gui(benchmark)
+            gui.mainloop()
+        except NameError:
+            LOGGER.error("If you want to use the gui command, you have to install the tkinter module")
+            exit()
         
 
 def tag(args):
