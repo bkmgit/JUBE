@@ -112,11 +112,11 @@ Create distribution
 
 Inside the main *JUBE* directory you can use::
 
-   >>> python setup.py sdist
+   >>> hatch build
 
-to update the ``tar.gz`` file inside the dist directory.
+to update the distribution files inside the dist directory.
 
-* Check version before running ``sdist``
+* Check version before building with ``hatch``
 * Store a completely new mayor version inside the tags area of the repository
 
 Database documentation

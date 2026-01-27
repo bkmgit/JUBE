@@ -33,19 +33,7 @@ Installation
 
 Requirements: *JUBE* needs **Python 3.2** (or any higher version)
 
-If you plan to use *YAML* based *JUBE* input files, you have to add the `pyyaml` module `<https://pyyaml.org>`_ to
-your *Python* module library. Additionally the `ruamel.yaml` module `<https://pypi.org/project/ruamel.yaml>`_ is optional. If installed it is used to verify the validity of the *YAML* files.
-If you want to use the figure result option, you have to install the matplotlib package. Installation instructions can be found at https://matplotlib.org/stable/install/index.html.
-
 To use the *JUBE* command line tool, the ``PYTHONPATH`` must contain the position of the *JUBE* package. This can be achieved in different ways:
-
-* You can use the **installation script** to copy all files to the right position (preferred)::
-
-   >>> python setup.py install --user
-
-  This will install the *JUBE* package files and executables to your ``$HOME/.local`` directory. Instead of ``--user`` also a user
-  specific ``--prefix`` option is available. Here you might have to set the ``PYTHONPATH`` environment variable first
-  (this will be mentioned during the install process).
 
 * You can utilize ``pip[3]`` to take care of the installation process (including the download) ::
 
