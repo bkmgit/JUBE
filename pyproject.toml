@@ -18,7 +18,8 @@
 
 # For installation you can use:
 #
-# python setup.py install --user
+# hatch build
+# pip install dist/jube... --user
 #
 # to install it into your .local folder. .local/bin must be inside your $PATH.
 # You can also change the folder by using --prefix instead of --user
@@ -90,6 +91,9 @@ RELEASE_NOTES = "share/jube/RELEASE_NOTES"
 include = [
   "/jube",
 ]
+
+[tool.hatch.build.targets.wheel.shared-scripts]
+"bin/jube-autorun" = "jube-autorun"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "Q"]
