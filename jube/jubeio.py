@@ -126,9 +126,9 @@ class Parser(object):
         
         benchmark_id, name, comment, outpath, version, file_path_ref = \
             db.select("Benchmark")[0]
-        tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
+        tags = db.select("Tag", ["value"], {"benchmark_id": benchmark_id})
         tags = set(tag for tag, in tags)
-        tag_docu = db.select("TagDocu", ["tag", "description"], f"benchmark_id='{benchmark_id}'")
+        tag_docu = db.select("TagDocu", ["tag", "description"], {"benchmark_id": benchmark_id})
         docu_dict = dict()
         for tag_name, description in tag_docu:
             docu_dict[tag_name] = description
@@ -483,11 +483,11 @@ class Parser(object):
         db.connect()
 
         # Extract tags out of database
-        tags = db.select("Tag", ["value"], f"benchmark_id='{benchmark_id}'")
+        tags = db.select("Tag", ["value"], {"benchmark_id": benchmark_id})
         tags = [tag for tag, in tags]
 
         # Extract name and comment out of database
-        name, comment = db.select("Benchmark", ["name", "comment"], f"benchmark_id='{benchmark_id}'")[0]
+        name, comment = db.select("Benchmark", ["name", "comment"], {"benchmark_id": benchmark_id})[0]
         comment = "" if comment is None else comment
         comment = re.sub(r"\s+", " ", comment).strip()
         db.disconnect()
@@ -611,12 +611,12 @@ class Parser(object):
             # Extract used parametersets
             parameterset = jube.parameter.Parameterset()
             parameter_names = []
-            parameters = db.select("SelectedParameter", None, f"workpackage_id='{workpackage_id}'")
+            parameters = db.select("SelectedParameter", None, {"workpackage_id": workpackage_id})
             for parameter in parameters:
                 iid, workpackage_id, selected, idx = parameter
                 iid, name, datatype, export, unit, mode, separator, update_mode, \
                     duplicate, value, parameterset_name = \
-                    db.select("Parameter", None, f"parameter_id='{iid}'")[0]
+                    db.select("Parameter", None, {"parameter_id": iid})[0]
                 parameter_names.append(name)
                 parameter = jube.parameter.Parameter.create_parameter(
                     name, value, separator, datatype, selected,
@@ -629,19 +629,19 @@ class Parser(object):
                                         iteration, cycle, status, done_time)
 
             # Extract workpackage parents
-            parents = db.select("WorkpackageParents", ["parent_workpackage_id"], f"workpackage_id='{workpackage_id}'")
+            parents = db.select("WorkpackageParents", ["parent_workpackage_id"], {"workpackage_id": workpackage_id})
             parents = [parent for parent, in parents]
             parents_tmp[workpackage_id] = parents
             if len(parents) == 0:
                 work_list.put(tmp[workpackage_id])
 
             # Extract workpackage iteration siblings
-            siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], f"workpackage_id='{workpackage_id}'")
+            siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], {"workpackage_id": workpackage_id})
             siblings = [sibling for sibling, in siblings]
             iteration_siblings_tmp[workpackage_id] = siblings
 
             # Extract operation status
-            op_status = db.select("OperationStatus", ["status"], f"workpackage_id='{workpackage_id}'")
+            op_status = db.select("OperationStatus", ["status"], {"workpackage_id": workpackage_id})
             for operation_number, status in enumerate(op_status):
                 tmp[workpackage_id].set_operation_status(operation_number,  status[0])
 
@@ -744,10 +744,10 @@ class Parser(object):
         """Extract workpackage env-information from database"""
         set_env = dict()
         unset_env = list()
-        env_names = db.select("WorkpackageEnvironment", ["environment_name"], f"workpackage_id='{workpackage_id}'")
+        env_names = db.select("WorkpackageEnvironment", ["environment_name"], {"workpackage_id": workpackage_id})
         env_names = [name for name, in env_names]
         for env_name in env_names:
-            env_name, value, env = db.select("Environment", None, f"environment_name='{env_name}'")[0]
+            env_name, value, env = db.select("Environment", None, {"environment_name": env_name})[0]
             if env:
                 if value is not None:
                     set_env[env_name] = value
@@ -1245,7 +1245,7 @@ class Parser(object):
         """
         steps = dict()
         # Extract all steps
-        steps_attributes = db.select("Step", None, f"benchmark_id='{benchmark_id}'")
+        steps_attributes = db.select("Step", None, {"benchmark_id": benchmark_id})
         for step_attributes in steps_attributes:
             name, iterations, cycles, depend, export, \
                 active, max_async, work_dir, suffix, \
@@ -1280,7 +1280,7 @@ class Parser(object):
         Return a list of operations
         """
         ops = []
-        ops_attributes = db.select("Operation", None, f"step_name='{step_name}'")
+        ops_attributes = db.select("Operation", None, {"step_name": step_name})
         for op_attributes in ops_attributes:
             iid, do, error_fn, async_fn, stdout_fn, \
                 stderr_fn, break_fn, active, shared, \
@@ -1299,13 +1299,13 @@ class Parser(object):
         Return a list of sets
         """
         sets = []
-        filesets = db.select("UsedFileset", None, f"step_name='{step_name}'")
+        filesets = db.select("UsedFileset", None, {"step_name": step_name})
         for fileset in filesets:
             sets.append(fileset[0])
-        paramsets = db.select("UsedParameterset", None, f"step_name='{step_name}'")
+        paramsets = db.select("UsedParameterset", None, {"step_name": step_name})
         for paramset in paramsets:
             sets.append(paramset[0])
-        subsets = db.select("UsedSubstituteset", None, f"step_name='{step_name}'")
+        subsets = db.select("UsedSubstituteset", None, {"step_name": step_name})
         for subset in subsets:
             sets.append(subset[0])
         return sets
@@ -1404,13 +1404,13 @@ class Parser(object):
     def _extract_analysers_from_database(self, db, benchmark_id):
         """Extract all analyser from database"""
         analysers = dict()
-        analyser_attributes = db.select("Analyser", None, f"benchmark_id='{benchmark_id}'")
+        analyser_attributes = db.select("Analyser", None, {"benchmark_id": benchmark_id})
         for analyse_attributes in analyser_attributes:
             name, reduce, benchmark_id = analyse_attributes
             reduce = bool(reduce)
             analyser = jube.analyser.Analyser(name, reduce)
 
-            patterns = db.select("AnalyserPattern", ["patternset_name"], f"analyser_name='{name}'")
+            patterns = db.select("AnalyserPattern", ["patternset_name"], {"analyser_name": name})
             patterns = [pattern for pattern, in patterns]
             analyser.add_uses(patterns)
             file_objects = self._extract_analyser_files_from_database(db, name)
@@ -1424,14 +1424,14 @@ class Parser(object):
     def _extract_analyser_files_from_database(self, db, analyser_name):
         """Extract all analyser files from database"""
         file_objects = []
-        files = db.select("AnalyseFile", ["analysefile_id", "path"], f"analyser_name='{analyser_name}'")
+        files = db.select("AnalyseFile", ["analysefile_id", "path"], {"analyser_name": analyser_name})
         for file in files:
             iid, path = file
             file_obj = jube.analyser.Analyser.AnalyseFile(path)
-            uses = db.select("AnalyseFilePattern", ["patternset_name"], f"analysefile_id='{iid}'")
+            uses = db.select("AnalyseFilePattern", ["patternset_name"], {"analysefile_id": iid})
             uses = [use for use, in uses]
             file_obj.add_uses(uses)
-            step = db.select("AnalyseStep", ["step_name"], f"analysefile_id='{iid}'")[0][0]
+            step = db.select("AnalyseStep", ["step_name"], {"analysefile_id": iid})[0][0]
             file_objects.append((file_obj, step))
         return file_objects
 
@@ -1490,11 +1490,11 @@ class Parser(object):
         """Extract all results from database"""
         results = dict()
         results_order = list()
-        results_attributes = db.select("Result", ["result_id", "result_dir"], f"benchmark_id='{benchmark_id}'")
+        results_attributes = db.select("Result", ["result_id", "result_dir"], {"benchmark_id": benchmark_id})
         for result_attributes in results_attributes:
             iid, result_dir = result_attributes
             result = self._extract_subresult_from_database(db, iid, result_dir)
-            uses = db.select("ResultAnalyser", ["analyser_name"], f"result_id='{iid}'")
+            uses = db.select("ResultAnalyser", ["analyser_name"], {"result_id": iid})
             uses = [use for use, in uses]
             result.add_uses(uses)
             results[result.name] = result
@@ -1504,7 +1504,7 @@ class Parser(object):
     def _extract_subresult_from_database(self, db, result_id, result_dir):
         """Extract all tables, databases, syslogs and figures from database"""
         # Extract table results
-        tables = db.select("ResultTable", None, f"result_id='{result_id}'")
+        tables = db.select("ResultTable", None, {"result_id": result_id})
         for table in tables:
             name, style, separator, res_filter, transpose, sort, result_id = table
             transpose = bool(transpose)
@@ -1512,50 +1512,50 @@ class Parser(object):
             result = jube.result_types.table.Table(name, style, separator,
                                                    sort_names, transpose, res_filter)
             result.result_dir = result_dir
-            columns = db.select("ResultTableColumn", None, f"table_name='{name}'")
+            columns = db.select("ResultTableColumn", None, {"table_name": name})
             for column in columns:
                 iid, column_name, title, data_format, colw, name = column
                 result.add_column(column_name, colw, data_format, title)
             return result
         # Extract database results
-        databases = db.select("ResultDatabase", None, f"result_id='{result_id}'")
+        databases = db.select("ResultDatabase", None, {"result_id": result_id})
         for database in databases:
             name, res_filter, file, result_id = database
             primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
-                                  f"database_name='{name}' AND is_primary=1")
+                                  {"database_name": name, "is_primary": 1})
             primekeys = [key for key, in primekeys]
             result = jube.result_types.database.Database(name, res_filter, primekeys, file)
             result.result_dir = result_dir
-            keys = db.select("ResultDatabaseKey", None, f"database_name='{name}'")
+            keys = db.select("ResultDatabaseKey", None, {"database_name": name})
             for key in keys:
                 iid, key_name, title, data_format, is_primary, name = key
                 result.add_key(key_name, data_format, title)
             return result
         # Extract syslog results
-        syslogs = db.select("ResultSyslog", None, f"result_id='{result_id}'")
+        syslogs = db.select("ResultSyslog", None, {"result_id": result_id})
         for syslog in syslogs:
             name, address, sys_format, res_filter, host, port, sort, result_id = syslog
             sort_names = [] if sort is None else sort.split(jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.syslog.SysloggedResult(
                 name, address, host, port, sys_format, sort_names, res_filter)
-            keys = db.select("ResultSyslogKey", None, f"syslog_name='{name}'")
+            keys = db.select("ResultSyslogKey", None, {"syslog_name": name})
             for key in keys:
                 iid, key_name, data_format, title, syslog_name = key
                 result.add_key(key_name, data_format, title)
             return result
         # Extract figure results
-        figures = db.select("ResultFigure", None, f"result_id='{result_id}'")
+        figures = db.select("ResultFigure", None, {"result_id": result_id})
         for figure in figures:
             name, title, savefig, showfig, filter, result_id, nrows, ncols= figure
             showfig = bool(showfig)
             result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter, nrows, ncols)
 
-            plots = db.select("ResultFigurePlot", None, f"figure_name='{name}'")
+            plots = db.select("ResultFigurePlot", None, {"figure_name": name})
             for plot in plots:
                 iid, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
                 legend = bool(legend)
                 
-                db_data = db.select("ResultFigurePlotData", None, f"plot_id='{iid}'")
+                db_data = db.select("ResultFigurePlotData", None, {"plot_id": iid})
                 plot_data = list()
                 for data in db_data:
                     data_id, x, y, groupby, plot_type, label, color, marker, linestyle, sort_data, plot_id = data
@@ -1930,7 +1930,7 @@ class Parser(object):
     def _extract_parametersets_from_database(self, db, benchmark_id):
         """Extract all parametersets from database"""
         parametersets = dict()
-        paramsets = db.select("Parameterset", None, f"benchmark_id='{benchmark_id}'")
+        paramsets = db.select("Parameterset", None, {"benchmark_id": benchmark_id})
         for paramset in paramsets: 
             name, duplicate, benchmark_id = paramset
             parameterset = jube.parameter.Parameterset(name, duplicate)
@@ -1942,7 +1942,7 @@ class Parser(object):
     def _extract_parameters_from_database(self, db, parameterset_name):
         """Extract all parameters from parameterset from database"""
         parameters = list()
-        params = db.select("Parameter", None, f"parameterset_name='{parameterset_name}'")
+        params = db.select("Parameter", None, {"parameterset_name": parameterset_name})
         for param in params:
             iid, name, datatype, export, unit, mode, separator, \
                 update_mode, duplicate, value, parameterset_name = param
@@ -2066,7 +2066,7 @@ class Parser(object):
     def _extract_patternsets_from_database(self, db, benchmark_id):
         """Return patternset from database"""
         patternsets = dict()
-        pattsets = db.select("Patternset", None, f"benchmark_id='{benchmark_id}'")
+        pattsets = db.select("Patternset", None, {"benchmark_id": benchmark_id})
         for pattset in pattsets:
             name, benchmark_id = pattset
             patternset = jube.pattern.Patternset(name)
@@ -2078,7 +2078,7 @@ class Parser(object):
     def _extract_pattern_from_database(self, db, patternset_name):
         """Extract pattern from patternset from database"""
         patternlist = list()
-        patterns = db.select("Pattern", None, f"patternset_name='{patternset_name}'")
+        patterns = db.select("Pattern", None, {"patternset_name": patternset_name})
         for pattern in patterns:
             name, datatype, unit, mode, dotall, \
                 default, value, patternset_name = pattern
@@ -2155,7 +2155,7 @@ class Parser(object):
     def _extract_filesets_from_database(self, db, benchmark_id):
         """Extract filesets from database"""
         filesets = dict()
-        sets = db.select("Fileset", None, f"benchmark_id='{benchmark_id}'")
+        sets = db.select("Fileset", None, {"benchmark_id": benchmark_id})
         for fileset in sets:
             name, benchmark_id = fileset
             filesets[name] = jube.fileset.Fileset(name)
@@ -2167,7 +2167,7 @@ class Parser(object):
         """Extract files from database"""
         filelist = list()
         # Extract Copies and Links
-        files = db.select("File", None, f"fileset_name='{fileset_name}'")
+        files = db.select("File", None, {"fileset_name": fileset_name})
         for file in files:
             iid, file_type, path, source_dir, name, file_path_ref, \
                 active, is_internal_ref, target_dir, fileset_name = file
@@ -2181,7 +2181,7 @@ class Parser(object):
                                               active, source_dir, target_dir)
             filelist.append(file_obj)
         # Extract Prepares
-        prepares = db.select("Prepare", None, f"fileset_name='{fileset_name}'")
+        prepares = db.select("Prepare", None, {"fileset_name": fileset_name})
         for prepare in prepares:
             iid, do, stdout_fn, stderr_fn, active, work_dir, fileset_name = prepare
             active = str(active).lower()
@@ -2295,7 +2295,7 @@ class Parser(object):
     def _extract_substitutesets_from_database(self, db, benchmark_id):
         """Extract substitutesets from database"""
         substitutesets = dict()
-        subsets = db.select("Substituteset", None, f"benchmark_id='{benchmark_id}'")
+        subsets = db.select("Substituteset", None, {"benchmark_id": benchmark_id})
         for subset in subsets:
             name, benchmark_id = subset
             files, sub_dict = self._extract_subs_from_database(db, name)
@@ -2307,11 +2307,11 @@ class Parser(object):
         """Extract substitutes from database"""
         files = list()
         sub_dict = dict()
-        file_rows = db.select("SubstituteFile", None, f"substituteset_name='{substituteset_name}'")
+        file_rows = db.select("SubstituteFile", None, {"substituteset_name": substituteset_name})
         for file in file_rows:
             iid, in_file, out_file, out_mode, substituteset_name = file
             files.append((out_file, in_file, out_mode))
-        sub_rows = db.select("Substitute", None, f"substituteset_name='{substituteset_name}'")
+        sub_rows = db.select("Substitute", None, {"substituteset_name": substituteset_name})
         for sub in sub_rows:
             iid, source, dest, mode, substituteset_name = sub
             sub_dict[source] = jube.substitute.Sub(source, mode, dest)

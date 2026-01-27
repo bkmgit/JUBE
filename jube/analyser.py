@@ -156,7 +156,7 @@ class Analyser(object):
             db.start_transaction()
             # Delete the previous analysers if an update is required
             if update:
-                db.delete("Analyser", f"benchmark_id='{benchmark_id}'")
+                db.delete("Analyser", {"benchmark_id": benchmark_id})
             analyser_data = {
                 "analyser_name": self._name,
                 "benchmark_id": benchmark_id

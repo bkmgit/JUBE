@@ -245,7 +245,7 @@ class Result(object):
         """Store result information in database"""
         # Delete the previous results if an update is required
         if update:
-            db.delete("Result", f"benchmark_id='{benchmark_id}'")
+            db.delete("Result", {"benchmark_id": benchmark_id})
         result_data = {
             "benchmark_id": benchmark_id
         }

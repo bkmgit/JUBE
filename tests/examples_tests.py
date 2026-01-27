@@ -175,7 +175,7 @@ class TestCase:
             if os.path.exists(database_path):
                 db = jube.util.database_interface.Database_Interface(database_path)
                 db.connect()
-                status = db.select("Workpackage", ["status"], f"workpackage_id={wp_id}")[0][0]
+                status = db.select("Workpackage", ["status"], {"workpackage_id": wp_id})[0][0]
                 db.disconnect()
             return (exist or status == "done")
 
@@ -191,7 +191,7 @@ class TestCase:
             if os.path.exists(database_path):
                 db = jube.util.database_interface.Database_Interface(database_path)
                 db.connect()
-                status = db.select("Workpackage", ["status"], f"workpackage_id={wp_id}")[0][0]
+                status = db.select("Workpackage", ["status"], {"workpackage_id": wp_id})[0][0]
                 db.disconnect()
             return (exist or status == "error")
 

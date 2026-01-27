@@ -195,7 +195,7 @@ class Benchmark(object):
         try:
             self.db.start_transaction()
             #deletes workpackage and any depend data in other tables
-            self.db.delete("Workpackage", f"workpackage_id='{workpackage_to_delete.id}'")
+            self.db.delete("Workpackage", {"workpackage_id": workpackage_to_delete.id})
             self.db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))
@@ -874,7 +874,7 @@ class Benchmark(object):
         try:
             self.db.start_transaction()
             self.db.update("Benchmark", {"comment": self._comment},
-                             f"benchmark_id='{self._id}'")
+                             {"benchmark_id": self._id})
             self.db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))
@@ -894,7 +894,7 @@ class Benchmark(object):
         self.db.connect()
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:
-                row = self.db.select("Workpackage", condition=f"workpackage_id='{workpackage.id}'")
+                row = self.db.select("Workpackage", condition={"workpackage_id": workpackage.id})
                 if not row:
                     workpackage.add_information_to_database(self.db)
         self.db.disconnect()

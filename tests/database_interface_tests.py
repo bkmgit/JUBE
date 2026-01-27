@@ -46,13 +46,13 @@ class TestDatabaseInterface(unittest.TestCase):
 
         # Test UPDATE
         check_content = [("BeispielName2", "BeispielKommentar")]
-        self.db.update("Benchmark", {"name": "BeispielName2"}, "name='BeispielName'")
+        self.db.update("Benchmark", {"name": "BeispielName2"}, {"name": "BeispielName"})
         actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 
         # Test DELETE
         check_content = []
-        self.db.delete("Benchmark", "name='BeispielName2'")
+        self.db.delete("Benchmark", {"name": "BeispielName2"})
         actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 

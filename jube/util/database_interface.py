@@ -99,31 +99,48 @@ class Database_Interface(object):
             columns = ", ".join(columns)
 
         query = f"SELECT {columns} FROM {table_name}"
+        params = []
 
         if condition:
-            query += f" WHERE {condition}"
+            where_clauses = []
+            for col, val in condition.items():
+                where_clauses.append(f"{col} = ?")
+                params.append(val)
+            query += " WHERE " + " AND ".join(where_clauses)
 
-        self._cursor.execute(query)
+        self._cursor.execute(query, params)
         rows = self._cursor.fetchall()
 
         return rows
 
-    def update(self, table_name, data, condition):
+    def update(self, table_name, data, condition=None):
         """Execute a query to update data for the given condition in the given table"""
         columns = ", ".join(f"{column} = ?" for column in data.keys())
-        values = tuple(data.values())
+        values = list(data.values())
 
-        query = f"UPDATE {table_name} SET {columns} WHERE {condition}"
+        query = f"UPDATE {table_name} SET {columns}"
+
+        if condition:
+            where_clauses = []
+            for col, val in condition.items():
+                where_clauses.append(f"{col} = ?")
+                values.append(val)
+            query += " WHERE " + " AND ".join(where_clauses)
 
         self._cursor.execute(query, values)
 
-    def delete(self, table_name, condition):
+    def delete(self, table_name, condition=None):
         """Execute a query to delete the data for the given condition in the given table"""
         query = f"DELETE FROM {table_name}"
-        if condition is not None:
-            query +=  f" WHERE {condition}"
+        params = []
+        if condition:
+            where_clauses = []
+            for col, val in condition.items():
+                where_clauses.append(f"{col} = ?")
+                params.append(val)
+            query += " WHERE " + " AND ".join(where_clauses)
 
-        self._cursor.execute(query)
+        self._cursor.execute(query,params)
 
     def alter_table(self, statement, table_name, column):
         """Execute a query to delete the given column in the given table"""

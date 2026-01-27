@@ -59,7 +59,7 @@ class Patternset(object):
             db.start_transaction()
             # Delete the previous patternsets if an update is required
             if update:
-                db.delete("Patternset", f"benchmark_id='{benchmark_id}'")
+                db.delete("Patternset", {"benchmark_id": benchmark_id})
             set_data = {
                 "patternset_name": self._name,
                 "benchmark_id": benchmark_id

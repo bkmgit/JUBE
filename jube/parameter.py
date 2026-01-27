@@ -702,9 +702,7 @@ class Parameter(object):
     def add_selected_parameter_to_database(self, db, workpackage_id):
         """Select parameter value and store in database"""
         if not self._id:
-            condition = f"parameter_name='{self._name}' AND"
-            condition += f" value='{self.based_on_value}'"
-            self._id = db.select("Parameter", ["parameter_id"], condition)[0][0]
+            self._id = db.select("Parameter", ["parameter_id"], {"parameter_name": self._name, "value": self.based_on_value})[0][0]
         selected_data = {
             "parameter_id": self._id,
             "selected": self.value,
@@ -713,8 +711,7 @@ class Parameter(object):
         if self._idx != -1:
             selected_data["idx"] = self._idx
         #Check if parameter already selected
-        condition = f"parameter_id='{self._id}' AND"
-        condition += f" workpackage_id='{workpackage_id}'"
+        condition = {"parameter_id": self._id, "workpackage_id": workpackage_id}
         row = db.select("SelectedParameter", None, condition)
         if len(row) > 0:
             # Update existing parameter selection
@@ -724,7 +721,7 @@ class Parameter(object):
             db.insert("SelectedParameter", selected_data)
 
         #Update mode in Parameter
-        db.update("Parameter", {"mode": self.based_on_mode}, f"parameter_id='{self._id}'")
+        db.update("Parameter", {"mode": self.based_on_mode}, {"parameter_id": self._id})
 
     def __repr__(self):
         return "Parameter({0})".format(self.__dict__)

@@ -114,7 +114,7 @@ class Workpackage(object):
         # Add workpackage iteration siblings relationship to database
         for sibling in self._iteration_siblings:
             # Only add relationship if sibling exists
-            if db.select("Workpackage", condition=f"workpackage_id='{sibling.id}'"):
+            if db.select("Workpackage", condition={"workpackage_id": sibling.id}):
                 db.insert("WorkpackageSibling", {"workpackage_id": self._id,
                           "sibling_workpackage_id": sibling.id}, addition="REPLACE")
 
