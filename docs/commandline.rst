@@ -475,3 +475,23 @@ Check *JUBE* version
 
 ``-h``, ``--help``
    show command help information
+
+.. index:: gui
+
+gui
+~~~~~~
+
+show the configuration and workpackage information of a given benchmark
+
+.. code-block:: none
+
+   jube gui [-h] [-i ID] [PATH]
+
+``-h``, ``--help``
+   show command help information
+
+``-i ID ``, ``--id ID ``
+   |ID_DESCRIPTION|
+
+``PATH``
+   path to input file or directory which contains benchmarks, default: .

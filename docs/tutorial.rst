@@ -266,6 +266,14 @@ Another useful command is the ``info`` command. It will show you information con
    # display information about a step inside the given benchmark
    >>> jube info <benchmark-directory> -- id <id> --step <stepname>
 
+If you would like more information about your existing benchmarks and their configuration, you can use the ``gui`` command. 
+It opens a graphical user interface with all the information about the benchmark configuration and the workpackages that have been created::
+
+   # open the gui for the latest benchmark
+   >>> jube gui <benchmark-directory>
+   # open the gui for a given benchmark
+   >>> jube gui <benchmark-directory> -- id <id>
+
 The third, also very important, functionality is the **logger**. Every ``run``, ``continue``, ``analyse``
 and ``result`` execution will produce log information inside your benchmark directory.
 This file contains much useful debugging output.

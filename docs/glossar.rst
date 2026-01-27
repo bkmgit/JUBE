@@ -97,6 +97,12 @@ Glossary
    complete
       Generate shell completion.
 
+   gui
+      show the configuration and workpackage information of a given benchmark
+
+      If no benchmark id is given, last benchmark found in directory will be used. If benchmark directory is missing, current
+      directory will be used.
+
    benchmark_tag
       The main benchmark definition
 
