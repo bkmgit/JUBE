@@ -103,19 +103,19 @@ class Step(object):
             fileset_names = self.get_used_sets(benchmark.filesets,
                                                parameter_dict)
             for fileset in fileset_names:
-                db.insert("UsedFileset",{"fileset_name": fileset,
+                db.insert("UsedFileset", {"fileset_name": fileset,
                           "step_name": self._name}, addition="REPLACE")
             # Get substituteset names and add to database
             subset_names = self.get_used_sets(benchmark.substitutesets,
                                               parameter_dict)
             for subset in subset_names:
-                db.insert("UsedSubstituteset",{"substituteset_name": subset,
+                db.insert("UsedSubstituteset", {"substituteset_name": subset,
                           "step_name": self._name}, addition="REPLACE")
             # Get parameterset names and add to database
             paramset_names = self.get_used_sets(benchmark.parametersets,
                                                 parameter_dict)
             for paramset in paramset_names:
-                db.insert("UsedParameterset",{"parameterset_name": paramset,
+                db.insert("UsedParameterset", {"parameterset_name": paramset,
                           "step_name": self._name}, addition="REPLACE")
             db.commit_transaction()
         except Exception as e:
@@ -211,7 +211,7 @@ class Step(object):
         if self._shared_name is not None:
             if parameter_dict is not None:
                 shared_name = jube.util.util.substitution(self._shared_name,
-                                                           parameter_dict)
+                                                          parameter_dict)
             else:
                 shared_name = self._shared_name
             return os.path.join(benchdir,
@@ -508,7 +508,7 @@ class Operation(object):
     def async_filename(self):
         """Get async filename"""
         return self._async_filename
-    
+
     @property
     def is_active(self):
         """Get active"""
@@ -638,8 +638,7 @@ class Operation(object):
 
                     sub = subprocess.Popen(
                         [shell, "-c",
-                         '{0} && env > "{1}"'.format(do,
-                                                       abs_info_file_path)],
+                         '{0} && env > "{1}"'.format(do, abs_info_file_path)],
                         cwd=work_dir, stdout=stdout_handle,
                         stderr=stderr, shell=False,
                         env=env)
@@ -757,7 +756,7 @@ class Operation(object):
                     LOGGER.debug("  skip error")
                 else:
                     do = jube.util.util.substitution(self._do, parameter_dict)
-                    raise(RuntimeError(('Error file "{0}" found after ' +
+                    raise (RuntimeError(('Error file "{0}" found after ' +
                                         'running the command "{1}".').format(
                                             error_filename, do)))
 

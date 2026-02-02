@@ -22,6 +22,7 @@ import unittest
 import os
 from examples_tests import TestCase
 
+
 class TestResultFigureExample(TestCase.TestExample):
 
     """Class for testing the result_database example"""
@@ -34,8 +35,8 @@ class TestResultFigureExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "result_figure"
-        cls._stdout = ["x2: 0; y2: 10","x2: 2; y2: 11","x2: 4; y2: 8","x2: 6; y2: 9",
-                       "type: Typ1 ; x: 0; y: 11","type: Typ1 ; x: 1; y: 12","type: Typ1 ; x: 2; y: 11","type: Typ1 ; x: 3; y: 13","type: Typ2 ; x: 0; y: 19","type: Typ2 ; x: 1; y: 18","type: Typ2 ; x: 2; y: 19","type: Typ2 ; x: 3; y: 22","type: Typ3 ; x: 0; y: 40","type: Typ3 ; x: 1; y: 20","type: Typ3 ; x: 2; y: 35","type: Typ3 ; x: 3; y: 25"]
+        cls._stdout = ["x2: 0; y2: 10", "x2: 2; y2: 11", "x2: 4; y2: 8", "x2: 6; y2: 9",
+                       "type: Typ1 ; x: 0; y: 11", "type: Typ1 ; x: 1; y: 12", "type: Typ1 ; x: 2; y: 11", "type: Typ1 ; x: 3; y: 13", "type: Typ2 ; x: 0; y: 19", "type: Typ2 ; x: 1; y: 18", "type: Typ2 ; x: 2; y: 19", "type: Typ2 ; x: 3; y: 22", "type: Typ3 ; x: 0; y: 40", "type: Typ3 ; x: 1; y: 20", "type: Typ3 ; x: 2; y: 35", "type: Typ3 ; x: 3; y: 25"]
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestResultFigureExample, cls).setUpClass()
         super(TestResultFigureExample, cls)._execute_commands(["-r"])
@@ -46,11 +47,12 @@ class TestResultFigureExample(TestCase.TestExample):
         for the result output to allow an example specific test.
         """
         for run_path, command_wps in self._wp_paths.items():
-            fig_paths = [os.path.join(os.getcwd(), "group_fig.png"), os.path.join(run_path, "result/fig.png")]
+            fig_paths = [os.path.join(os.getcwd(), "group_fig.png"), os.path.join(
+                run_path, "result/fig.png")]
             for fig_path in fig_paths:
                 # Test if result figure exists
                 self.assertTrue(os.path.isfile(fig_path), "Error: Figure in path {0} "
-                               "does not exist".format(fig_path))
+                                "does not exist".format(fig_path))
 
     @classmethod
     def tearDownClass(cls):
@@ -61,6 +63,7 @@ class TestResultFigureExample(TestCase.TestExample):
         """
         fig_path = os.path.abspath(os.path.join(os.getcwd(), "group_fig.png"))
         os.remove(fig_path)
+
 
 if __name__ == "__main__":
     unittest.main()

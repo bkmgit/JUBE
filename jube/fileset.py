@@ -116,10 +116,10 @@ class File(object):
         pathname = jube.util.util.substitution(self._path, parameter_dict)
         pathname = os.path.expanduser(pathname)
         source_dir = jube.util.util.substitution(self._source_dir,
-                                                  parameter_dict)
+                                                 parameter_dict)
         source_dir = os.path.expanduser(source_dir)
         target_dir = jube.util.util.substitution(self._target_dir,
-                                                  parameter_dict)
+                                                 parameter_dict)
         target_dir = os.path.expanduser(target_dir)
         if environment is not None:
             pathname = jube.util.util.substitution(pathname, environment)
@@ -160,7 +160,7 @@ class File(object):
             # When using shell extensions, alternative filenames are not
             # allowed for multiple matches.
             if (len(paths) > 1) or ((pathname != path) and
-                                     (name == os.path.basename(pathname))):
+                                    (name == os.path.basename(pathname))):
                 name = os.path.basename(path)
 
             # Add target prefix directory if needed
@@ -198,17 +198,17 @@ class File(object):
     def is_internal_ref(self):
         """Return path is internal ref"""
         return self._is_internal_ref
-    
+
     @property
     def source_dir(self):
         """Return source directory"""
         return self._source_dir
-    
+
     @property
     def target_dir(self):
         """Return target directory"""
         return self._target_dir
-    
+
     @property
     def name(self):
         """Return alternative name"""
@@ -299,11 +299,11 @@ class Prepare(jube.step.Operation):
     def __init__(self, cmd, stdout_filename=None, stderr_filename=None,
                  work_dir=None, active="true"):
         jube.step.Operation.__init__(self,
-                                      do=cmd,
-                                      stdout_filename=stdout_filename,
-                                      stderr_filename=stderr_filename,
-                                      active=active,
-                                      work_dir=work_dir)
+                                     do=cmd,
+                                     stdout_filename=stdout_filename,
+                                     stderr_filename=stderr_filename,
+                                     active=active,
+                                     work_dir=work_dir)
 
     def execute(self, parameter_dict, work_dir, only_check_pending=False,
                 environment=None):

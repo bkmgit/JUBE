@@ -166,10 +166,11 @@ class Analyser(object):
             db.insert("Analyser", analyser_data)
             for use in self._use:
                 db.insert("AnalyserPattern", {"analyser_name": self._name,
-                                             "patternset_name": use})
+                                              "patternset_name": use})
             for step_name in self._analyse:
                 for fileobj in self._analyse[step_name]:
-                    analysefile_id = fileobj.add_information_to_database(db, self._name)
+                    analysefile_id = fileobj.add_information_to_database(
+                        db, self._name)
                     db.insert("AnalyseStep", {"step_name": step_name,
                                               "analysefile_id": analysefile_id})
             db.commit_transaction()
@@ -279,7 +280,7 @@ class Analyser(object):
 
                         filename = \
                             jube.util.util.substitution(file_obj.path,
-                                                         parameter)
+                                                        parameter)
                         filename = \
                             os.path.expandvars(os.path.expanduser(filename))
 

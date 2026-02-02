@@ -296,8 +296,8 @@ class KeyValuesResult(Result):
                                "ignored for exclusion.".format(exclude_name))
 
         # Select and exclude table columns
-        self._keys = [key for key in self._keys if key.name in select and \
-                                                   key.name not in exclude]
+        self._keys = [key for key in self._keys if key.name in select and
+                      key.name not in exclude]
 
         # Create table data
         table_data = list()

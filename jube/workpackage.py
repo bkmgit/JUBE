@@ -70,13 +70,13 @@ class Workpackage(object):
         self._workpackage_dir_cache = None
         self._operation_status = {}
 
-
     def update_information_in_database(self):
         """Update workpackage information after run in database"""
         db = self._benchmark.db
         db.connect()
         # Adding used sets that need to be substituted
-        self.step.add_used_sets_to_database(db, self._benchmark, self.parameter_dict)
+        self.step.add_used_sets_to_database(
+            db, self._benchmark, self.parameter_dict)
         self.add_information_to_database(db)
         self._benchmark.deinitialize_db()
 
@@ -123,7 +123,7 @@ class Workpackage(object):
             db.insert("OperationStatus", {"workpackage_id": self._id,
                                           "operation_id": op._database_id,
                                           "status": self.operation_status(op_number)},
-                                           addition="REPLACE")
+                      addition="REPLACE")
 
         # Add environment variables to database
         for env_name, value in self._env.items():
@@ -325,8 +325,8 @@ class Workpackage(object):
             # Check if done file exist (old version)
             done_file = os.path.join(self.workpackage_dir,
                                      "wp_{0}_{1:02d}".format(
-                                     jube.conf.WORKPACKAGE_DONE_FILENAME,
-                                     operation_number))
+                                         jube.conf.WORKPACKAGE_DONE_FILENAME,
+                                         operation_number))
             if os.path.exists(done_file):
                 self.set_operation_status(operation_number, "done")
                 os.remove(done_file)
@@ -466,7 +466,7 @@ class Workpackage(object):
             self._status = status
         else:
             raise TypeError("No valid value for the status")
-        
+
     def status_color(self):
         """return GREEN (DONE), YELLOW (RUNNING) or RED (ERROR) depending on the workpackage status"""
         if self.done:
@@ -528,7 +528,7 @@ class Workpackage(object):
                              jube.util.util.id_dir("", self._id),
                              parameter_type="string",
                              update_mode=jube.parameter.JUBE_MODE))
-        
+
         # workpackage status
         parameterset.add_parameter(
             jube.parameter.Parameter.
@@ -633,7 +633,7 @@ class Workpackage(object):
             if parameter_dict is not None:
                 shared_name = \
                     jube.util.util.substitution(self._step.shared_link_name,
-                                                 parameter_dict)
+                                                parameter_dict)
             else:
                 shared_name = self._step.shared_link_name
             link_path = os.path.join(self.work_dir, shared_name)
@@ -680,7 +680,7 @@ class Workpackage(object):
                 parameter_dict = self.parameter_dict
             alt_work_dir = self._step.alt_work_dir
             alt_work_dir = jube.util.util.substitution(alt_work_dir,
-                                                        parameter_dict)
+                                                       parameter_dict)
             alt_work_dir = os.path.expandvars(os.path.expanduser(alt_work_dir))
             alt_work_dir = os.path.join(self._benchmark.file_path_ref,
                                         alt_work_dir)
@@ -979,7 +979,7 @@ class Workpackage(object):
                 self.set_error(True, str(e))
                 continue_cycle = False
                 if jube.conf.EXIT_ON_ERROR:
-                    raise(RuntimeError(str(e)))
+                    raise (RuntimeError(str(e)))
                 else:
                     LOGGER.debug(
                         "{0}\n{1}\n{2}".format(40 * "-", str(e), 40 * "-"))
@@ -992,8 +992,8 @@ class Workpackage(object):
         if mode == "p":
             parameterDeletionList = list()
             for p in self._parameterset.all_parameters:
-                if(p.search_method(propertyString="eval_helper",
-                                   recursiveProperty="based_on")):
+                if (p.search_method(propertyString="eval_helper",
+                                    recursiveProperty="based_on")):
                     parameterDeletionList.append(p)
             for p in parameterDeletionList:
                 self._parameterset.delete_parameter(p)

@@ -80,7 +80,7 @@ class Benchmark(object):
     def outpath(self):
         """Return benchmark outpath"""
         return self._outpath
-    
+
     @property
     def version(self):
         """Return benchmark JUBE version"""
@@ -194,8 +194,9 @@ class Benchmark(object):
         self.db.connect()
         try:
             self.db.start_transaction()
-            #deletes workpackage and any depend data in other tables
-            self.db.delete("Workpackage", {"workpackage_id": workpackage_to_delete.id})
+            # deletes workpackage and any depend data in other tables
+            self.db.delete("Workpackage", {
+                           "workpackage_id": workpackage_to_delete.id})
             self.db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))
@@ -222,14 +223,16 @@ class Benchmark(object):
     def delete_xml_configuration(self):
         """Delete configuration.xml"""
         # DEPRECATED (Full function): Future versions will no longer support XML files
-        xml_configuration = os.path.join(self.bench_dir, jube.conf.CONFIGURATION_FILENAME)
+        xml_configuration = os.path.join(
+            self.bench_dir, jube.conf.CONFIGURATION_FILENAME)
         if os.path.exists(xml_configuration):
             os.remove(xml_configuration)
 
     def delete_xml_workpackages(self):
         """Delete workpackages.xml"""
         # DEPRECATED (Full function): Future versions will no longer support XML files
-        xml_workpackages = os.path.join(self.bench_dir, jube.conf.WORKPACKAGES_FILENAME)
+        xml_workpackages = os.path.join(
+            self.bench_dir, jube.conf.WORKPACKAGES_FILENAME)
         if os.path.exists(xml_workpackages):
             os.remove(xml_workpackages)
 
@@ -635,7 +638,7 @@ class Benchmark(object):
                 # run postprocessing of each wp
                 for i, wp in enumerate(self._workpackages[val["step_name"]]):
                     if wp.id == val["id"]:
-                        if(len(val) == 2):  # workpackage is done or its execution was erroneous
+                        if (len(val) == 2):  # workpackage is done or its execution was erroneous
                             pass
                         else:
                             # update corresponding wp in self._workpackage with modified wp
@@ -644,8 +647,8 @@ class Benchmark(object):
                             # which needed to be deleted within the multiprocess
                             # execution to avoid excessive memory usage
                             for p in wp._parameterset.all_parameters:
-                                if(p.search_method(propertyString="eval_helper",
-                                                   recursiveProperty="based_on")):
+                                if (p.search_method(propertyString="eval_helper",
+                                                    recursiveProperty="based_on")):
                                     val["parameterset"].add_parameter(p)
                             wp.parameterset = val["parameterset"]
                             wp.cycle = val["cycle"]
@@ -660,7 +663,7 @@ class Benchmark(object):
             if not workpackage.done:
                 # execute wps in parallel which have the same name
                 if workpackage.step.procs > 1:
-                    #Remove database instance to run parallel
+                    # Remove database instance to run parallel
                     self.deinitialize_db()
 
                     run_parallel = True
@@ -753,7 +756,7 @@ class Benchmark(object):
         # if possible)
         self._work_stat.update_queues(workpackage)
 
-        #Update workpackage status for jube parameter
+        # Update workpackage status for jube parameter
         workpackage.update_status()
 
         if not jube.conf.HIDE_ANIMATIONS:
@@ -823,7 +826,8 @@ class Benchmark(object):
 
             if len(self._tags) > 0:
                 for tag in self._tags:
-                    self.db.insert("Tag", {"value": tag, "benchmark_id": self._id})
+                    self.db.insert(
+                        "Tag", {"value": tag, "benchmark_id": self._id})
             if len(self._tag_docu) > 0:
                 for tag, docu in self._tag_docu.items():
                     self.db.insert("TagDocu", {"tag": tag, "description": docu,
@@ -858,10 +862,12 @@ class Benchmark(object):
         self.db.connect()
         # Update patternsets in database
         for patternset in self._patternsets.values():
-            patternset.add_information_to_database(self.db, self._id, update=True)
+            patternset.add_information_to_database(
+                self.db, self._id, update=True)
         # Update analyser in database
         for analyser in self._analyser.values():
-            analyser.add_information_to_database(self.db, self._id, update=True)
+            analyser.add_information_to_database(
+                self.db, self._id, update=True)
         # Update results in database
         for result_name in self._results_order:
             result = self._results[result_name]
@@ -874,7 +880,7 @@ class Benchmark(object):
         try:
             self.db.start_transaction()
             self.db.update("Benchmark", {"comment": self._comment},
-                             {"benchmark_id": self._id})
+                           {"benchmark_id": self._id})
             self.db.commit_transaction()
         except Exception as e:
             LOGGER.warning(str(e))
@@ -894,7 +900,8 @@ class Benchmark(object):
         self.db.connect()
         for workpackages in self._workpackages.values():
             for workpackage in workpackages:
-                row = self.db.select("Workpackage", condition={"workpackage_id": workpackage.id})
+                row = self.db.select("Workpackage", condition={
+                                     "workpackage_id": workpackage.id})
                 if not row:
                     workpackage.add_information_to_database(self.db)
         self.db.disconnect()

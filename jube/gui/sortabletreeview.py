@@ -20,6 +20,7 @@
 from tkinter import ttk
 from jube.conf import GREY, LIGHT_GREY, WHITE
 
+
 class SortableTreeview(ttk.Treeview):
 
     """A ttk.Treeview whose columns are sortable"""
@@ -38,12 +39,14 @@ class SortableTreeview(ttk.Treeview):
 
     def sort_by_column(self, col, descending=False):
         """Sorts the data in the column col descending/ascending"""
-        data = [(self.set(child, col), child) for child in self.get_children("")]
-        try: #needed to allow numerical sorting in the TreeView
-            data_converted =  [(float(x),y) for x,y in data]
+        data = [(self.set(child, col), child)
+                for child in self.get_children("")]
+        try:  # needed to allow numerical sorting in the TreeView
+            data_converted = [(float(x), y) for x, y in data]
         except (ValueError, TypeError):
             data_converted = data
-        data_converted.sort(reverse=not descending, key=lambda x: x[0] if x[0] else x[0])
+        data_converted.sort(reverse=not descending,
+                            key=lambda x: x[0] if x[0] else x[0])
         for index, (val, child) in enumerate(data_converted):
             self.move(child, "", index)
         self._sort_column = col
@@ -74,39 +77,41 @@ class SortableTreeview(ttk.Treeview):
 
     def insert(self, parent, index, values):
         """Inserts a new row into the treeview"""
-        iid = super().insert(parent, index, 
-                             values = [self._convert_value(value) for value in values])
+        iid = super().insert(parent, index,
+                             values=[self._convert_value(value) for value in values])
         self.sort_by_column(self._sort_column, self._heading_clicked)
         self.add_tags()
         return iid
-    
-    def _convert_value(self,value):
+
+    def _convert_value(self, value):
         """converts a value to the format that should be displayed in the TreeView. 
         (internally the treeview saves all values as string)"""
         if value is None:
-            return "" #shows nothing
+            return ""  # shows nothing
         elif isinstance(value, list) or isinstance(value, set):
-            return ", ".join(f"{v!r}" for v in sorted(value)) #'...','...','...'
+            # '...','...','...'
+            return ", ".join(f"{v!r}" for v in sorted(value))
         else:
-            return repr(str(value))[1:-1] #escapes special characters such as \n
+            # escapes special characters such as \n
+            return repr(str(value))[1:-1]
 
     def add_tags(self):
         """Creates alternating row colors"""
         if self["style"] == "Custom.Treeview":
-            self.tag_configure("even", background = LIGHT_GREY)
-            self.tag_configure("odd", background = GREY)
+            self.tag_configure("even", background=LIGHT_GREY)
+            self.tag_configure("odd", background=GREY)
         elif self["style"] == "Grey.Custom.Treeview":
-            self.tag_configure("even", background = LIGHT_GREY)
-            self.tag_configure("odd", background = WHITE)
+            self.tag_configure("even", background=LIGHT_GREY)
+            self.tag_configure("odd", background=WHITE)
         else:
-            self.tag_configure("even", background = WHITE)
-            self.tag_configure("odd", background = GREY)
+            self.tag_configure("even", background=WHITE)
+            self.tag_configure("odd", background=GREY)
 
         for i, child_iid in enumerate(self.get_children()):
             if i % 2 == 0:
-                self.item(child_iid, tags = "even")
+                self.item(child_iid, tags="even")
             else:
-                self.item(child_iid, tags = "odd")
+                self.item(child_iid, tags="odd")
 
     def on_heading_motion(self, event):
         """Event Handler that is used if the user hovers the mouse over the treeview"""
@@ -114,4 +119,3 @@ class SortableTreeview(ttk.Treeview):
             self.config(cursor="hand2")
         else:
             self.config(cursor="")
-            

@@ -67,6 +67,7 @@ def status(args):
             return
         jube.info.print_benchmark_status(benchmark)
 
+
 def gui(args):
     """Start GUI"""
     found_benchmarks = search_for_benchmarks(args)
@@ -79,9 +80,10 @@ def gui(args):
             gui = Gui(benchmark)
             gui.mainloop()
         except NameError:
-            LOGGER.error("If you want to use the gui command, you have to install the tkinter module")
+            LOGGER.error(
+                "If you want to use the gui command, you have to install the tkinter module")
             exit()
-        
+
 
 def tag(args):
     """Show tag documentation"""
@@ -98,7 +100,7 @@ def tag(args):
         found_benchmarks = search_for_benchmarks(args)
         for benchmark_folder in found_benchmarks:
             benchmark = _load_existing_benchmark(args, benchmark_folder,
-                                                load_analyse=False)
+                                                 load_analyse=False)
             if benchmark is None:
                 return
             jube.info.print_benchmark_tag_documentation(benchmark)
@@ -113,25 +115,25 @@ def output(args):
     found_workpackages = search_for_workpackage(args, True)
 
     for wp in found_workpackages:
-        #create parameter dictionary
+        # create parameter dictionary
         param_dict = dict()
-        #all parameter from the benchmark
+        # all parameter from the benchmark
         for param_set in wp.benchmark.parametersets.values():
             for param in param_set.all_parameters:
                 param_dict[param.name] = param.value
-        #all jube parameter from the workpackage
+        # all jube parameter from the workpackage
         for param in wp.get_jube_parameterset():
             param_dict[param.name] = param.value
-        #all jube parameter from the benchmark
+        # all jube parameter from the benchmark
         for param in wp.benchmark.get_jube_parameterset():
             param_dict[param.name] = param.value
 
-        #create work directory
+        # create work directory
         if wp.step.alt_work_dir is None:
             work_dir = [os.getcwd(), wp.work_dir]
         else:
             dir_cache = jube.util.util.substitution(wp.step.alt_work_dir,
-                                                     param_dict)
+                                                    param_dict)
             dir_cache = os.path.expandvars(os.path.expanduser(dir_cache))
             work_dir = [os.getcwd(), dir_cache]
 
@@ -159,7 +161,7 @@ def output(args):
             stderr_paths.add(os.path.join(*work_dir))
             work_dir.remove(stderr_filename)
 
-    #show only error or done file
+    # show only error or done file
     if args.only:
         if args.only == "stdout":
             paths.update(stdout_paths)
@@ -169,10 +171,10 @@ def output(args):
         paths.update(stdout_paths)
         paths.update(stderr_paths)
 
-    #sort paths
+    # sort paths
     paths = sorted(paths)
 
-    #show content of file, not only filename
+    # show content of file, not only filename
     if args.display:
         for path in paths:
             LOGGER.info(path + "\n")
@@ -181,6 +183,7 @@ def output(args):
     else:
         for path in paths:
             LOGGER.info(path + "\n")
+
 
 def benchmarks_results(args):
     """Show benchmark results"""
@@ -209,7 +212,7 @@ def analyse_benchmarks(args):
 
 def remove_benchmarks(args):
     """Remove benchmarks or workpackages"""
-    if(args.workpackage is not None):
+    if (args.workpackage is not None):
         # If a workpackage id is provided by the user, only specific
         # workpackages will be removed
         found_workpackages = search_for_workpackage(args)
@@ -246,9 +249,9 @@ def info(args):
     """Benchmark information"""
     if args.id is None:
         if args.step is not None or args.workpackage is not None:
-                LOGGER.warning("The -s and -w options are ignored if no "
-                               "benchmark ID is given. Information for all "
-                               "benchmarks is printed out.")
+            LOGGER.warning("The -s and -w options are ignored if no "
+                           "benchmark ID is given. Information for all "
+                           "benchmarks is printed out.")
         jube.info.print_benchmarks_info(args.dir)
     else:
         found_benchmarks = search_for_benchmarks(args)
@@ -285,12 +288,13 @@ def info(args):
                     wp_ids = [int(iid) for iid in args.workpackage]
                 else:
                     wp_ids = [wp.id for wps in benchmark.workpackages.values()
-                                    for wp in wps]
+                              for wp in wps]
                 for wp_id in wp_ids:
                     workpackage = benchmark.workpackage_by_id(wp_id)
                     if workpackage:
                         if workpackage.step.name in steps:
-                            jube.info.print_workpackage_info(benchmark, workpackage)
+                            jube.info.print_workpackage_info(
+                                benchmark, workpackage)
                         else:
                             LOGGER.warning("Workpackage with ID is ignored for "
                                            "further execution. It was not found in "
@@ -299,6 +303,7 @@ def info(args):
                         LOGGER.warning("Workpackage with ID is ignored for "
                                        "further execution. It was not found in "
                                        "the specified benchmark.")
+
 
 def update_check(args):
     """Check if a newer JUBE version is available."""
@@ -384,8 +389,9 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
     if found_configuration:
         try:
             parser = jube.jubeio.Parser(found_configuration, force=args.force,
-                                         strict=args.strict)
-            benchmark = parser.load_benchmark_from_configuration(db, benchmark_folder)
+                                        strict=args.strict)
+            benchmark = parser.load_benchmark_from_configuration(
+                db, benchmark_folder)
         except IOError as exception:
             LOGGER.warning(str(exception))
             return None
@@ -398,8 +404,9 @@ def _load_existing_benchmark(args, benchmark_folder, restore_workpackages=True,
         # Read existing workpackage information
         try:
             parser = jube.jubeio.Parser(found_workpackage, force=args.force,
-                                         strict=args.strict)
-            workpackages, work_stat = parser.load_workpackages_from_configuration(benchmark, db)
+                                        strict=args.strict)
+            workpackages, work_stat = parser.load_workpackages_from_configuration(
+                benchmark, db)
         except IOError as exception:
             LOGGER.warning(str(exception))
             return None
@@ -487,6 +494,7 @@ def search_for_benchmarks(args):
     found_benchmarks.sort()
     return found_benchmarks
 
+
 def search_for_workpackage(args, search_for_step=False):
     """Search for existing workpackages"""
     found_benchmarks = search_for_benchmarks(args)
@@ -513,7 +521,7 @@ def search_for_workpackage(args, search_for_step=False):
                 for step_name in args.step:
                     if step_name not in benchmark.workpackages:
                         LOGGER.warning('Step "{0}" not found in benchmark '
-                                     '"{1}".'.format(step_name,
+                                       '"{1}".'.format(step_name,
                                                        benchmark.name))
                     else:
                         for wp in benchmark.workpackages[step_name]:
@@ -523,6 +531,7 @@ def search_for_workpackage(args, search_for_step=False):
                     for wp in benchmark.workpackages[wp_name]:
                         found_workpackages.append(wp)
     return found_workpackages
+
 
 def run_new_benchmark(args):
     """Start a new benchmark run"""
@@ -551,7 +560,7 @@ def run_new_benchmark(args):
         # Read new benchmarks
         if args.include_path is not None:
             include_paths = [include_path for include_path in
-                              args.include_path if include_path != ""]
+                             args.include_path if include_path != ""]
         else:
             include_paths = None
 
@@ -560,8 +569,8 @@ def run_new_benchmark(args):
             args.outpath = jube.util.util.check_and_get_benchmark_outpath()
 
         parser = jube.jubeio.Parser(path, tags, include_paths,
-                                     args.outpath, args.force, args.strict,
-                                     args.subparser)
+                                    args.outpath, args.force, args.strict,
+                                    args.subparser)
         benchmarks, only_bench, not_bench = parser.benchmarks_from_xml()
 
         # Add new comment
@@ -667,7 +676,7 @@ def _analyse_benchmark(benchmark_folder, args):
 
     LOGGER.info(jube.util.output.text_boxed(
         ('Analyse benchmark "{0}" id: {1}').format(benchmark.name,
-                                                     benchmark.id)))
+                                                   benchmark.id)))
     benchmark.analyse()
     if os.path.isfile(
             os.path.join(benchmark_folder, jube.conf.ANALYSE_FILENAME)):
@@ -733,11 +742,11 @@ def _update_analyse_and_result(args, benchmark):
         # Read new benchmarks
         if args.include_path is not None:
             include_paths = [include_path for include_path in
-                              args.include_path if include_path != ""]
+                             args.include_path if include_path != ""]
         else:
             include_paths = None
         parser = jube.jubeio.Parser(args.update, tags, include_paths,
-                                     args.force, args.strict)
+                                    args.force, args.strict)
         benchmarks = parser.benchmarks_from_xml()[0]
 
         # Update benchmark
@@ -759,7 +768,7 @@ def _remove_benchmark(benchmark_folder, args):
     remove = True
     if not args.force:
         inp = input('Really remove "{0}" (y/n):'
-                        .format(benchmark_folder))
+                    .format(benchmark_folder))
         remove = inp.startswith("y")
     if remove:
         # Delete benchmark folder
@@ -773,8 +782,8 @@ def _remove_workpackage(workpackage, args):
     if workpackage.started:
         if not args.force:
             inp = input(('Really remove "{0}" and its dependent ' +
-                             "workpackages (y/n):")
-                            .format(workpackage.workpackage_dir))
+                         "workpackages (y/n):")
+                        .format(workpackage.workpackage_dir))
             remove = inp.startswith("y")
         if remove:
             workpackage.remove()
@@ -804,12 +813,12 @@ def _configuration_exists(benchmark_folder):
     # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_config = os.path.join(benchmark_folder,
                               jube.conf.CONFIGURATION_FILENAME)
-    if os.path.isfile(xml_config): 
+    if os.path.isfile(xml_config):
         return xml_config
     # DEPRECATED (END): Future versions will no longer support XML files
     database_config = os.path.join(benchmark_folder,
                                    jube.conf.DATABASE_FILENAME)
-    if os.path.isfile(database_config): 
+    if os.path.isfile(database_config):
         return database_config
     # No configuration file found
     return False
@@ -821,12 +830,12 @@ def _workpackage_exists(benchmark_folder):
     # DEPRECATED (BEGIN): Future versions will no longer support XML files
     xml_workpackage = os.path.join(benchmark_folder,
                                    jube.conf.WORKPACKAGES_FILENAME)
-    if os.path.isfile(xml_workpackage): 
+    if os.path.isfile(xml_workpackage):
         return xml_workpackage
     # DEPRECATED (END): Future versions will no longer support XML files
     database_workpackage = os.path.join(benchmark_folder,
                                         jube.conf.DATABASE_FILENAME)
-    if os.path.isfile(database_workpackage): 
+    if os.path.isfile(database_workpackage):
         return database_workpackage
     # No configuration file found
     return False
@@ -1040,7 +1049,7 @@ def gen_subparser_conf():
                  "nargs": "+"}
         }
     }
-    
+
     # gui subparser
     subparser_configuration["gui"] = {
         "help": "show benchmark data in gui",
@@ -1054,8 +1063,8 @@ def gen_subparser_conf():
                  "nargs": "?"}
         }
     }
-    
-    #output subparser
+
+    # output subparser
     subparser_configuration["output"] = {
         "help": "show filename of output",
         "func": output,
@@ -1070,9 +1079,9 @@ def gen_subparser_conf():
                 {"help": "show filenames for given step", "nargs": "+"},
             ("-w", "--workpackage"):
                 {"help": "show filenames for given workpackages id",
-                "nargs": "+"},
+                 "nargs": "+"},
             ("-d", "--display"):
-                {"help": "display content of output file" , "action": "store_true"},
+                {"help": "display content of output file", "action": "store_true"},
             ("-o", "--only"):
                 {"help": "show only stdout or stderr",
                  "choices": ["stdout", "stderr"]}
@@ -1189,7 +1198,7 @@ def _get_args_parser():
     help_keys = list(zip(*[iter(help_keys)] * max_columns))
     # create overview
     help_overview = jube.util.output.text_table(help_keys, separator="   ",
-                                                 align_right=False)
+                                                align_right=False)
 
     # help subparser
     subparser["help"] = \
@@ -1244,8 +1253,8 @@ def main(command=None):
 
     if args.subparser:
         jube.log.setup_logging(mode="console",
-                                verbose=(jube.conf.VERBOSE_LEVEL == 1) or
-                                        (jube.conf.VERBOSE_LEVEL == 3))
+                               verbose=(jube.conf.VERBOSE_LEVEL == 1) or
+                               (jube.conf.VERBOSE_LEVEL == 3))
         if args.devel:
             args.func(args)
         else:

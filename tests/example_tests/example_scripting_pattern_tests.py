@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestScriptingPatternExample(TestCase.TestExample):
 
     """Class for testing the scripting pattern example"""
@@ -37,6 +38,7 @@ class TestScriptingPatternExample(TestCase.TestExample):
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestScriptingPatternExample, cls).setUpClass()
         super(TestScriptingPatternExample, cls)._execute_commands(["-r"])
+
 
 if __name__ == "__main__":
     unittest.main()

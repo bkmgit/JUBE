@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestScriptingParameterExample(TestCase.TestExample):
 
     """Class for testing the scripting_parameter example"""
@@ -33,12 +34,13 @@ class TestScriptingParameterExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "scripting_parameter"
-        cls._stdout = ["number: "+str(i)+", additional_number: "+str(i*a)+
-                       "\nnumber_mult: "+str(i*a*i)+", text: Number: "
-                       +str(i) for i in [1, 2, 4] for a in [1,2]]
+        cls._stdout = ["number: "+str(i)+", additional_number: " + str(i*a) +
+                       "\nnumber_mult: "+str(i*a*i)+", text: Number: " + str(i)
+                       for i in [1, 2, 4] for a in [1, 2]]
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestScriptingParameterExample, cls).setUpClass()
         super(TestScriptingParameterExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

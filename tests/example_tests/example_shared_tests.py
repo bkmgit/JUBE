@@ -22,6 +22,7 @@ import unittest
 import os
 from examples_tests import TestCase
 
+
 class TestSharedExample(TestCase.TestExample):
 
     """Class for testing the shared example"""
@@ -43,25 +44,26 @@ class TestSharedExample(TestCase.TestExample):
         Additional test to check the content of the shared directories
         """
         for run_path, command_wps in self._wp_paths.items():
-            #Check the content of the files in shared directory
+            # Check the content of the files in shared directory
             shared_path = os.path.join(run_path, "a_step_shared")
 
-            #Check for existence of id file
+            # Check for existence of id file
             id_file = os.path.join(shared_path, "all_ids")
             self.assertTrue(self._existing_file(id_file),
                             "Error: id file for shared "
                             "directory {0} does not exist".format(shared_path))
-            #Check for content of id file
+            # Check for content of id file
             id_content = self._content_of_file(id_file)
             self.assertEqual(id_content, "0\n1\n2",
                              "Error: id file for shared directory {0} "
                              "has not the right content".format(shared_path))
 
-            #Check for content of stdout file
+            # Check for content of stdout file
             stdout = self._content_of_file(self._get_stdout_file(shared_path))
             self.assertEqual(stdout, "0\n1\n2",
                              "Error: stdout for shared directory {0} "
                              "has not the right content".format(shared_path))
+
 
 if __name__ == "__main__":
     unittest.main()

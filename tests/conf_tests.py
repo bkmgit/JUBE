@@ -22,6 +22,7 @@ import unittest
 import jube.conf
 from jube.util.version import StrictVersion
 
+
 class TestConf(unittest.TestCase):
 
     """Class for testing the configurations"""

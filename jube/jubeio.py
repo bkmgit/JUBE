@@ -64,7 +64,7 @@ class Parser(object):
         self._outpath = outpath
         self._force = force
         self._strict = strict
-        self._command_name = command_name # run, continue, analyse, ...
+        self._command_name = command_name  # run, continue, analyse, ...
 
     @property
     def file_path_ref(self):
@@ -123,31 +123,36 @@ class Parser(object):
         in the corresponding Database file.
         """
         LOGGER.debug("Parsing {0}".format(self._filename))
-        
+
         benchmark_id, name, comment, outpath, version, file_path_ref = \
             db.select("Benchmark")[0]
         tags = db.select("Tag", ["value"], {"benchmark_id": benchmark_id})
         tags = set(tag for tag, in tags)
-        tag_docu = db.select("TagDocu", ["tag", "description"], {"benchmark_id": benchmark_id})
+        tag_docu = db.select("TagDocu", ["tag", "description"], {
+                             "benchmark_id": benchmark_id})
         docu_dict = dict()
         for tag_name, description in tag_docu:
             docu_dict[tag_name] = description
-        comment, outpath, file_path_ref = self._evaluate_benchmark_attributes(comment, outpath, file_path_ref)
-        
-        parametersets = self._extract_parametersets_from_database(db, benchmark_id)
-        substitutesets = self._extract_substitutesets_from_database(db, benchmark_id)
+        comment, outpath, file_path_ref = self._evaluate_benchmark_attributes(
+            comment, outpath, file_path_ref)
+
+        parametersets = self._extract_parametersets_from_database(
+            db, benchmark_id)
+        substitutesets = self._extract_substitutesets_from_database(
+            db, benchmark_id)
         filesets = self._extract_filesets_from_database(db, benchmark_id)
         patternsets = self._extract_patternsets_from_database(db, benchmark_id)
         steps = self._extract_steps_from_database(db, benchmark_id)
         analyser = self._extract_analysers_from_database(db, benchmark_id)
-        results, results_order = self._extract_results_from_database(db, benchmark_id)
+        results, results_order = self._extract_results_from_database(
+            db, benchmark_id)
 
         benchmark = jube.benchmark.Benchmark(name, outpath,
-                                              parametersets, substitutesets,
-                                              filesets, patternsets, steps,
-                                              analyser, results, results_order,
-                                              comment, tags, docu_dict,
-                                              file_path_ref)
+                                             parametersets, substitutesets,
+                                             filesets, patternsets, steps,
+                                             analyser, results, results_order,
+                                             comment, tags, docu_dict,
+                                             file_path_ref)
         benchmark.id = benchmark_id
         return benchmark
 
@@ -172,14 +177,14 @@ class Parser(object):
         # In such cases the encode will stop, using an UnicodeEncodeError
         try:
             xml = jube.util.output.element_tree_tostring(tree.getroot(),
-                                                          encoding="UTF-8")
+                                                         encoding="UTF-8")
             xml.encode(sys.getfilesystemencoding())
         except UnicodeEncodeError as uee:
             raise ValueError("Your terminal only allows '{0}' encoding. {1}"
                              .format(sys.getfilesystemencoding(), str(uee)))
 
         # Check input file version
-        version = Parser._get_attr(tree.getroot(),"version")
+        version = Parser._get_attr(tree.getroot(), "version")
         if (version is not None) and (not self._force):
             if StrictVersion(version) > StrictVersion(jube.conf.JUBE_VERSION):
                 if self._strict:
@@ -281,14 +286,14 @@ class Parser(object):
 
         # Check for remaining <include> tags
         node = jube.util.util.get_tree_element(tree.getroot(),
-                                                tag_path="include")
-                                                
+                                               tag_path="include")
+
         if node is not None:
             raise ValueError(("Remaining include element found, which " +
                               "was not replaced (e.g. due to a missing " +
                               "include-path):\n" +
                               '<include from="{0}" ... />')
-                             .format(node.attrib["from"]))   
+                             .format(node.attrib["from"]))
 
         # DEPRECATED: check_tags no longer allowed at global level, only in tags
         # Read all global check_tags and check if necessary tags are given
@@ -324,10 +329,10 @@ class Parser(object):
     @staticmethod
     def _check_valid_tags(element, tags):
         """Check if element contains only valid tags"""
-        return jube.util.util.valid_tags(Parser._get_attr(element,"tag"), tags)
+        return jube.util.util.valid_tags(Parser._get_attr(element, "tag"), tags)
 
     @staticmethod
-    def _get_attr(elem, key, default=None, strip = True):
+    def _get_attr(elem, key, default=None, strip=True):
         v = elem.get(key, default)
         return v.strip() if strip and isinstance(v, str) else v
 
@@ -413,7 +418,8 @@ class Parser(object):
                         files[hash_val].add((filename, name))
 
                 # Replace set-name with an internal one
-                use.text = jube.conf.DEFAULT_SEPARATOR.join(["jube_{0}_{1}".format(hash_val, name) for name in set_names])
+                use.text = jube.conf.DEFAULT_SEPARATOR.join(
+                    ["jube_{0}_{1}".format(hash_val, name) for name in set_names])
 
         # Create new xml elements
         for fileid in files:
@@ -479,7 +485,8 @@ class Parser(object):
         found in database"""
         # Create a database connection if not already done
         if db is None:
-            db = jube.util.database_interface.Database_Interface(self._filename)
+            db = jube.util.database_interface.Database_Interface(
+                self._filename)
         db.connect()
 
         # Extract tags out of database
@@ -487,7 +494,8 @@ class Parser(object):
         tags = [tag for tag, in tags]
 
         # Extract name and comment out of database
-        name, comment = db.select("Benchmark", ["name", "comment"], {"benchmark_id": benchmark_id})[0]
+        name, comment = db.select("Benchmark", ["name", "comment"], {
+                                  "benchmark_id": benchmark_id})[0]
         comment = "" if comment is None else comment
         comment = re.sub(r"\s+", " ", comment).strip()
         db.disconnect()
@@ -500,7 +508,7 @@ class Parser(object):
         tree = ET.parse(self._filename).getroot()
         tags = set()
         for tag_etree in jube.util.util.get_tree_elements(tree,
-                                                           "selection/tag"):
+                                                          "selection/tag"):
             if tag_etree.text is not None:
                 tags.update(set([tag.strip() for tag in
                                  tag_etree.text.split(
@@ -509,7 +517,7 @@ class Parser(object):
         if benchmark_etree is None:
             raise ValueError('benchmark-tag not found in "{0}"'.format(
                 self._filename))
-        name = Parser._attribute_from_element(benchmark_etree,"name")
+        name = Parser._attribute_from_element(benchmark_etree, "name")
         comment_element = benchmark_etree.find("comment")
         if comment_element is not None:
             comment = comment_element.text
@@ -561,8 +569,8 @@ class Parser(object):
                         else:
                             value = ""
                         value = jube.util.util.convert_type(pattern_name,
-                                                             pattern_type,
-                                                             value)
+                                                            pattern_type,
+                                                            value)
                         analyse_result[analyser_name][step_name][
                             wp_id][pattern_name] = value
         return analyse_result
@@ -605,13 +613,14 @@ class Parser(object):
         for workpackage in workpackages:
             workpackage_id, iteration, cycle, step_name, status, done_time = workpackage
             max_id = max(max_id, workpackage_id)
-            
+
             step = benchmark.steps[step_name]
 
             # Extract used parametersets
             parameterset = jube.parameter.Parameterset()
             parameter_names = []
-            parameters = db.select("SelectedParameter", None, {"workpackage_id": workpackage_id})
+            parameters = db.select("SelectedParameter", None, {
+                                   "workpackage_id": workpackage_id})
             for parameter in parameters:
                 iid, workpackage_id, selected, idx = parameter
                 iid, name, datatype, export, unit, mode, separator, update_mode, \
@@ -624,29 +633,34 @@ class Parser(object):
                     eval_helper=None, fixed=False, duplicate=duplicate)
                 parameterset.add_parameter(parameter)
 
-            tmp[workpackage_id] = jube.workpackage.Workpackage(benchmark, step, \
-                                        parameter_names, parameterset, workpackage_id,
-                                        iteration, cycle, status, done_time)
+            tmp[workpackage_id] = jube.workpackage.Workpackage(benchmark, step,
+                                                               parameter_names, parameterset, workpackage_id,
+                                                               iteration, cycle, status, done_time)
 
             # Extract workpackage parents
-            parents = db.select("WorkpackageParents", ["parent_workpackage_id"], {"workpackage_id": workpackage_id})
+            parents = db.select("WorkpackageParents", ["parent_workpackage_id"], {
+                                "workpackage_id": workpackage_id})
             parents = [parent for parent, in parents]
             parents_tmp[workpackage_id] = parents
             if len(parents) == 0:
                 work_list.put(tmp[workpackage_id])
 
             # Extract workpackage iteration siblings
-            siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], {"workpackage_id": workpackage_id})
+            siblings = db.select("WorkpackageSibling", ["sibling_workpackage_id"], {
+                                 "workpackage_id": workpackage_id})
             siblings = [sibling for sibling, in siblings]
             iteration_siblings_tmp[workpackage_id] = siblings
 
             # Extract operation status
-            op_status = db.select("OperationStatus", ["status"], {"workpackage_id": workpackage_id})
+            op_status = db.select("OperationStatus", ["status"], {
+                                  "workpackage_id": workpackage_id})
             for operation_number, status in enumerate(op_status):
-                tmp[workpackage_id].set_operation_status(operation_number,  status[0])
+                tmp[workpackage_id].set_operation_status(
+                    operation_number,  status[0])
 
             # Extract environment variables
-            set_env, unset_env = self._extract_workpackage_env(db, workpackage_id)
+            set_env, unset_env = self._extract_workpackage_env(
+                db, workpackage_id)
             tmp[workpackage_id].env.update(set_env)
             tmp[workpackage_id].nonenv = unset_env
             for env_name in unset_env:
@@ -736,7 +750,8 @@ class Parser(object):
                         workpackage.queued = True
                         work_stat.put(workpackage)
                 if mode == "all":
-                    found_workpackages[workpackage.step.name].append(workpackage)
+                    found_workpackages[workpackage.step.name].append(
+                        workpackage)
 
         return found_workpackages, work_stat
 
@@ -744,14 +759,16 @@ class Parser(object):
         """Extract workpackage env-information from database"""
         set_env = dict()
         unset_env = list()
-        env_names = db.select("WorkpackageEnvironment", ["environment_name"], {"workpackage_id": workpackage_id})
+        env_names = db.select("WorkpackageEnvironment", ["environment_name"], {
+                              "workpackage_id": workpackage_id})
         env_names = [name for name, in env_names]
         for env_name in env_names:
-            env_name, value, env = db.select("Environment", None, {"environment_name": env_name})[0]
+            env_name, value, env = db.select(
+                "Environment", None, {"environment_name": env_name})[0]
             if env:
                 if value is not None:
                     set_env[env_name] = value
-                    if ((set_env[env_name][0] == "'") or \
+                    if ((set_env[env_name][0] == "'") or
                             ((set_env[env_name][0] == "u") and (set_env[env_name][1] == "'"))) and \
                             (set_env[env_name][-1] == "'"):
                         set_env[env_name] = ast.literal_eval(set_env[env_name])
@@ -786,8 +803,8 @@ class Parser(object):
             parameter_names = [parameter.name for parameter in parameterset]
             tmp[workpackage_id] = \
                 jube.workpackage.Workpackage(benchmark, step, parameter_names,
-                                              parameterset, workpackage_id,
-                                              iteration, cycle)
+                                             parameterset, workpackage_id,
+                                             iteration, cycle)
             max_id = max(max_id, workpackage_id)
             parents_tmp[workpackage_id] = parents
             iteration_siblings_tmp[workpackage_id] = iteration_siblings
@@ -983,7 +1000,8 @@ class Parser(object):
                             ((set_env[env_name][0] == "u") and
                              (set_env[env_name][1] == "'")) and \
                            (set_env[env_name][-1] == "'"):
-                            set_env[env_name] = ast.literal_eval(set_env[env_name])
+                            set_env[env_name] = ast.literal_eval(
+                                set_env[env_name])
                 elif env_etree.tag == "nonenv":
                     unset_env.append(env_name)
         return (workpackage_id, step_name, parameterset, parents,
@@ -1067,9 +1085,9 @@ class Parser(object):
         if check_tags != "":
             if not jube.util.util.valid_tags(check_tags, self._tags):
                 raise ValueError("The following tag combination is required: "
-                                 "{0}".format(check_tags.replace("|", " or ")\
-                                 .replace("+", " and ").replace("!", " not ")\
-                                 .replace("^", " xor ")))
+                                 "{0}".format(check_tags.replace("|", " or ")
+                                              .replace("+", " and ").replace("!", " not ")
+                                              .replace("^", " xor ")))
 
     def _extract_tags(self, tree, check_tags=True):
         """
@@ -1084,7 +1102,8 @@ class Parser(object):
             if check_tags:
                 self._control_check_tags(tags_tree)
 
-            forced = Parser._get_attr(tags_tree, "forced", "false").lower() == "true" or forced
+            forced = Parser._get_attr(
+                tags_tree, "forced", "false").lower() == "true" or forced
 
             # find tag documentation
             for element in tags_tree:
@@ -1171,10 +1190,11 @@ class Parser(object):
         comment = re.sub(r"\s+", " ", comment).strip()
         if self._outpath is None:
             outpath = Parser._attribute_from_element(benchmark_etree,
-                                                    "outpath")
+                                                     "outpath")
             outpath = os.path.expandvars(os.path.expanduser(outpath))
             # Add position of user to outpath
-            outpath = os.path.normpath(os.path.join(self.file_path_ref, outpath))
+            outpath = os.path.normpath(
+                os.path.join(self.file_path_ref, outpath))
         # Change runtime outpath if specified
         else:
             outpath = self._outpath
@@ -1211,7 +1231,7 @@ class Parser(object):
 
         # File path reference for relative file location
         file_path_ref = \
-                os.path.expandvars(os.path.expanduser(file_path_ref))
+            os.path.expandvars(os.path.expanduser(file_path_ref))
 
         # Add position of user to file_path_ref
         file_path_ref = \
@@ -1245,13 +1265,14 @@ class Parser(object):
         """
         steps = dict()
         # Extract all steps
-        steps_attributes = db.select("Step", None, {"benchmark_id": benchmark_id})
+        steps_attributes = db.select(
+            "Step", None, {"benchmark_id": benchmark_id})
         for step_attributes in steps_attributes:
             name, iterations, cycles, depend, export, \
                 active, max_async, work_dir, suffix, \
                 procs, shared, do_log_file, benchmark_id = step_attributes
             depend = set(val.strip() for val in
-                     depend.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
+                         depend.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
             export = bool(export)
             active = str(active).lower()
             if do_log_file in ["None", "False", "false"]:
@@ -1262,8 +1283,8 @@ class Parser(object):
                 raise ValueError('Empty "shared" attribute in ' +
                                  "<step> found.")
             step = jube.step.Step(name, depend, iterations, work_dir,
-                               shared, export, max_async, active, suffix,
-                               cycles, procs, do_log_file)
+                                  shared, export, max_async, active, suffix,
+                                  cycles, procs, do_log_file)
             # Extract related operations
             ops = self._extract_operation_from_database(db, name)
             for op in ops:
@@ -1288,8 +1309,8 @@ class Parser(object):
             active = str(active).lower()
             shared = bool(shared)
             operation = jube.step.Operation(do, async_fn, stdout_fn, stderr_fn,
-                                             active, shared, work_dir, break_fn,
-                                             error_fn, iid)
+                                            active, shared, work_dir, break_fn,
+                                            error_fn, iid)
             ops.append(operation)
         return ops
 
@@ -1302,10 +1323,12 @@ class Parser(object):
         filesets = db.select("UsedFileset", None, {"step_name": step_name})
         for fileset in filesets:
             sets.append(fileset[0])
-        paramsets = db.select("UsedParameterset", None, {"step_name": step_name})
+        paramsets = db.select("UsedParameterset", None,
+                              {"step_name": step_name})
         for paramset in paramsets:
             sets.append(paramset[0])
-        subsets = db.select("UsedSubstituteset", None, {"step_name": step_name})
+        subsets = db.select("UsedSubstituteset", None,
+                            {"step_name": step_name})
         for subset in subsets:
             sets.append(subset[0])
         return sets
@@ -1336,8 +1359,9 @@ class Parser(object):
         LOGGER.debug('  Parsing <step name="{0}">'.format(name))
         tmp = Parser._get_attr(etree_step, "depend", "")
         iterations = int(Parser._get_attr(etree_step, "iterations", "1"))
-        alt_work_dir = Parser._get_attr(etree_step,"work_dir")
-        export = Parser._get_attr(etree_step, "export", "false").lower() == "true"
+        alt_work_dir = Parser._get_attr(etree_step, "work_dir")
+        export = Parser._get_attr(
+            etree_step, "export", "false").lower() == "true"
         max_wps = Parser._get_attr(etree_step, "max_async", "0")
         active = Parser._get_attr(etree_step, "active", "true")
         suffix = Parser._get_attr(etree_step, "suffix", "")
@@ -1356,8 +1380,8 @@ class Parser(object):
                      tmp.split(jube.conf.DEFAULT_SEPARATOR) if val.strip())
 
         step = jube.step.Step(name, depend, iterations, alt_work_dir,
-                               shared_name, export, max_wps, active, suffix,
-                               cycles, procs, do_log_file)
+                              shared_name, export, max_wps, active, suffix,
+                              cycles, procs, do_log_file)
         for element in etree_step:
             Parser._check_tag(element, valid_tags)
             if element.tag == "do":
@@ -1388,14 +1412,14 @@ class Parser(object):
                 if cmd is None:
                     cmd = ""
                 operation = jube.step.Operation(cmd.strip(),
-                                                 async_filename,
-                                                 stdout_filename,
-                                                 stderr_filename,
-                                                 active,
-                                                 shared,
-                                                 alt_work_dir,
-                                                 break_filename,
-                                                 error_filename)
+                                                async_filename,
+                                                stdout_filename,
+                                                stderr_filename,
+                                                active,
+                                                shared,
+                                                alt_work_dir,
+                                                break_filename,
+                                                error_filename)
                 step.add_operation(operation)
             elif element.tag == "use":
                 step.add_uses(Parser._extract_use(element))
@@ -1404,13 +1428,15 @@ class Parser(object):
     def _extract_analysers_from_database(self, db, benchmark_id):
         """Extract all analyser from database"""
         analysers = dict()
-        analyser_attributes = db.select("Analyser", None, {"benchmark_id": benchmark_id})
+        analyser_attributes = db.select(
+            "Analyser", None, {"benchmark_id": benchmark_id})
         for analyse_attributes in analyser_attributes:
             name, reduce, benchmark_id = analyse_attributes
             reduce = bool(reduce)
             analyser = jube.analyser.Analyser(name, reduce)
 
-            patterns = db.select("AnalyserPattern", ["patternset_name"], {"analyser_name": name})
+            patterns = db.select("AnalyserPattern", ["patternset_name"], {
+                                 "analyser_name": name})
             patterns = [pattern for pattern, in patterns]
             analyser.add_uses(patterns)
             file_objects = self._extract_analyser_files_from_database(db, name)
@@ -1424,14 +1450,17 @@ class Parser(object):
     def _extract_analyser_files_from_database(self, db, analyser_name):
         """Extract all analyser files from database"""
         file_objects = []
-        files = db.select("AnalyseFile", ["analysefile_id", "path"], {"analyser_name": analyser_name})
+        files = db.select("AnalyseFile", ["analysefile_id", "path"], {
+                          "analyser_name": analyser_name})
         for file in files:
             iid, path = file
             file_obj = jube.analyser.Analyser.AnalyseFile(path)
-            uses = db.select("AnalyseFilePattern", ["patternset_name"], {"analysefile_id": iid})
+            uses = db.select("AnalyseFilePattern", [
+                             "patternset_name"], {"analysefile_id": iid})
             uses = [use for use, in uses]
             file_obj.add_uses(uses)
-            step = db.select("AnalyseStep", ["step_name"], {"analysefile_id": iid})[0][0]
+            step = db.select("AnalyseStep", ["step_name"], {
+                             "analysefile_id": iid})[0][0]
             file_objects.append((file_obj, step))
         return file_objects
 
@@ -1452,15 +1481,16 @@ class Parser(object):
     def _extract_analyser(etree_analyser):
         """Extract an analyser from etree"""
         valid_tags = ["use", "analyse"]
-        name = Parser._attribute_from_element(etree_analyser,"name")
+        name = Parser._attribute_from_element(etree_analyser, "name")
         reduce_iteration = \
-            Parser._get_attr(etree_analyser, "reduce", "true").lower() == "true"
+            Parser._get_attr(etree_analyser, "reduce",
+                             "true").lower() == "true"
         analyser = jube.analyser.Analyser(name, reduce_iteration)
         LOGGER.debug('  Parsing <analyser name="{0}">'.format(name))
         for element in etree_analyser:
             Parser._check_tag(element, valid_tags)
             if element.tag == "analyse":
-                step_name = Parser._attribute_from_element(element,"step")
+                step_name = Parser._attribute_from_element(element, "step")
                 # If there are no files, just add a dummy element to the list
                 if len(element) == 0:
                     analyser.add_analyse(step_name, None)
@@ -1490,11 +1520,13 @@ class Parser(object):
         """Extract all results from database"""
         results = dict()
         results_order = list()
-        results_attributes = db.select("Result", ["result_id", "result_dir"], {"benchmark_id": benchmark_id})
+        results_attributes = db.select("Result", ["result_id", "result_dir"], {
+                                       "benchmark_id": benchmark_id})
         for result_attributes in results_attributes:
             iid, result_dir = result_attributes
             result = self._extract_subresult_from_database(db, iid, result_dir)
-            uses = db.select("ResultAnalyser", ["analyser_name"], {"result_id": iid})
+            uses = db.select("ResultAnalyser", [
+                             "analyser_name"], {"result_id": iid})
             uses = [use for use, in uses]
             result.add_uses(uses)
             results[result.name] = result
@@ -1508,11 +1540,13 @@ class Parser(object):
         for table in tables:
             name, style, separator, res_filter, transpose, sort, result_id = table
             transpose = bool(transpose)
-            sort_names = [] if sort is None else sort.split(jube.conf.DEFAULT_SEPARATOR)
+            sort_names = [] if sort is None else sort.split(
+                jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.table.Table(name, style, separator,
                                                    sort_names, transpose, res_filter)
             result.result_dir = result_dir
-            columns = db.select("ResultTableColumn", None, {"table_name": name})
+            columns = db.select("ResultTableColumn", None,
+                                {"table_name": name})
             for column in columns:
                 iid, column_name, title, data_format, colw, name = column
                 result.add_column(column_name, colw, data_format, title)
@@ -1524,9 +1558,11 @@ class Parser(object):
             primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
                                   {"database_name": name, "is_primary": 1})
             primekeys = [key for key, in primekeys]
-            result = jube.result_types.database.Database(name, res_filter, primekeys, file)
+            result = jube.result_types.database.Database(
+                name, res_filter, primekeys, file)
             result.result_dir = result_dir
-            keys = db.select("ResultDatabaseKey", None, {"database_name": name})
+            keys = db.select("ResultDatabaseKey", None,
+                             {"database_name": name})
             for key in keys:
                 iid, key_name, title, data_format, is_primary, name = key
                 result.add_key(key_name, data_format, title)
@@ -1535,7 +1571,8 @@ class Parser(object):
         syslogs = db.select("ResultSyslog", None, {"result_id": result_id})
         for syslog in syslogs:
             name, address, sys_format, res_filter, host, port, sort, result_id = syslog
-            sort_names = [] if sort is None else sort.split(jube.conf.DEFAULT_SEPARATOR)
+            sort_names = [] if sort is None else sort.split(
+                jube.conf.DEFAULT_SEPARATOR)
             result = jube.result_types.syslog.SysloggedResult(
                 name, address, host, port, sys_format, sort_names, res_filter)
             keys = db.select("ResultSyslogKey", None, {"syslog_name": name})
@@ -1546,29 +1583,33 @@ class Parser(object):
         # Extract figure results
         figures = db.select("ResultFigure", None, {"result_id": result_id})
         for figure in figures:
-            name, title, savefig, showfig, filter, result_id, nrows, ncols= figure
+            name, title, savefig, showfig, filter, result_id, nrows, ncols = figure
             showfig = bool(showfig)
-            result = jube.result_types.figure.Figure(name, showfig, savefig, title, filter, nrows, ncols)
+            result = jube.result_types.figure.Figure(
+                name, showfig, savefig, title, filter, nrows, ncols)
 
             plots = db.select("ResultFigurePlot", None, {"figure_name": name})
             for plot in plots:
                 iid, legend, xlabel, ylabel, xscale, yscale, figure_name = plot
                 legend = bool(legend)
-                
-                db_data = db.select("ResultFigurePlotData", None, {"plot_id": iid})
+
+                db_data = db.select("ResultFigurePlotData",
+                                    None, {"plot_id": iid})
                 plot_data = list()
                 for data in db_data:
                     data_id, x, y, groupby, plot_type, label, color, marker, linestyle, sort_data, plot_id = data
-                    groupby = [g.strip() for g in groupby.split(jube.conf.DEFAULT_SEPARATOR) if g.strip() != ""]
+                    groupby = [g.strip() for g in groupby.split(
+                        jube.conf.DEFAULT_SEPARATOR) if g.strip() != ""]
                     result.add_key(x)
                     result.add_key(y)
                     for group in groupby:
                         result.add_key(group)
-                    plot_data.append({"x": x, "y": y, "type": plot_type, 
-                                    "groupby": groupby, "label": label,
-                                    "color": color, "marker": marker,
-                                    "linestyle": linestyle, "sort": bool(sort_data)})
-                result.add_plot(plot_data, legend, xlabel, ylabel, xscale, yscale)
+                    plot_data.append({"x": x, "y": y, "type": plot_type,
+                                      "groupby": groupby, "label": label,
+                                      "color": color, "marker": marker,
+                                      "linestyle": linestyle, "sort": bool(sort_data)})
+                result.add_plot(plot_data, legend, xlabel,
+                                ylabel, xscale, yscale)
             return result
 
     @staticmethod
@@ -1626,7 +1667,8 @@ class Parser(object):
         """Extract a table from etree"""
         name = Parser._attribute_from_element(etree_table, "name")
         separator = \
-            Parser._get_attr(etree_table, "separator", jube.conf.DEFAULT_SEPARATOR, False)
+            Parser._get_attr(etree_table, "separator",
+                             jube.conf.DEFAULT_SEPARATOR, False)
         style = Parser._get_attr(etree_table, "style", "csv")
         if style not in ["csv", "pretty", "aligned"]:
             raise ValueError('Not allowed style-type "{0}" '
@@ -1636,11 +1678,12 @@ class Parser(object):
         sort_names = [sort_name.strip() for sort_name in sort_names]
         sort_names = [
             sort_name for sort_name in sort_names if len(sort_name) > 0]
-        transpose = Parser._get_attr(etree_table, "transpose","false").lower() == "true"
+        transpose = Parser._get_attr(
+            etree_table, "transpose", "false").lower() == "true"
         res_filter = Parser._get_attr(etree_table, "filter")
         table = jube.result_types.table.Table(name, style, separator,
-                                               sort_names, transpose,
-                                               res_filter)
+                                              sort_names, transpose,
+                                              res_filter)
         for element in etree_table:
             Parser._check_tag(element, ["column"])
             column_name = element.text
@@ -1680,7 +1723,8 @@ class Parser(object):
                 raise ValueError("Empty <key> not allowed")
             title = Parser._get_attr(element, "title")
             format_string = Parser._get_attr(element, "format")
-            primekey = Parser._get_attr(element, "primekey","false").lower() == "true"
+            primekey = Parser._get_attr(
+                element, "primekey", "false").lower() == "true"
             database.add_key(key_name, format_string, title, primekey)
         return database
 
@@ -1691,64 +1735,70 @@ class Parser(object):
         valid_plot_types = ["line", "scatter", "bar", "stem", "step"]
 
         name = Parser._attribute_from_element(etree_figure, "name")
-        showfig = Parser._get_attr(etree_figure,"showfig", "true").lower()
+        showfig = Parser._get_attr(etree_figure, "showfig", "true").lower()
         if showfig not in ["true", "false"]:
-            raise ValueError("Supported values for <figure showfig>: true, false")
+            raise ValueError(
+                "Supported values for <figure showfig>: true, false")
         showfig = showfig == "true"
-        savefig = Parser._get_attr(etree_figure,"savefig")
-        title = Parser._get_attr(etree_figure,"title", "")
-        res_filter = Parser._get_attr(etree_figure,"filter")
-        nrows = int(Parser._get_attr(etree_figure,"nrows", "0"))
+        savefig = Parser._get_attr(etree_figure, "savefig")
+        title = Parser._get_attr(etree_figure, "title", "")
+        res_filter = Parser._get_attr(etree_figure, "filter")
+        nrows = int(Parser._get_attr(etree_figure, "nrows", "0"))
         if nrows < 0:
             nrows = 0
-        ncols = int(Parser._get_attr(etree_figure,"ncols", "0"))
+        ncols = int(Parser._get_attr(etree_figure, "ncols", "0"))
         if ncols < 0:
             nrows = 0
 
-        figure = jube.result_types.figure.Figure(name, showfig, savefig, title, res_filter, nrows, ncols)
+        figure = jube.result_types.figure.Figure(
+            name, showfig, savefig, title, res_filter, nrows, ncols)
 
         for etree_plot in etree_figure:
             Parser._check_tag(etree_plot, ["plot"])
-            legend = Parser._get_attr(etree_plot,"legend", "false").lower()
+            legend = Parser._get_attr(etree_plot, "legend", "false").lower()
             if legend not in ["true", "false"]:
-                raise ValueError("Supported values for <figure legend>: true, false")
+                raise ValueError(
+                    "Supported values for <figure legend>: true, false")
             legend = legend == "true"
-            xlabel = Parser._get_attr(etree_plot,"xlabel", "")
-            ylabel = Parser._get_attr(etree_plot,"ylabel", "")
-            xscale = Parser._get_attr(etree_plot,"xscale","")
-            if xscale not in valid_scale_types and xscale !="":
+            xlabel = Parser._get_attr(etree_plot, "xlabel", "")
+            ylabel = Parser._get_attr(etree_plot, "ylabel", "")
+            xscale = Parser._get_attr(etree_plot, "xscale", "")
+            if xscale not in valid_scale_types and xscale != "":
                 raise ValueError("Supported values for <plot xscale>: {}"
-                                    .format(", ".join(valid_scale_types)))
-            yscale = Parser._get_attr(etree_plot,"yscale","")
-            if yscale not in valid_scale_types and xscale !="":
+                                 .format(", ".join(valid_scale_types)))
+            yscale = Parser._get_attr(etree_plot, "yscale", "")
+            if yscale not in valid_scale_types and xscale != "":
                 raise ValueError("Supported values for <plot yscale>: {}"
-                                    .format(", ".join(valid_scale_types)))
+                                 .format(", ".join(valid_scale_types)))
 
             plot_data = list()
             for etree_data in etree_plot:
                 Parser._check_tag(etree_data, ["data"])
                 x = Parser._attribute_from_element(etree_data, "x")
                 y = Parser._attribute_from_element(etree_data, "y")
-                groupby = Parser._get_attr(etree_data,"groupby", "").split(jube.conf.DEFAULT_SEPARATOR)
+                groupby = Parser._get_attr(etree_data, "groupby", "").split(
+                    jube.conf.DEFAULT_SEPARATOR)
                 groupby = [g.strip() for g in groupby if g.strip() != ""]
-                data_type = Parser._get_attr(etree_data,"type", "line")
+                data_type = Parser._get_attr(etree_data, "type", "line")
                 if data_type not in valid_plot_types:
                     raise ValueError("Supported values for <data type>: {}"
                                      .format(", ".join(valid_plot_types)))
-                label = Parser._get_attr(etree_data,"label", "")
-                color = Parser._get_attr(etree_data,"color", "")
-                marker = Parser._get_attr(etree_data,"marker", "")
-                linestyle = Parser._get_attr(etree_data,"linestyle", "")
-                sort_data = Parser._get_attr(etree_data,"sort", "false").lower()
+                label = Parser._get_attr(etree_data, "label", "")
+                color = Parser._get_attr(etree_data, "color", "")
+                marker = Parser._get_attr(etree_data, "marker", "")
+                linestyle = Parser._get_attr(etree_data, "linestyle", "")
+                sort_data = Parser._get_attr(
+                    etree_data, "sort", "false").lower()
                 if sort_data not in ["true", "false"]:
-                    raise ValueError("Supported values for <data sort_data>: true, false")
+                    raise ValueError(
+                        "Supported values for <data sort_data>: true, false")
                 sort_data = sort_data == "true"
 
                 figure.add_key(x)
                 figure.add_key(y)
                 for group in groupby:
                     figure.add_key(group)
-                plot_data.append({"x": x, "y": y, "type": data_type, 
+                plot_data.append({"x": x, "y": y, "type": data_type,
                                   "groupby": groupby, "label": label,
                                   "color": color, "marker": marker,
                                   "linestyle": linestyle, "sort": sort_data})
@@ -1836,7 +1886,7 @@ class Parser(object):
 
         # Find element in XML-tree
         elements = jube.util.util.get_tree_elements(etree, set_type,
-                                                     {"name": search_name})
+                                                    {"name": search_name})
         # Element can also be the root element itself
         if etree.tag == set_type:
             element = jube.util.util.get_tree_element(
@@ -1844,7 +1894,7 @@ class Parser(object):
             if element is not None:
                 elements.append(element)
 
-        test_duplicate=None
+        test_duplicate = None
         duplicate_attr = Parser._get_attr(elements[0], "duplicate")
         if duplicate == "###initiated_with_without_duplicate_mentioning###":
             if duplicate_attr is not None:
@@ -1859,7 +1909,8 @@ class Parser(object):
                     test_duplicate = duplicate_attr
             if duplicate is not None:
                 if test_duplicate != duplicate:
-                    raise ValueError("The {0} {1} is mentioned at least twice with different duplicate options.".format(set_type, name))
+                    raise ValueError(
+                        "The {0} {1} is mentioned at least twice with different duplicate options.".format(set_type, name))
         if duplicate == "###initiated_with_without_duplicate_mentioning###":
             raise Exception("Unknown error in extracting an extern set." +
                             "This should not happen. Please contact the JUBE developers.")
@@ -1930,8 +1981,9 @@ class Parser(object):
     def _extract_parametersets_from_database(self, db, benchmark_id):
         """Extract all parametersets from database"""
         parametersets = dict()
-        paramsets = db.select("Parameterset", None, {"benchmark_id": benchmark_id})
-        for paramset in paramsets: 
+        paramsets = db.select("Parameterset", None, {
+                              "benchmark_id": benchmark_id})
+        for paramset in paramsets:
             name, duplicate, benchmark_id = paramset
             parameterset = jube.parameter.Parameterset(name, duplicate)
             for parameter in self._extract_parameters_from_database(db, name):
@@ -1942,7 +1994,8 @@ class Parser(object):
     def _extract_parameters_from_database(self, db, parameterset_name):
         """Extract all parameters from parameterset from database"""
         parameters = list()
-        params = db.select("Parameter", None, {"parameterset_name": parameterset_name})
+        params = db.select("Parameter", None, {
+                           "parameterset_name": parameterset_name})
         for param in params:
             iid, name, datatype, export, unit, mode, separator, \
                 update_mode, duplicate, value, parameterset_name = param
@@ -1966,7 +2019,7 @@ class Parser(object):
                                  "<parameterset> found.")
             LOGGER.debug('  Parsing <parameterset name="{0}">'.format(name))
             duplicate = Parser._get_attr(element, "duplicate", "replace")
-            if duplicate not in ["replace","concat","error"]:
+            if duplicate not in ["replace", "concat", "error"]:
                 raise ValueError('Invalid "duplicate" attribute in ' +
                                  "parameterset {0} found. ".format(name) +
                                  'Use "replace" (default)' +
@@ -2009,30 +2062,32 @@ class Parser(object):
                 raise ValueError(('name="{0}" in <parameter> ' +
                                   "contains a disallowed " +
                                   "character").format(name))
-            separator = Parser._get_attr(param, "separator",jube.conf.DEFAULT_SEPARATOR,False)
+            separator = Parser._get_attr(
+                param, "separator", jube.conf.DEFAULT_SEPARATOR, False)
             parameter_type = Parser._get_attr(param, "type", "string")
             parameter_mode = Parser._get_attr(param, "mode", "text")
             parameter_unit = Parser._get_attr(param, "unit", "")
             parameter_update_mode = Parser._get_attr(param, "update_mode",
-                                              "never")
+                                                     "never")
             if parameter_update_mode not in jube.parameter.UPDATE_MODES:
                 raise ValueError(
                     ('update_mode="{0}" in ' +
                      '<parameter name="{1}"> does not exist')
                     .format(parameter_update_mode, name))
-            export = Parser._get_attr(param, "export", "false").lower() == "true"
+            export = Parser._get_attr(
+                param, "export", "false").lower() == "true"
 
             duplicate = Parser._get_attr(param, "duplicate", "none")
-            if duplicate not in ["replace","concat","error","none"]:
+            if duplicate not in ["replace", "concat", "error", "none"]:
                 raise ValueError('Invalid "duplicate" attribute in ' +
-                                 "parameter {0} found.".format(name) + 
+                                 "parameter {0} found.".format(name) +
                                  'Use "replace", "concat", ' +
                                  '"error" or "none" (default).')
             if parameter_mode not in jube.conf.ALLOWED_MODETYPES:
                 raise ValueError(
                     ('parameter-mode "{0}" not allowed in ' +
                      '<parameter name="{1}">').format(parameter_mode,
-                                                        name))
+                                                      name))
             value_etree = param.find("value")
             if value_etree is not None:
                 if value_etree.text is None:
@@ -2066,7 +2121,8 @@ class Parser(object):
     def _extract_patternsets_from_database(self, db, benchmark_id):
         """Return patternset from database"""
         patternsets = dict()
-        pattsets = db.select("Patternset", None, {"benchmark_id": benchmark_id})
+        pattsets = db.select("Patternset", None, {
+                             "benchmark_id": benchmark_id})
         for pattset in pattsets:
             name, benchmark_id = pattset
             patternset = jube.pattern.Patternset(name)
@@ -2078,14 +2134,15 @@ class Parser(object):
     def _extract_pattern_from_database(self, db, patternset_name):
         """Extract pattern from patternset from database"""
         patternlist = list()
-        patterns = db.select("Pattern", None, {"patternset_name": patternset_name})
+        patterns = db.select(
+            "Pattern", None, {"patternset_name": patternset_name})
         for pattern in patterns:
             name, datatype, unit, mode, dotall, \
                 default, value, patternset_name = pattern
             dotall = bool(dotall)
             patternlist.append(jube.pattern.Pattern(name, value, mode,
-                                                     datatype, unit,
-                                                     default, dotall))
+                                                    datatype, unit,
+                                                    default, dotall))
         return patternlist
 
     def _extract_patternsets(self, etree):
@@ -2141,15 +2198,16 @@ class Parser(object):
                     pattern_mode, name))
             content_type = Parser._get_attr(pattern, "type", "string")
             unit = Parser._get_attr(pattern, "unit", "")
-            dotall = Parser._get_attr(pattern, "dotall", "false").lower() == "true"
+            dotall = Parser._get_attr(
+                pattern, "dotall", "false").lower() == "true"
             default = Parser._get_attr(pattern, "default")
             if pattern.text is None:
                 value = ""
             else:
                 value = pattern.text.strip()
             patternlist.append(jube.pattern.Pattern(name, value, pattern_mode,
-                                                     content_type, unit,
-                                                     default, dotall))
+                                                    content_type, unit,
+                                                    default, dotall))
         return patternlist
 
     def _extract_filesets_from_database(self, db, benchmark_id):
@@ -2174,11 +2232,11 @@ class Parser(object):
             is_internal_ref = bool(is_internal_ref)
             active = str(active).lower()
             if file_type == "Copy":
-                file_obj = jube.fileset.Copy(path, name, is_internal_ref, \
-                                              active, source_dir, target_dir)
+                file_obj = jube.fileset.Copy(path, name, is_internal_ref,
+                                             active, source_dir, target_dir)
             elif file_type == "Link":
-                file_obj = jube.fileset.Link(path, name, is_internal_ref, \
-                                              active, source_dir, target_dir)
+                file_obj = jube.fileset.Link(path, name, is_internal_ref,
+                                             active, source_dir, target_dir)
             filelist.append(file_obj)
         # Extract Prepares
         prepares = db.select("Prepare", None, {"fileset_name": fileset_name})
@@ -2187,7 +2245,7 @@ class Parser(object):
             active = str(active).lower()
 
             prepare_obj = jube.fileset.Prepare(do, stdout_fn,
-                                                stderr_fn,work_dir, active)
+                                               stderr_fn, work_dir, active)
             filelist.append(prepare_obj)
         return filelist
 
@@ -2226,8 +2284,8 @@ class Parser(object):
         for etree_file in etree_fileset:
             Parser._check_tag(etree_file, valid_tags)
             if etree_file.tag in ["copy", "link"]:
-                separator = Parser._get_attr(etree_file, 
-                    "separator", jube.conf.DEFAULT_SEPARATOR,False)
+                separator = Parser._get_attr(etree_file,
+                                             "separator", jube.conf.DEFAULT_SEPARATOR, False)
                 source_dir = Parser._get_attr(etree_file, "directory", "")
                 # New source_dir attribute overwrites deprecated directory
                 # attribute
@@ -2241,12 +2299,13 @@ class Parser(object):
                 # Check if the filepath is relatively seen to working dir or the
                 # position of the xml-input-file
                 is_internal_ref = \
-                    Parser._get_attr(etree_file, "rel_path_ref", "external") == "internal"
+                    Parser._get_attr(etree_file, "rel_path_ref",
+                                     "external") == "internal"
                 if etree_file.text is None:
                     raise ValueError("Empty filelist in <{0}> found."
                                      .format(etree_file.tag))
                 files = jube.util.util.safe_split(etree_file.text.strip(),
-                                                   separator)
+                                                  separator)
                 if alt_name is not None:
                     # Use the new alternative filenames
                     names = [name.strip() for name in
@@ -2287,31 +2346,34 @@ class Parser(object):
                 active = Parser._get_attr(etree_file, "active", "true")
 
                 prepare_obj = jube.fileset.Prepare(cmd, stdout_filename,
-                                                    stderr_filename,
-                                                    alt_work_dir, active)
+                                                   stderr_filename,
+                                                   alt_work_dir, active)
                 filelist.append(prepare_obj)
         return filelist
 
     def _extract_substitutesets_from_database(self, db, benchmark_id):
         """Extract substitutesets from database"""
         substitutesets = dict()
-        subsets = db.select("Substituteset", None, {"benchmark_id": benchmark_id})
+        subsets = db.select("Substituteset", None, {
+                            "benchmark_id": benchmark_id})
         for subset in subsets:
             name, benchmark_id = subset
             files, sub_dict = self._extract_subs_from_database(db, name)
             substitutesets[name] = \
-                    jube.substitute.Substituteset(name, files, sub_dict)
+                jube.substitute.Substituteset(name, files, sub_dict)
         return substitutesets
 
     def _extract_subs_from_database(self, db, substituteset_name):
         """Extract substitutes from database"""
         files = list()
         sub_dict = dict()
-        file_rows = db.select("SubstituteFile", None, {"substituteset_name": substituteset_name})
+        file_rows = db.select("SubstituteFile", None, {
+                              "substituteset_name": substituteset_name})
         for file in file_rows:
             iid, in_file, out_file, out_mode, substituteset_name = file
             files.append((out_file, in_file, out_mode))
-        sub_rows = db.select("Substitute", None, {"substituteset_name": substituteset_name})
+        sub_rows = db.select("Substitute", None, {
+                             "substituteset_name": substituteset_name})
         for sub in sub_rows:
             iid, source, dest, mode, substituteset_name = sub
             sub_dict[source] = jube.substitute.Sub(source, mode, dest)

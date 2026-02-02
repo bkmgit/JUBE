@@ -22,6 +22,7 @@ import unittest
 import jube.main
 from examples_tests import TestCase
 
+
 class TestTaggingExample(TestCase.TestExample):
 
     """Class for testing the tagging example"""
@@ -34,12 +35,12 @@ class TestTaggingExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "tagging"
-        cls._stdout = [["Hallo $world_str"] , ["Hallo $world_str"],
+        cls._stdout = [["Hallo $world_str"], ["Hallo $world_str"],
                        ["Hello World"], ["Hello World"],
                        ["Hallo World"], ["Hallo World"]]
         super(TestTaggingExample, cls).setUpClass()
 
-        #Create run arguments for commands with all tag combinations
+        # Create run arguments for commands with all tag combinations
         tags = ["deu", "eng", "deu eng"]
         run_args = []
         for tag in tags:
@@ -52,8 +53,10 @@ class TestTaggingExample(TestCase.TestExample):
         """
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
-                jube.main.main(["continue", self._bench_run_path, "--id", f"{wp_id}"])
+                jube.main.main(
+                    ["continue", self._bench_run_path, "--id", f"{wp_id}"])
             break
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,6 +23,7 @@ import os
 import re
 from examples_tests import TestCase
 
+
 class TestIterationsExample(TestCase.TestExample):
 
     """Class for testing the iterations example"""
@@ -35,10 +36,10 @@ class TestIterationsExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "iterations"
-        cls._stdout = [ foo + " iter:"+ iter for foo in ["1", "2", "4"]
-                        for iter in ["0", "1"]]
-        cls._stdout += [ foo + " iter:"+ iter for foo in ["1", "2", "4"]
-                         for iter in ["0", "1", "2", "3"]]
+        cls._stdout = [foo + " iter:" + iter for foo in ["1", "2", "4"]
+                       for iter in ["0", "1"]]
+        cls._stdout += [foo + " iter:" + iter for foo in ["1", "2", "4"]
+                        for iter in ["0", "1", "2", "3"]]
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestIterationsExample, cls).setUpClass()
         super(TestIterationsExample, cls)._execute_commands(["-r"])
@@ -49,28 +50,29 @@ class TestIterationsExample(TestCase.TestExample):
         for the result output to allow an example specific test.
         """
         for run_path, command_wps in self._wp_paths.items():
-            #Get content of target result output
+            # Get content of target result output
             result_file_path = os.path.join(os.path.dirname(__file__),
                                             "../examples_result_output",
                                             self._name, "result.dat")
             origin_result_file = open(result_file_path)
             origin_result_content = \
-                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)"
-                            ,line) for line in origin_result_file]
+                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)", line)
+                 for line in origin_result_file]
             origin_result_file.close()
 
-            #Get actual content of result output
+            # Get actual content of result output
             run_result_file = open(os.path.join(run_path, "result",
                                                 "result.dat"))
             run_result_content = \
-                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)"
-                            ,line) for line in run_result_file]
+                [re.findall(r"(\|.+ \| .+ \|)(?: [^|]+ \| [^|]+ \| [^|]+ )(\| .+ \|)", line)
+                 for line in run_result_file]
             run_result_file.close()
 
-            #Check that the two results using a regular expression are the same.
+            # Check that the two results using a regular expression are the same.
             for run_line in run_result_content:
                 self.assertTrue(run_line in origin_result_content, "Result for "
                                 "example {} not correct".format(self._name))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestDuplicateExample(TestCase.TestExample):
 
     """Class for testing the duplicate example"""
@@ -34,19 +35,20 @@ class TestDuplicateExample(TestCase.TestExample):
         """
         cls._name = "duplicate"
         cls._stdout = [["1"], ["1"], ["1", "3", "6", "10"],
-                        ["1", "3", "6", "10"],
-                        ["1", "210", "465", "820"],
-                        ["1", "210", "465", "820"],
-                        ["1", "3", "210", "6", "465", "10", "820"],
-                        ["1", "3", "210", "6", "465", "10", "820"]]
+                       ["1", "3", "6", "10"],
+                       ["1", "210", "465", "820"],
+                       ["1", "210", "465", "820"],
+                       ["1", "3", "210", "6", "465", "10", "820"],
+                       ["1", "3", "210", "6", "465", "10", "820"]]
         super(TestDuplicateExample, cls).setUpClass()
 
-        #Create run arguments for commands with all tag combinations
+        # Create run arguments for commands with all tag combinations
         tags = ["few", "many", "few many"]
         run_args = [""]
         for tag in tags:
             run_args.append("--tag "+tag)
         super(TestDuplicateExample, cls)._execute_commands(run_args)
+
 
 if __name__ == "__main__":
     unittest.main()

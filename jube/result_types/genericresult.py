@@ -69,7 +69,8 @@ class GenericResult(Result):
                     else:
                         self._data[key] = list()
 
-            number_of_new_values = len(list(data.values())[0]) if len(data) > 0 else 0
+            number_of_new_values = len(
+                list(data.values())[0]) if len(data) > 0 else 0
             # Add new rows
             for key in self._data.keys():
                 if key in data.keys():
@@ -224,8 +225,8 @@ class GenericResult(Result):
                                "ignored for exclusion.".format(exclude_name))
 
         # Select and exclude table columns
-        self._keys = [key for key in self._keys if key.name in select and \
-                                                   key.name not in exclude]
+        self._keys = [key for key in self._keys if key.name in select and
+                      key.name not in exclude]
 
         # Create result data
         data = dict()

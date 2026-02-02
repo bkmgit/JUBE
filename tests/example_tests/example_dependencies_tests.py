@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestDependenciesExample(TestCase.TestExample):
 
     """Class for testing the dependencies example"""
@@ -37,6 +38,7 @@ class TestDependenciesExample(TestCase.TestExample):
                        ["1", "2", "4", "1", "2", "4"]]
         super(TestDependenciesExample, cls).setUpClass()
         super(TestDependenciesExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

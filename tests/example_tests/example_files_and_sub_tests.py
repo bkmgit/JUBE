@@ -20,7 +20,8 @@
 
 import unittest
 import os
-from examples_tests import TestCase 
+from examples_tests import TestCase
+
 
 class TestFilesAndSubExample(TestCase.TestExample):
 
@@ -34,7 +35,7 @@ class TestFilesAndSubExample(TestCase.TestExample):
         Create the necessary variables and paths for the specific example
         """
         cls._name = "files_and_sub"
-        cls._stdout = ["Number: "+i+ "\nZahl: "+j
+        cls._stdout = ["Number: " + i + "\nZahl: " + j
                        for i in ["1", "2", "4"]
                        for j in ["2", "4", "5"]]
         cls._stdout = [cls._stdout, cls._stdout]
@@ -47,10 +48,10 @@ class TestFilesAndSubExample(TestCase.TestExample):
         """
         for run_path, command_wps in self._wp_paths.items():
             command_id = int(run_path[-2:])
-            #Check for content in work directory
+            # Check for content in work directory
             for wp_id, wp_path in command_wps.items():
                 work_path = self._get_work_path(wp_path)
-                #Check for content of file.in
+                # Check for content of file.in
                 origin_file_in = self._content_of_file(os.path.join(self._path,
                                                                     "file.in"))
                 actual_file_in = self._content_of_file(os.path.join(work_path,
@@ -60,13 +61,14 @@ class TestFilesAndSubExample(TestCase.TestExample):
                                  "with id {0} in directory {1} has not the "
                                  "right content".format(wp_id, work_path))
 
-                #Check for content of file.out -> sub successful?
+                # Check for content of file.out -> sub successful?
                 file_out = self._content_of_file(os.path.join(work_path,
                                                               "file.out"))
                 self.assertEqual(file_out, self._stdout[command_id][wp_id],
                                  "Error: file.out in work for workpackage "
                                  "with id {0} in directory {1} has not the "
                                  "right content".format(wp_id, work_path))
+
 
 if __name__ == "__main__":
     unittest.main()

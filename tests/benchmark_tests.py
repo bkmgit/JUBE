@@ -26,6 +26,7 @@ import jube.parameter
 import jube.benchmark
 import jube.workpackage
 
+
 class TestBenchmark(unittest.TestCase):
 
     """Benchmark test class"""
@@ -42,8 +43,8 @@ class TestBenchmark(unittest.TestCase):
         self.step = jube.step.Step(name="execution", depend=set())
         self.step.add_uses(["param_set"])
         self.operation = jube.step.Operation('echo "$i"', stdout_filename="stdout",
-                                              stderr_filename="stderr",
-                                              work_dir=".", error_filename="error")
+                                             stderr_filename="stderr",
+                                             work_dir=".", error_filename="error")
         self.step.add_operation(self.operation)
         self.benchmark = jube.benchmark.Benchmark(
             name="workpackages",

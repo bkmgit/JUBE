@@ -29,26 +29,28 @@ import jube.workpackage
 import jube.main
 import subprocess
 
+
 class TestStep(unittest.TestCase):
 
     """Step test class"""
 
     def setUp(self):
         self.para_cluster = \
-            jube.parameter.Parameter.create_parameter("cluster_module", "CM, DAM, ESB")
+            jube.parameter.Parameter.create_parameter(
+                "cluster_module", "CM, DAM, ESB")
         self.paramset_cluster = jube.parameter.Parameterset("cluster")
         self.paramset_cluster.add_parameter(self.para_cluster)
 
         self.para_acc = \
             jube.parameter.Parameter.create_parameter("ACC",
-                                                       "{'CM': '66', 'DAM': '77', 'ESB': '88'}"+
-                                                       ".get('${cluster_module}', 0)",
-                                                       parameter_mode="python")
+                                                      "{'CM': '66', 'DAM': '77', 'ESB': '88'}" +
+                                                      ".get('${cluster_module}', 0)",
+                                                      parameter_mode="python")
         self.para_acc_step = \
             jube.parameter.Parameter.create_parameter("ACC_STEP",
-                                                       "{'sec': '${ACC}'}.get('$jube_step_name', 'NO_ACC')",
-                                                       parameter_mode="python",
-                                                       update_mode=jube.parameter.STEP_MODE)
+                                                      "{'sec': '${ACC}'}.get('$jube_step_name', 'NO_ACC')",
+                                                      parameter_mode="python",
+                                                      update_mode=jube.parameter.STEP_MODE)
         self.parameterset = jube.parameter.Parameterset("update_test")
         self.parameterset.add_parameter(self.para_acc)
         self.parameterset.add_parameter(self.para_acc_step)
@@ -56,28 +58,29 @@ class TestStep(unittest.TestCase):
         self.first_step = jube.step.Step(name="first", depend=set())
         self.first_step.add_uses(["cluster", "update_test"])
         operation = jube.step.Operation('echo "${ACC}, ${ACC_STEP}"',
-                                         stdout_filename="stdout",
-                                         stderr_filename="stderr",
-                                         work_dir=".", error_filename="error")
+                                        stdout_filename="stdout",
+                                        stderr_filename="stderr",
+                                        work_dir=".", error_filename="error")
         self.first_step.add_operation(operation)
 
         self.second_step = jube.step.Step(name="sec", depend={"first"})
         operation = jube.step.Operation('echo "BEFORE ${ACC}, ${ACC_STEP}"',
-                                         stdout_filename="stdout",
-                                         stderr_filename="stderr",
-                                         work_dir=".", error_filename="error")
+                                        stdout_filename="stdout",
+                                        stderr_filename="stderr",
+                                        work_dir=".", error_filename="error")
         self.second_step.add_operation(operation)
         operation = jube.step.Operation("", stdout_filename="stdout",
-                                         stderr_filename="stderr",
-                                         async_filename="ready",
-                                         work_dir=".", error_filename="error")
+                                        stderr_filename="stderr",
+                                        async_filename="ready",
+                                        work_dir=".", error_filename="error")
         self.second_step.add_operation(operation)
         operation = jube.step.Operation('echo "AFTER ${ACC}, ${ACC_STEP}"',
-                                         stdout_filename="stdout",
-                                         stderr_filename="stderr",
-                                         work_dir=".", error_filename="error")
+                                        stdout_filename="stdout",
+                                        stderr_filename="stderr",
+                                        work_dir=".", error_filename="error")
         self.second_step.add_operation(operation)
-        self.bench_run_path = os.path.join(os.path.dirname(__file__), "bench_run")
+        self.bench_run_path = os.path.join(
+            os.path.dirname(__file__), "bench_run")
         self.benchmark = jube.benchmark.Benchmark(
             name="update_test",
             outpath=self.bench_run_path,
@@ -108,7 +111,6 @@ class TestStep(unittest.TestCase):
             f.close()
             self.assertEqual(stdout, output[i])
 
-
         # Test if second step was succesful until done file
         output = ["BEFORE 66, 66\n", "BEFORE 77, 77\n", "BEFORE 88, 88\n"]
         for i, path in enumerate(["000003_sec", "000004_sec", "000005_sec"]):
@@ -137,7 +139,7 @@ class TestStep(unittest.TestCase):
             f.close()
             self.assertEqual(stdout, output[i])
 
-    def tearDown(self)->None:
+    def tearDown(self) -> None:
         shutil.rmtree(self.bench_run_path)
 
 
@@ -151,7 +153,7 @@ class TestOperation(unittest.TestCase):
         self.echoPath = self.echoPath.replace("\n", "")
         self.currWorkDir = os.getcwd()
         self.operation = jube.step.Operation(self.echoPath+" Test", stdout_filename="stdout",
-                                              stderr_filename="stderr", work_dir=".", error_filename="error")
+                                             stderr_filename="stderr", work_dir=".", error_filename="error")
         self.parameter_dict = {
             "param": "p1",
             "jube_benchmark_id": "0",
@@ -206,12 +208,12 @@ class TestOperation(unittest.TestCase):
         self.operation._async_filename = "ready"
         # First run (done file not existing -> not done)
         continue_op, continue_cycle = self.operation.execute(self.parameter_dict,
-                                         self.work_dir, environment=self.environment)
+                                                             self.work_dir, environment=self.environment)
         self.assertTrue(continue_cycle)
         self.assertFalse(continue_op)
         # Continue (done file not existing -> not done)
         continue_op, continue_cycle = self.operation.execute(self.parameter_dict,
-                                         self.work_dir, environment=self.environment)
+                                                             self.work_dir, environment=self.environment)
         self.assertTrue(continue_cycle)
         self.assertFalse(continue_op)
         # Create ready file
@@ -219,7 +221,7 @@ class TestOperation(unittest.TestCase):
                           "ready"), "a").close()
         # Continue (done file existing -> done)
         continue_op, continue_cycle = self.operation.execute(self.parameter_dict,
-                                         self.work_dir, environment=self.environment)
+                                                             self.work_dir, environment=self.environment)
         self.assertTrue(continue_cycle)
         self.assertTrue(continue_op)
 

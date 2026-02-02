@@ -53,7 +53,8 @@ class TestXMLScripts(unittest.TestCase):
         """Testing the example xml script xml-test-01.xml"""
         thisfiledir = os.path.dirname(__file__)
         if os.path.exists(os.path.join(thisfiledir, "benchmark_runs")):
-            shutil.rmtree(os.path.join(os.path.dirname(__file__), "benchmark_runs"))
+            shutil.rmtree(os.path.join(
+                os.path.dirname(__file__), "benchmark_runs"))
         jube.main.main(("run -e "+os.path.join(thisfiledir,
                         "xml-test-01.xml")).split())
         errorFileExistent = False

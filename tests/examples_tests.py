@@ -28,6 +28,7 @@ import examples_tests
 
 EXAMPLES_PREFIX = os.path.join(os.path.dirname(__file__), "../examples")
 
+
 class TestCase:
 
     class TestExample(unittest.TestCase):
@@ -41,7 +42,7 @@ class TestCase:
 
             Create the required paths
             """
-            #Path to example directory, input files and run directory
+            # Path to example directory, input files and run directory
             cls._path = os.path.join(EXAMPLES_PREFIX, cls._name)
             cls._xml_file = os.path.join(cls._path, cls._name + ".xml")
             cls._yaml_file = os.path.join(cls._path, cls._name + ".yaml")
@@ -53,23 +54,24 @@ class TestCase:
             Executes all commands to check the output
             of the examples for correctness.
             """
-            #Delete all existing example runs first
+            # Delete all existing example runs first
             if os.path.exists(cls._bench_run_path):
                 shutil.rmtree(cls._bench_run_path)
 
-            #Create all commands with the specified files and suffixes
-            cls._commands = ["run -e --hide-animation {0} {1}".format(file, arg).split() \
-                              for arg in run_args \
-                              for file in [cls._xml_file, cls._yaml_file]]
+            # Create all commands with the specified files and suffixes
+            cls._commands = ["run -e --hide-animation {0} {1}".format(file, arg).split()
+                             for arg in run_args
+                             for file in [cls._xml_file, cls._yaml_file]]
 
-            #Execute all commands and save the created workpackage directories
+            # Execute all commands and save the created workpackage directories
             cls._wp_paths = {}
             for command_id, command in enumerate(cls._commands):
                 jube.main.main(command)
-                run_path = cls._get_run_path(cls, cls._bench_run_path, command_id)
+                run_path = cls._get_run_path(
+                    cls, cls._bench_run_path, command_id)
                 cls._wp_paths[run_path] = cls._get_wp_paths(cls, run_path)
 
-            #Save run arguments for result test
+            # Save run arguments for result test
             cls._run_args = run_args
 
         def test_for_wp_status(self):
@@ -85,10 +87,10 @@ class TestCase:
                                     "done file in workpackage directory {1}"
                                     .format(wp_id, wp_path))
                     self.assertFalse(self._is_status_error(run_path, wp_id, wp_path),
-                                    "Failed to successfully complete "
-                                    "workpackage with id {0}: Missing "
-                                    "done file in workpackage  directory {1}"
-                                    .format(wp_id, wp_path))
+                                     "Failed to successfully complete "
+                                     "workpackage with id {0}: Missing "
+                                     "done file in workpackage  directory {1}"
+                                     .format(wp_id, wp_path))
 
         def test_for_stdout_content_in_work_folders(self):
             """
@@ -108,22 +110,22 @@ class TestCase:
 
         def test_for_equal_result_data(self):
             """Checks that the result output matches the target result output"""
-            #Checks only if a result output has been processed
+            # Checks only if a result output has been processed
             if "-r" in self._run_args:
                 for run_path, command_wps in self._wp_paths.items():
-                    #Get content of target result output
+                    # Get content of target result output
                     origin_result_path = os.path.join(os.path.dirname(__file__),
                                                       "examples_result_output",
                                                       self._name, "result.dat")
                     origin_result_content = \
-                                    self._content_of_file(origin_result_path)
+                        self._content_of_file(origin_result_path)
 
-                    #Get actual content of result output
+                    # Get actual content of result output
                     run_result_path = os.path.join(run_path, "result",
                                                    "result.dat")
                     run_result_content = self._content_of_file(run_result_path)
 
-                    #Check that both result outputs are the same
+                    # Check that both result outputs are the same
                     self.assertEqual(run_result_content, origin_result_content,
                                      "Result content for example {0} not "
                                      "correct".format(self._name))
@@ -143,7 +145,7 @@ class TestCase:
                 wp_path = os.path.join(run_path, wp_dir)
                 # check if directory and id in name
                 if os.path.isdir(wp_path) and (wp_dir[:6]).isdigit():
-                    #get wp id out of dir name
+                    # get wp id out of dir name
                     wp_id = int(wp_dir[:6])
                     workpackages[wp_id] = wp_path
             return workpackages
@@ -166,16 +168,18 @@ class TestCase:
             the workpackage status in database is done
             """
             # DEPRECATED (BEGIN): Future versions will not use done_files
-            #check for done file (old version)
+            # check for done file (old version)
             done_file_path = os.path.join(file_path, "done")
             exist = self._existing_file(done_file_path)
             # DEPRECATED (END): Future versions will not use done_files
             status = ""
             database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
             if os.path.exists(database_path):
-                db = jube.util.database_interface.Database_Interface(database_path)
+                db = jube.util.database_interface.Database_Interface(
+                    database_path)
                 db.connect()
-                status = db.select("Workpackage", ["status"], {"workpackage_id": wp_id})[0][0]
+                status = db.select("Workpackage", ["status"], {
+                                   "workpackage_id": wp_id})[0][0]
                 db.disconnect()
             return (exist or status == "done")
 
@@ -189,9 +193,11 @@ class TestCase:
             status = ""
             database_path = os.path.join(run_path, jube.conf.DATABASE_FILENAME)
             if os.path.exists(database_path):
-                db = jube.util.database_interface.Database_Interface(database_path)
+                db = jube.util.database_interface.Database_Interface(
+                    database_path)
                 db.connect()
-                status = db.select("Workpackage", ["status"], {"workpackage_id": wp_id})[0][0]
+                status = db.select("Workpackage", ["status"], {
+                                   "workpackage_id": wp_id})[0][0]
                 db.disconnect()
             return (exist or status == "error")
 
@@ -211,9 +217,10 @@ class TestCase:
             """
             shutil.rmtree(cls._bench_run_path)
 
+
 if __name__ == "__main__":
     """Import all example tests to run all tests at once"""
-    #import to run all example tests
+    # import to run all example tests
     from example_tests.example_cycle_tests import TestCycleExample
     from example_tests.example_dependencies_tests import TestDependenciesExample
     from example_tests.example_do_log_tests import TestDoLogExample
@@ -235,5 +242,3 @@ if __name__ == "__main__":
     from example_tests.example_statistic_tests import TestStatisticExample
     from example_tests.example_tagging_tests import TestTaggingExample
     unittest.main()
-
-

@@ -22,6 +22,7 @@ import unittest
 import os
 from examples_tests import TestCase
 
+
 class TestResultCreationExample(TestCase.TestExample):
 
     """Class for testing the result_creation example"""
@@ -42,12 +43,12 @@ class TestResultCreationExample(TestCase.TestExample):
         """
         Additional test to check the content of the de and en files
         """
-        origin_stdout = [[text + ": "+ number for text in ["Zahl", "Number"]]
-                        for number in ["1", "2", "4"]]
+        origin_stdout = [[text + ": " + number for text in ["Zahl", "Number"]]
+                         for number in ["1", "2", "4"]]
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
                 work_path = self._get_work_path(wp_path)
-                #Check for content of de file
+                # Check for content of de file
                 de_file = os.path.join(work_path, "de")
                 stdout = self._content_of_file(de_file)
                 self.assertEqual(stdout, origin_stdout[wp_id][0],
@@ -55,13 +56,14 @@ class TestResultCreationExample(TestCase.TestExample):
                                  "with id {0} in directory {1} has not the "
                                  "right content".format(wp_id, de_file))
 
-                #Check for content of en file
+                # Check for content of en file
                 en_file = os.path.join(work_path, "en")
                 stdout = self._content_of_file(en_file)
                 self.assertEqual(stdout, origin_stdout[wp_id][1],
                                  "Error: en file in work for workpackage "
                                  "with id {0} in directory {1} has not the "
                                  "right content".format(wp_id, de_file))
+
 
 if __name__ == "__main__":
     unittest.main()

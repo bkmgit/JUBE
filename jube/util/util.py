@@ -240,13 +240,13 @@ def substitution(text, substitution_dict):
         text = new_text
     # Final substitution to remove $$
     tmp = string.Template(text)
-    return re.sub(r"\$(?=([\s]|$))","$$",tmp.safe_substitute(str_substitution_dict))
+    return re.sub(r"\$(?=([\s]|$))", "$$", tmp.safe_substitute(str_substitution_dict))
 
 
 def convert_type(name, value_type, value, stop=True):
     """Convert value to given type"""
     result_value = None
-    value_type_incorrect=False
+    value_type_incorrect = False
     try:
         if value_type == "int":
             if value == "nan":
@@ -254,20 +254,22 @@ def convert_type(name, value_type, value, stop=True):
             else:
                 result_value = int(float(value))
                 if re.match(r"^[-+]?\d+$", value) is None:
-                    value_type_incorrect=True
+                    value_type_incorrect = True
         elif value_type == "float":
             result_value = float(value)
-            if re.match(r"([+-]?(?:\d*\.?\d+(?:[eE][-+]?\d+)?|\d+\.))",value) is None:
-                value_type_incorrect=True
+            if re.match(r"([+-]?(?:\d*\.?\d+(?:[eE][-+]?\d+)?|\d+\.))", value) is None:
+                value_type_incorrect = True
         else:
             result_value = value
     except ValueError:
         if stop:
-            raise ValueError(f'"{value}" from "{name}" cannot be represented as a "{value_type}"')
+            raise ValueError(
+                f'"{value}" from "{name}" cannot be represented as a "{value_type}"')
         else:
             result_value = value
     if value_type_incorrect:
-        LOGGER.debug(f'Warning: "{value}" from "{name}" was converted to type "{value_type}": {result_value}.\n')
+        LOGGER.debug(
+            f'Warning: "{value}" from "{name}" was converted to type "{value_type}": {result_value}.\n')
     return result_value
 
 
@@ -472,12 +474,14 @@ def check_and_get_verbose_level():
             exit(1)
     return verbose_level
 
+
 def check_and_get_benchmark_outpath():
     """Read environment var JUBE_BENCHMARK_OUTPATH and return outpath"""
     env_outpath = None
     if "JUBE_BENCHMARK_OUTPATH" in os.environ:
         env_outpath = os.environ["JUBE_BENCHMARK_OUTPATH"]
     return env_outpath
+
 
 def consistency_check(benchmark):
     """Do some consistency checks"""
@@ -540,7 +544,7 @@ def safe_split(text, separator):
 
 
 def ensure_list(element):
-    if not isinstance(element,list):
+    if not isinstance(element, list):
         return [element]
     else:
         return element

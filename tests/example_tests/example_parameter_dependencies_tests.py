@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestParameterDependenciesExample(TestCase.TestExample):
 
     """Class for testing the parameter_dependencies example"""
@@ -35,10 +36,11 @@ class TestParameterDependenciesExample(TestCase.TestExample):
         cls._name = "parameter_dependencies"
         cls._stdout = [["hello 3 10", "hello 5 10", "world 1 20",
                         "world 2 20", "world 4 20"],
-                         ["hello 3 10", "hello 5 10", "world 1 20",
+                       ["hello 3 10", "hello 5 10", "world 1 20",
                         "world 2 20", "world 4 20"]]
         super(TestParameterDependenciesExample, cls).setUpClass()
         super(TestParameterDependenciesExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

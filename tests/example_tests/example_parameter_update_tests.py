@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestParameterUpdateExample(TestCase.TestExample):
 
     """Class for testing the parameter_update example"""
@@ -36,11 +37,12 @@ class TestParameterUpdateExample(TestCase.TestExample):
         cls._stdout = [["iter_never: 0\niter_use: 0\niter_step: 0",
                         "iter_never: 0\niter_use: 1\niter_step: 1",
                         "iter_never: 0\niter_use: 1\niter_step: 2"],
-                        ["iter_never: 0\niter_use: 0\niter_step: 0",
+                       ["iter_never: 0\niter_use: 0\niter_step: 0",
                         "iter_never: 0\niter_use: 1\niter_step: 1",
                         "iter_never: 0\niter_use: 1\niter_step: 2"]]
         super(TestParameterUpdateExample, cls).setUpClass()
         super(TestParameterUpdateExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

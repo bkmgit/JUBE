@@ -69,7 +69,8 @@ class Figure(GenericResult):
                 # plot function calls are created dynamically because certain
                 # arguments are not mandatory and would cause an error
                 label = label if label is not None else data.label
-                x_data = sorted(table_data[data.x]) if data.sort else table_data[data.x]
+                x_data = sorted(
+                    table_data[data.x]) if data.sort else table_data[data.x]
                 if data.type == "line":
                     func_args = "x_data, table_data[data.y], label=label"
                     for attr in ["color", "marker", "linestyle"]:
@@ -80,7 +81,7 @@ class Figure(GenericResult):
                 elif data.type in ["bar", "stem"]:
                     plot_func = getattr(ax, data.type)
                     plot_func(x_data, table_data[data.y],
-                                label=label)
+                              label=label)
                 else:
                     # dynamically create plot function call (e.g. ax.scatter())
                     plot_func = getattr(ax, data.type)
@@ -94,7 +95,7 @@ class Figure(GenericResult):
             def prepare_axis(ax, keys, table_data, set_ticks, set_ticklabels):
                 """ensures that the x/y ticks on the x/y axis are sorted correctly without sorting the data itself"""
                 all_values = {val for k in keys for val in table_data[k]}
-                
+
                 if any(isinstance(v, str) for v in all_values):
                     # one or more strings -> all values are treated as a category. They are therefore sorted lexicographically
                     labels = sorted(all_values, key=str)
@@ -106,12 +107,12 @@ class Figure(GenericResult):
                     # # no strings -> all values are treated as numbers and are therefore automatically sorted by matplotlib
                     return {k: table_data[k] for k in keys}
 
-            table_data = {v.name:k for v,k in self._data.items()}
+            table_data = {v.name: k for v, k in self._data.items()}
 
             for plot in self._plots[:]:
                 for data in plot.plot_data[:]:
                     if data.x not in table_data.keys() or \
-                        data.y not in table_data.keys():
+                            data.y not in table_data.keys():
                         plot.plot_data.remove(data)
                 if len(plot.plot_data) == 0:
                     self._plots.remove(plot)
@@ -122,18 +123,19 @@ class Figure(GenericResult):
 
             if self._nrows == 0 and self._ncols == 0:
                 rows = 1
-                cols= len(self._plots)
+                cols = len(self._plots)
             elif self._nrows == 0:
                 rows = (len(self._plots) + self._ncols - 1) // self._ncols
-                cols= self._ncols
+                cols = self._ncols
             elif self._ncols == 0:
                 rows = self._nrows
-                cols= (len(self._plots) + self._nrows - 1) // self._nrows
+                cols = (len(self._plots) + self._nrows - 1) // self._nrows
             elif self._nrows * self._ncols >= len(self._plots):
                 rows = self._nrows
-                cols= self._ncols
+                cols = self._ncols
             else:
-                LOGGER.error("There are too many plots for the specified number of rows (={0}) and columns (={1})".format(self._nrows, self._ncols))
+                LOGGER.error("There are too many plots for the specified number of rows (={0}) and columns (={1})".format(
+                    self._nrows, self._ncols))
                 exit()
 
             try:
@@ -146,25 +148,29 @@ class Figure(GenericResult):
             fig.suptitle(self._title)
 
             for i, plot in enumerate(self._plots):
-                if plot.xlabel: 
+                if plot.xlabel:
                     axes[i].set_xlabel(plot.xlabel)
-                if plot.ylabel: 
+                if plot.ylabel:
                     axes[i].set_ylabel(plot.ylabel)
-                if plot.xscale: 
+                if plot.xscale:
                     axes[i].set_xscale(plot.xscale)
-                if plot.yscale: 
+                if plot.yscale:
                     axes[i].set_yscale(plot.yscale)
 
                 x_keys = {d.x for d in plot.plot_data}
                 y_keys = {d.y for d in plot.plot_data}
-                x_data = prepare_axis(axes[i], x_keys, table_data, axes[i].set_xticks, axes[i].set_xticklabels)
-                y_data = prepare_axis(axes[i], y_keys, table_data, axes[i].set_yticks, axes[i].set_yticklabels)
+                x_data = prepare_axis(
+                    axes[i], x_keys, table_data, axes[i].set_xticks, axes[i].set_xticklabels)
+                y_data = prepare_axis(
+                    axes[i], y_keys, table_data, axes[i].set_yticks, axes[i].set_yticklabels)
 
                 for data in plot.plot_data:
                     if data.groupby:
-                        groups = list(zip(*[table_data[g] for g in data.groupby]))
+                        groups = list(zip(*[table_data[g]
+                                      for g in data.groupby]))
                         for group in sorted(set(groups)):
-                            group_ids = [i for i, x in enumerate(groups) if x == group]
+                            group_ids = [i for i, x in enumerate(groups)
+                                         if x == group]
                             group_data = {
                                 data.x: [x_data[data.x][i] for i in group_ids],
                                 data.y: [y_data[data.y][i] for i in group_ids]
@@ -177,7 +183,7 @@ class Figure(GenericResult):
                             data.y: y_data[data.y]
                         }
                         create_plot(data, plot_data, axes[i])
-                if plot.legend: 
+                if plot.legend:
                     axes[i].legend()
 
             # if "savefig" is set, then save figure in "savefig" file
@@ -212,6 +218,7 @@ class Figure(GenericResult):
 
         class Data():
             """Plot data"""
+
             def __init__(self, x, y, groupby, plot_type, label,
                          color, marker, linestyle, sort_data):
                 self._x = x
@@ -281,7 +288,8 @@ class Figure(GenericResult):
                 data["x"] = self._x
                 data["y"] = self._y
                 if self._groupby:
-                    data["groupby"] = jube.conf.DEFAULT_SEPARATOR.join(self._groupby)
+                    data["groupby"] = jube.conf.DEFAULT_SEPARATOR.join(
+                        self._groupby)
                 if self._type:
                     data["plot_type"] = self._type
                 if self._label:
@@ -305,8 +313,8 @@ class Figure(GenericResult):
                 self._plot_data.append(
                     Figure.Plot.Data(data["x"], data["y"], data["groupby"],
                                      data["type"], data["label"],
-                                     data["color"], data["marker"], 
-                                     data["linestyle"],data["sort"]))
+                                     data["color"], data["marker"],
+                                     data["linestyle"], data["sort"]))
             self._legend = legend
             self._xlabel = xlabel
             self._ylabel = ylabel
@@ -322,7 +330,7 @@ class Figure(GenericResult):
         def xlabel(self):
             """Get 'xlabel'"""
             return self._xlabel
-        
+
         @property
         def ylabel(self):
             """Get 'ylabel'"""
@@ -337,12 +345,12 @@ class Figure(GenericResult):
         def yscale(self):
             """Get 'ylabel'"""
             return self._yscale
-        
+
         @property
         def plot_data(self):
             """Get 'plot_data'"""
             return self._plot_data
-        
+
         def __str__(self):
             plot_str = f"IN PLOT: legend: {self._legend}, xlabel: {self._xlabel}, "\
                        f"ylabel: {self._ylabel}, xscale: {self._xscale}, "\
@@ -350,7 +358,7 @@ class Figure(GenericResult):
             for data in self._plot_data:
                 plot_str += f"{data}\n"
             return plot_str
-            
+
         def add_information_to_database(self, db, figure_name):
             """Store plot information in database"""
             plot_data = dict()
@@ -415,19 +423,21 @@ class Figure(GenericResult):
 
     def add_plot(self, plot_data, legend, xlabel, ylabel, xscale, yscale):
         """Add an additional plot to the dataset"""
-        self._plots.append(Figure.Plot(plot_data, legend, xlabel, ylabel, xscale, yscale))
+        self._plots.append(Figure.Plot(plot_data, legend,
+                           xlabel, ylabel, xscale, yscale))
 
     def create_result_data(self, style=None, select=None, exclude=None):
         """Create result data"""
         result_data = GenericResult.create_result_data(self, select, exclude)
         return Figure.FigureData(result_data, self._plots, self._savefig,
                                  self._title, self._showfig, self._nrows, self._ncols)
-    
+
     def add_information_to_database(self, db, benchmark_id, update=False):
         """Store figure information in database"""
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+            result_id = Result.add_information_to_database(
+                self, db, benchmark_id, update)
             figure_data = {
                 "figure_name": self._name,
                 "result_id": result_id

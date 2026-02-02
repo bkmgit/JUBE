@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestCycleExample(TestCase.TestExample):
 
     """Class for testing the cycle example"""
@@ -44,7 +45,7 @@ class TestCycleExample(TestCase.TestExample):
         """
         for run_path, command_wps in self._wp_paths.items():
             for wp_id, wp_path in command_wps.items():
-                #get work directory
+                # get work directory
                 work_path = self._get_work_path(wp_path)
                 self.assertTrue(self._is_status_done(run_path, wp_id, work_path),
                                 "Failed to successfully complete "
@@ -52,10 +53,11 @@ class TestCycleExample(TestCase.TestExample):
                                 "done file in work directory {1}"
                                 .format(wp_id, work_path))
                 self.assertFalse(self._is_status_error(run_path, wp_id, work_path),
-                                "Failed to successfully complete "
-                                "workpackage with id {0}: Missing "
-                                "done file in work directory {1}"
-                                .format(wp_id, work_path))
+                                 "Failed to successfully complete "
+                                 "workpackage with id {0}: Missing "
+                                 "done file in work directory {1}"
+                                 .format(wp_id, work_path))
+
 
 if __name__ == "__main__":
     unittest.main()

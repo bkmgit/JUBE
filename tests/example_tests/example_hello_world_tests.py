@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestHelloWorldExample(TestCase.TestExample):
 
     """Class for testing the hello_world example"""
@@ -36,6 +37,7 @@ class TestHelloWorldExample(TestCase.TestExample):
         cls._stdout = [["Hello World"], ["Hello World"]]
         super(TestHelloWorldExample, cls).setUpClass()
         super(TestHelloWorldExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

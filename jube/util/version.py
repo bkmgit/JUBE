@@ -1,8 +1,8 @@
 # Updated from:
 # distutils/version.py
-# 
+#
 # found on: https://github.com/pypa/distutils/blob/main/distutils/version.py
-# 
+#
 # Implements multiple version numbering conventions for the
 # Python Module Distribution Utilities.
 #
@@ -29,6 +29,7 @@ Every version number class implements the following interface:
 """
 
 import re
+
 
 class Version:
     """Abstract base class for version numbering classes.  Just provides

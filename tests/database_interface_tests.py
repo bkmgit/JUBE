@@ -46,7 +46,8 @@ class TestDatabaseInterface(unittest.TestCase):
 
         # Test UPDATE
         check_content = [("BeispielName2", "BeispielKommentar")]
-        self.db.update("Benchmark", {"name": "BeispielName2"}, {"name": "BeispielName"})
+        self.db.update("Benchmark", {"name": "BeispielName2"}, {
+                       "name": "BeispielName"})
         actual_content = self.db.select("Benchmark", ["name", "comment"])
         self.assertEqual(actual_content, check_content, "")
 
@@ -60,6 +61,7 @@ class TestDatabaseInterface(unittest.TestCase):
         """Disconnect and remove database"""
         self.db.disconnect()
         os.remove("database.db")
+
 
 if __name__ == "__main__":
     unittest.main()

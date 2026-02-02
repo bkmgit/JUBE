@@ -140,7 +140,8 @@ class Table(KeyValuesResult):
 
         def add_information_to_database(self, db, table_name):
             """Store column information in database"""
-            column_data = KeyValuesResult.DataKey.get_information_for_database(self)
+            column_data = KeyValuesResult.DataKey.get_information_for_database(
+                self)
             column_data["column_name"] = column_data.pop("name")
             column_data["table_name"] = table_name
             if self._colw is not None:
@@ -191,7 +192,8 @@ class Table(KeyValuesResult):
         """Store table information in database"""
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+            result_id = Result.add_information_to_database(
+                self, db, benchmark_id, update)
             table_data = {
                 "table_name": self._name,
                 "result_id": result_id

@@ -28,10 +28,10 @@ import jube.conf
 
 PATH_PREFIX = os.path.join(os.path.dirname(__file__))
 
+
 class TestSubstitute(unittest.TestCase):
 
     """Substitute test class"""
-
 
     @classmethod
     def setUpClass(cls):
@@ -52,50 +52,52 @@ class TestSubstitute(unittest.TestCase):
 
     def test_regex_substitute(self):
         """Test standard and regex substitute"""
-        #Create file.in 
+        # Create file.in
         with open("file.in", "w") as file:
             file.write("Number: #NUMBER#")
         self.std_files_data = [["std_file.out", "file.in", "w"]]
         self.std_sub = jube.substitute.Sub("#NUMBER#", "text", "1")
         self.std_sub_set = jube.substitute.Substituteset("sub_set",
-                                                          self.std_files_data,
-                                                          {"#NUMBER#": self.std_sub})
+                                                         self.std_files_data,
+                                                         {"#NUMBER#": self.std_sub})
         self.std_sub_set.substitute({}, None)
         self.regex_files_data = [["regex_file.out", "file.in", "w"]]
         self.regex_sub = jube.substitute.Sub("#.*#", "regex", "1")
         self.regex_sub_set = jube.substitute.Substituteset("regex_set",
-                                                            self.regex_files_data,
-                                                            {"#.*#": self.regex_sub})
+                                                           self.regex_files_data,
+                                                           {"#.*#": self.regex_sub})
         self.regex_sub_set.substitute({}, None)
-        #Do std substitute
+        # Do std substitute
         self.std_sub_set.substitute({})
-        #Get content of stdout
+        # Get content of stdout
         with open("std_file.out", "r") as file:
             std_output = file.read().strip()
 
-        #Do regex substitute
+        # Do regex substitute
         self.regex_sub_set.substitute({})
-        #Get content of regex
+        # Get content of regex
         with open("regex_file.out", "r") as file:
             regex_output = file.read().strip()
 
-        #test if output equal
+        # test if output equal
         self.assertEqual(std_output, regex_output)
 
     def test_init_with_substitution(self):
         """Testing for existing files and content"""
-        jube.main.main(("run -e "+ self._input_path).split())
+        jube.main.main(("run -e " + self._input_path).split())
         # DEPRECATED (BEGIN): Future versions will not use done_files
         # Test for done file
         done_file = os.path.join(self._wp_path, "done")
         exist = os.path.exists(done_file)
         # DEPRECATED (END): Future versions will not use done_files
         status = ""
-        database_path = os.path.join(self._run_path, jube.conf.DATABASE_FILENAME)
+        database_path = os.path.join(
+            self._run_path, jube.conf.DATABASE_FILENAME)
         if os.path.exists(database_path):
             db = jube.util.database_interface.Database_Interface(database_path)
             db.connect()
-            status = db.select("Workpackage", ["status"], {"workpackage_id": 0})[0][0]
+            status = db.select("Workpackage", ["status"], {
+                               "workpackage_id": 0})[0][0]
             db.disconnect()
         self.assertTrue((exist or status == "done"), "Failed to successfully "
                         "complete workpackage with id 0: Missing done file in "
@@ -118,7 +120,7 @@ class TestSubstitute(unittest.TestCase):
                                             "../platform/slurm/submit.job.in")
         with open(original_submit_file, "r") as file:
             origin_submit_output = file.read().strip()
-        check_submit_file = os.path.join (self._work_path, "submit.job.in")
+        check_submit_file = os.path.join(self._work_path, "submit.job.in")
         with open(check_submit_file, "r") as file:
             check_submit_output = file.read().strip()
         self.assertEqual(origin_submit_output, check_submit_output, "Error: "
@@ -168,6 +170,7 @@ class TestSubstitute(unittest.TestCase):
             os.remove("std_file.out")
         if os.path.exists("regex_file.out"):
             os.remove("regex_file.out")
+
 
 if __name__ == "__main__":
     unittest.main()

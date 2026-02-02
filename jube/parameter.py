@@ -102,7 +102,7 @@ class Parameterset(object):
         """Overwrite existing parameters. Do not add new parameters"""
         for parameter in parameterset:
             if parameter.name in self:
-                #Restore parameter id for database
+                # Restore parameter id for database
                 if parameter.id is None:
                     parameter.id = self._parameters[parameter.name].id
                 self._parameters[parameter.name] = parameter.copy()
@@ -113,13 +113,14 @@ class Parameterset(object):
             if self._parameters[parameter.name]._value == parameter._value:
                 return parameter
             else:
-                value=list(set(jube.util.util.ensure_list(self._parameters[parameter.name]._value)+jube.util.util.ensure_list(parameter._value)))
+                value = list(set(jube.util.util.ensure_list(
+                    self._parameters[parameter.name]._value)+jube.util.util.ensure_list(parameter._value)))
                 value.sort()
                 return jube.parameter.TemplateParameter(
-                            parameter._name, value, parameter._separator, parameter._type,
-                            parameter._mode, parameter._unit, parameter._export,
-                            parameter._update_mode, parameter._idx,
-                            parameter._eval_helper, parameter._duplicate)
+                    parameter._name, value, parameter._separator, parameter._type,
+                    parameter._mode, parameter._unit, parameter._export,
+                    parameter._update_mode, parameter._idx,
+                    parameter._eval_helper, parameter._duplicate)
         else:
             return parameter
 
@@ -130,17 +131,19 @@ class Parameterset(object):
         if only_duplicate:
             if parameter._duplicate != self._parameters[parameter.name]._duplicate:
                 LOGGER.debug(
-                        "The duplicate options for the parameter {0} are stated at least twice differently leading to undefined behaviour.\n".format(
-                            parameter.name))
-                raise ValueError("The duplicate options for the parameter {0} are stated at least twice differently leading to undefined behaviour.".format(parameter.name))
+                    "The duplicate options for the parameter {0} are stated at least twice differently leading to undefined behaviour.\n".format(
+                        parameter.name))
+                raise ValueError(
+                    "The duplicate options for the parameter {0} are stated at least twice differently leading to undefined behaviour.".format(parameter.name))
         else:
-            if  parameter._separator != self._parameters[parameter.name]._separator or \
+            if parameter._separator != self._parameters[parameter.name]._separator or \
                     parameter._type != self._parameters[parameter.name]._type or \
                     parameter._update_mode != self._parameters[parameter.name]._update_mode:
                 LOGGER.debug(
-                        "At least one option (separator, type, update_mode) for the parameter {0} was defined at least twice differently leading to undefined behaviour.\n".format(
-                            parameter.name))
-                raise ValueError("At least one option (separator, type, update_mode) for the parameter {0} was defined at least twice differently leading to undefined behaviour.".format(parameter.name))
+                    "At least one option (separator, type, update_mode) for the parameter {0} was defined at least twice differently leading to undefined behaviour.\n".format(
+                        parameter.name))
+                raise ValueError(
+                    "At least one option (separator, type, update_mode) for the parameter {0} was defined at least twice differently leading to undefined behaviour.".format(parameter.name))
 
     def add_parameter(self, parameter):
         """Add a new parameter"""
@@ -149,41 +152,48 @@ class Parameterset(object):
         else:
             # Check whether only the duplicate option of two parameters is
             # identical, otherwise the behaviour is undefined.
-            self.check_parameter_options(parameter=parameter, only_duplicate=True)
+            self.check_parameter_options(
+                parameter=parameter, only_duplicate=True)
             # check, which action to perform and prioritize the duplicate
             # option from the parameters over the duplicate option from
             # the parametersets
-            raise_unknown_error=False
+            raise_unknown_error = False
             if parameter._duplicate == "replace":
                 self._parameters[parameter.name] = parameter
             elif parameter._duplicate == "concat":
-                self.check_parameter_options(parameter=parameter, only_duplicate=False)
-                self._parameters[parameter.name] = self.concat_parameter(parameter)
+                self.check_parameter_options(
+                    parameter=parameter, only_duplicate=False)
+                self._parameters[parameter.name] = self.concat_parameter(
+                    parameter)
             elif parameter._duplicate == "error":
                 if parameter.name in self._parameters.keys():
-                    raise Exception("The parameter {0} was defined at least twice.".format(parameter.name))
+                    raise Exception(
+                        "The parameter {0} was defined at least twice.".format(parameter.name))
                 else:
                     self._parameters[parameter.name] = parameter
             elif parameter._duplicate == "none":
                 if self._duplicate == "replace":
                     self._parameters[parameter.name] = parameter
                 elif self._duplicate == "concat":
-                    self.check_parameter_options(parameter=parameter, only_duplicate=False)
-                    self._parameters[parameter.name] = self.concat_parameter(parameter)
+                    self.check_parameter_options(
+                        parameter=parameter, only_duplicate=False)
+                    self._parameters[parameter.name] = self.concat_parameter(
+                        parameter)
                 elif self._duplicate == "error":
                     if parameter.name in self._parameters.keys():
-                        raise Exception("The parameter {0} was defined at least twice.".format(parameter.name))
+                        raise Exception(
+                            "The parameter {0} was defined at least twice.".format(parameter.name))
                     else:
                         self._parameters[parameter.name] = parameter
-                else: # unknown error, this situation should never occur!
-                    raise_unknown_error=True
-            else: # unknown error, this situation should never occur!
-                raise_unknown_error=True
+                else:  # unknown error, this situation should never occur!
+                    raise_unknown_error = True
+            else:  # unknown error, this situation should never occur!
+                raise_unknown_error = True
 
             if raise_unknown_error:
-                raise Exception("The execution was aborted due to an unknown error "+
-                    "when adding a parameter. Please contact the JUBE developers "+
-                    "to resolve this situation.")
+                raise Exception("The execution was aborted due to an unknown error " +
+                                "when adding a parameter. Please contact the JUBE developers " +
+                                "to resolve this situation.")
 
     def delete_parameter(self, parameter):
         """Delete a parameter"""
@@ -442,7 +452,7 @@ class Parameter(object):
         else:
             self._update_mode = NEVER_MODE
         self._eval_helper = eval_helper
-        self._duplicate=duplicate
+        self._duplicate = duplicate
         self._id = None
 
     @staticmethod
@@ -499,9 +509,9 @@ class Parameter(object):
 
     def search_method(self, propertyString, recursiveProperty=None):
         """ Searches, potentially recursively, for a method and returns True in case of a success """
-        if(inspect.ismethod(self[propertyString])):
+        if (inspect.ismethod(self[propertyString])):
             return True
-        elif(recursiveProperty and self[recursiveProperty]):
+        elif (recursiveProperty and self[recursiveProperty]):
             return self[recursiveProperty].search_method(propertyString, recursiveProperty)
         else:
             return False
@@ -583,7 +593,7 @@ class Parameter(object):
     def mode(self):
         """Return parameter mode"""
         return self._mode
-        
+
     @property
     def unit(self):
         """Return unit"""
@@ -593,7 +603,7 @@ class Parameter(object):
     def value(self):
         """Return parameter value"""
         return self._value
-    
+
     @property
     def type(self):
         """Return datatype"""
@@ -702,7 +712,8 @@ class Parameter(object):
     def add_selected_parameter_to_database(self, db, workpackage_id):
         """Select parameter value and store in database"""
         if not self._id:
-            self._id = db.select("Parameter", ["parameter_id"], {"parameter_name": self._name, "value": self.based_on_value})[0][0]
+            self._id = db.select("Parameter", ["parameter_id"], {
+                                 "parameter_name": self._name, "value": self.based_on_value})[0][0]
         selected_data = {
             "parameter_id": self._id,
             "selected": self.value,
@@ -710,8 +721,9 @@ class Parameter(object):
         }
         if self._idx != -1:
             selected_data["idx"] = self._idx
-        #Check if parameter already selected
-        condition = {"parameter_id": self._id, "workpackage_id": workpackage_id}
+        # Check if parameter already selected
+        condition = {"parameter_id": self._id,
+                     "workpackage_id": workpackage_id}
         row = db.select("SelectedParameter", None, condition)
         if len(row) > 0:
             # Update existing parameter selection
@@ -720,8 +732,9 @@ class Parameter(object):
             # Insert parameter selection
             db.insert("SelectedParameter", selected_data)
 
-        #Update mode in Parameter
-        db.update("Parameter", {"mode": self.based_on_mode}, {"parameter_id": self._id})
+        # Update mode in Parameter
+        db.update("Parameter", {"mode": self.based_on_mode}, {
+                  "parameter_id": self._id})
 
     def __repr__(self):
         return "Parameter({0})".format(self.__dict__)
@@ -867,7 +880,7 @@ class StaticParameter(Parameter):
         env_str = ""
         for var_name, var_value in re.findall(
                 r"^export (.+?)\s*=\s*?(.+?)?\s*?$", value, re.MULTILINE):
-            if not var_value: # Exporting empty variables
+            if not var_value:  # Exporting empty variables
                 env_str += 'export {0}=""\n'.format(var_name)
             elif (var_value[0] == "'" and var_value[-1] == "'") or \
                     (var_value[0] == '"' and var_value[-1] == '"'):
@@ -901,7 +914,7 @@ class TemplateParameter(Parameter):
                                            value=value,
                                            separator=self._separator,
                                            parameter_type=self._type,
-                                           unit = self._unit,
+                                           unit=self._unit,
                                            export=self._export,
                                            update_mode=self._update_mode,
                                            idx=index, duplicate=self._duplicate)

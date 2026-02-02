@@ -42,12 +42,12 @@ class Substituteset(object):
     def name(self):
         """Return name of Substituteset"""
         return self._name
-    
+
     @property
     def files(self):
         """Return files"""
         return self._files
-    
+
     @property
     def substitute_dict(self):
         """Return substitute dict"""
@@ -85,9 +85,12 @@ class Substituteset(object):
         if parameter_dict is not None:
             substitute_dict = dict()
             for name, sub in self._substitute_dict.items():
-                new_source = jube.util.util.substitution(sub.source, parameter_dict)
-                new_dest = jube.util.util.substitution(sub.dest, parameter_dict)
-                substitute_dict[new_source] = Sub(new_source, sub.mode, new_dest)
+                new_source = jube.util.util.substitution(
+                    sub.source, parameter_dict)
+                new_dest = jube.util.util.substitution(
+                    sub.dest, parameter_dict)
+                substitute_dict[new_source] = Sub(
+                    new_source, sub.mode, new_dest)
         else:
             substitute_dict = self._substitute_dict
 
@@ -98,9 +101,9 @@ class Substituteset(object):
             out_mode = data[2]
 
             infile = jube.util.util.substitution(infile_name,
-                                                  parameter_dict)
+                                                 parameter_dict)
             outfile = jube.util.util.substitution(outfile_name,
-                                                   parameter_dict)
+                                                  parameter_dict)
 
             LOGGER.debug("  substitute {0} -> {1}".format(infile, outfile))
 
@@ -175,7 +178,8 @@ class Substituteset(object):
 
     def __repr__(self):
         return "Substitute({0})".format(self.__dict__)
-    
+
+
 class Sub(object):
     def __init__(self, source, sub_mode, dest):
         self._source = source

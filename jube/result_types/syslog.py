@@ -138,7 +138,8 @@ class SysloggedResult(KeyValuesResult):
         """Store syslog information in database"""
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+            result_id = Result.add_information_to_database(
+                self, db, benchmark_id, update)
             syslog_data = {
                 "syslog_name": self._name,
                 "result_id": result_id

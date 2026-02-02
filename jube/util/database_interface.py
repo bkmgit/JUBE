@@ -140,12 +140,12 @@ class Database_Interface(object):
                 params.append(val)
             query += " WHERE " + " AND ".join(where_clauses)
 
-        self._cursor.execute(query,params)
+        self._cursor.execute(query, params)
 
     def alter_table(self, statement, table_name, column):
         """Execute a query to delete the given column in the given table"""
         query = f"ALTER TABLE {table_name} {statement}"
-        query +=  f" COLUMN {', '.join(column)}"
+        query += f" COLUMN {', '.join(column)}"
 
         self._cursor.execute(query)
 

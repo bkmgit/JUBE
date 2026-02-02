@@ -19,7 +19,8 @@
 """Test the cycle example"""
 
 import unittest
-from examples_tests import TestCase 
+from examples_tests import TestCase
+
 
 class TestEnvironmentExample(TestCase.TestExample):
 
@@ -37,6 +38,7 @@ class TestEnvironmentExample(TestCase.TestExample):
                        ["Hello world", "VALUE\nHello again"]]
         super(TestEnvironmentExample, cls).setUpClass()
         super(TestEnvironmentExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestStatisticExample(TestCase.TestExample):
 
     """Class for testing the statistic example"""
@@ -37,6 +38,7 @@ class TestStatisticExample(TestCase.TestExample):
                        ["1 2 3 4 5 6 7 8 9 10"]]
         super(TestStatisticExample, cls).setUpClass()
         super(TestStatisticExample, cls)._execute_commands(["-r"])
+
 
 if __name__ == "__main__":
     unittest.main()

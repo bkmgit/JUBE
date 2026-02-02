@@ -21,6 +21,7 @@
 import unittest
 from examples_tests import TestCase
 
+
 class TestParameterspaceExample(TestCase.TestExample):
 
     """Class for testing the parameterspace example"""
@@ -34,10 +35,11 @@ class TestParameterspaceExample(TestCase.TestExample):
         """
         cls._name = "parameterspace"
         cls._stdout = [text + number for number in ["1", "2", "4"]
-                        for text in ["Hello ", "World "]]
+                       for text in ["Hello ", "World "]]
         cls._stdout = [cls._stdout, cls._stdout]
         super(TestParameterspaceExample, cls).setUpClass()
         super(TestParameterspaceExample, cls)._execute_commands()
+
 
 if __name__ == "__main__":
     unittest.main()

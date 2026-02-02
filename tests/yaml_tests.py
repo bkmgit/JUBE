@@ -77,12 +77,12 @@ class TestYAMLScripts(unittest.TestCase):
         try:
             import ruamel.yaml
             with self.assertRaises(ruamel.yaml.constructor.DuplicateKeyError):
-                jube.util.yaml_converter.YAML_Converter(os.path.join(thisfiledir,"yaml_test_scripts/overwrite_parameterset.yaml"))
+                jube.util.yaml_converter.YAML_Converter(os.path.join(
+                    thisfiledir, "yaml_test_scripts/overwrite_parameterset.yaml"))
         except ImportError:
             with self.assertRaises(SystemExit):
                 jube.main.main(("run -e "+os.path.join(thisfiledir,
-                            "yaml_test_scripts/overwrite_parameterset.yaml")).split())
-
+                                                       "yaml_test_scripts/overwrite_parameterset.yaml")).split())
 
 
 if __name__ == "__main__":

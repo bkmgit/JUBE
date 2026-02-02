@@ -52,7 +52,7 @@ class Database(KeyValuesResult):
             # only into file)
             # filename = name of standard output/database file
             # All keys: print([key.name for key in self._keys])
-            #col_names = [key.name for key in self._keys]
+            # col_names = [key.name for key in self._keys]
             # All data: print(self.data)
             keys = [k.resulting_name for k in self.keys]
 
@@ -90,7 +90,8 @@ class Database(KeyValuesResult):
                               "str", "text") for i in range(len(self.keys))}
 
                 # Add key with primekey=true to primekeys and use set to remove duplicates
-                self._primekeys = list(set(self._primekeys + [k.resulting_name for k in self._keys if k.primekey]))
+                self._primekeys = list(
+                    set(self._primekeys + [k.resulting_name for k in self._keys if k.primekey]))
 
                 if len(self._primekeys) > 0:
                     LOGGER.warning("The `primekeys` attribute of the `<database>`-tag is deprecated. "
@@ -98,7 +99,8 @@ class Database(KeyValuesResult):
                                    '(<key primekey="true"|"false">..</key>)')
 
                 # create new table with a name of stored in variable self.name if it does not exists
-                db.create_database_table(self.name, key_dtypes, self._primekeys)
+                db.create_database_table(
+                    self.name, key_dtypes, self._primekeys)
 
                 # check for primary keys in database table
                 db_pragma = db.pragma("table_info", self.name)
@@ -169,7 +171,7 @@ class Database(KeyValuesResult):
     def add_key(self, name, format_string=None, title=None, primekey=False):
         """Add an additional key to the dataset"""
         self._keys.append(Database.Column(name, title, format_string,
-                                                  primekey))
+                                          primekey))
 
     def create_result_data(self, style=None, select=None, exclude=None):
         """Create result data"""
@@ -181,7 +183,8 @@ class Database(KeyValuesResult):
         """Store database information in database"""
         try:
             db.start_transaction()
-            result_id = Result.add_information_to_database(self, db, benchmark_id, update)
+            result_id = Result.add_information_to_database(
+                self, db, benchmark_id, update)
             database_data = {
                 "database_name": self._name,
                 "file": str(self._db_file),

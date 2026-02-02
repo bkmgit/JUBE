@@ -71,7 +71,8 @@ class YAML_Converter(object):
         try:
             yaml.add_constructor("!include", self.__yaml_include)
         except NameError:
-            LOGGER.error("yaml module not available; either install it (https://pyyaml.org), or switch to .xml input files.")
+            LOGGER.error(
+                "yaml module not available; either install it (https://pyyaml.org), or switch to .xml input files.")
             exit()
         self._ignore_search_errors = True
         self._tags.update(self.__search_for_tags())
@@ -102,8 +103,8 @@ class YAML_Converter(object):
             except NameError:
                 pass
             except ruamel.yaml.constructor.DuplicateKeyError as e:
-                e.note=""
-                raise(e)
+                e.note = ""
+                raise (e)
 
         LOGGER.debug("  Start YAML to XML file conversion for file {0}".format(
             self._path))
@@ -244,7 +245,7 @@ class YAML_Converter(object):
                             tag, attr_and_tags, parent_node)
                     to_delete.append(tag)
         for tag in to_delete:
-            del(data[tag])
+            del (data[tag])
         if "benchmark" not in data:
             YAML_Converter.create_tag("benchmark", data, parent_node)
 
@@ -265,7 +266,8 @@ class YAML_Converter(object):
                         # Create new subtag
                         if type(val) is list:
                             for element in val:
-                                YAML_Converter.create_tag(key, element, new_node)
+                                YAML_Converter.create_tag(
+                                    key, element, new_node)
                         else:
                             YAML_Converter.create_tag(key, val, new_node)
                     else:
