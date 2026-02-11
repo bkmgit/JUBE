@@ -62,13 +62,6 @@ classifiers = [
 path = "jube/conf.py"
 pattern = 'JUBE_VERSION = "(?P<version>[^"]+)"'
 
-[tool.hatch.envs.test]
-dependencies = [
-"pytest",
-"pytest-cov",
-"matplotlib"
-]
-
 [project.scripts]
 jube = "jube.main:main"
 
@@ -86,6 +79,9 @@ AUTHORS = "share/jube/AUTHORS"
 CODE_OF_CONDUCT = "share/jube/CODE_OF_CONDUCT"
 LICENSE = "share/jube/LICENSE"
 RELEASE_NOTES = "share/jube/RELEASE_NOTES"
+"tests/examples_tests.py" = "share/jube/tests/examples_tests.py"
+"tests/example_tests" = "share/jube/tests/example_tests"
+"tests/examples_result_output" = "share/jube/tests/examples_result_output"
 
 [tool.hatch.build.targets.wheel]
 include = [

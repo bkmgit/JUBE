@@ -19,11 +19,9 @@ cache:
 stages:
     - prepare
     - build
+    - packaging
     - tests
     - deploy
-
-include:
-    - local: 'packaging.gitlab-ci.yml'
 
 dependencies:
     stage: prepare
@@ -87,7 +85,7 @@ build:year:
 
 build:version:
     variables:
-        FILE_LIST: jube/conf.py docs/conf.py setup.py
+        FILE_LIST: jube/conf.py docs/conf.py
         COMMIT_MESSAGE: "Updating Version"
     stage: build
     script:
@@ -96,8 +94,6 @@ build:version:
         - |
             echo "Last version on docs/release_notes.rst: ${RELEASE}"
         # Updating version in files
-        - |
-            sed -i "s/'version': '.*'/'version': '${RELEASE}'/g" ${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}/setup.py
         - sed -i "s/JUBE_VERSION = \".*\"/JUBE_VERSION = \"${RELEASE}\"/g" ${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}/jube/conf.py
         - sed -i "s/version = '.*'/version = '${VERSION}'/g" ${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}/docs/conf.py
         - sed -i "s/release = '.*'/release = '${RELEASE}'/g" ${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}/docs/conf.py
@@ -166,6 +162,17 @@ build:site:
           changes:
             - docs/**/* # all files under folder 'docs'
 
+build:package:
+    stage: packaging
+    script:
+        - pip3 install hatch
+        - hatch build -t sdist
+    #rules:
+    #    - if: '$CI_COMMIT_TAG =~ /^REL-.*/'
+    #    - if: '$CI_COMMIT_BRANCH == "master"'
+    artifacts:
+        paths:
+            - dist/*
 
 .test_make: &test_make
     stage: tests
@@ -207,12 +214,29 @@ tests:site:
             - docs/**/* # all files under folder 'docs'
 
 
+tests:packaging: 
+    stage: tests
+    needs: 
+        - build:package
+    #rules:
+    #    - if: '$CI_COMMIT_TAG =~ /^REL-.*/'
+    #    - if: '$CI_COMMIT_BRANCH == "master"'
+    before_script:
+        - pip3 install dist/*.tar.gz
+    script:
+        - cd /home/gitlab-runner/.local/share/jube/
+        - python3.13 tests/examples_tests.py 2>&1 | tee output
+        - if [[ ! -z $(grep "Warning\|warning" output) ]] ; then echo "Warnings in the output" ; exit 21 ; fi
+    allow_failure:
+        exit_codes: 21
+
+
 .run_test: &run_test
     stage: tests
+    before_script:
+        - pip3 install hatch
     script:
-        - cd ${CI_PROJECT_DIR}/tests/
-        - export PYTHONPATH=${CI_PROJECT_DIR}:${PYTHONPATH}
-        - python3.13 ${CI_JOB_NAME#*:}.py 2>&1 | tee output
+        - hatch run ${CI_PROJECT_DIR}/tests/${CI_JOB_NAME#*:}.py 2>&1 | tee output
         - if [[ ! -z $(grep "Warning\|warning" output) ]] ; then echo "Warnings in the output" ; exit 21 ; fi
     allow_failure:
         exit_codes: 21
@@ -261,28 +285,22 @@ tests:python_linter:
     image: python:3.12
     stage: tests
     before_script:
-        - pip install ruff
+        - pip3 install ruff
     script:
         - ruff check .
 
 deploy:dist_package:
     stage: deploy
     <<: *clone_repo
+    needs: 
+        - tests:packaging
     script:
-        - cd "${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}"
-        - git status
-        # Creating distribution package tarball
-        - python3.13 setup.py sdist
-    after_script:
         - echo "Copying distribution package to web server"
         - cd "${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}"
         - "sshpass -e -P 'passphrase for key' rsync -rlgoDzP --del dist/* apps_jube_docu:software/"
         # Cleaning up
         - cd ${CI_PROJECT_DIR}
         - rm -r "${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}"
-    artifacts:
-        paths:
-            - ${CI_PROJECT_DIR}/${CI_JOB_NAME#*:}/dist/*
     rules:
         - if: $CI_COMMIT_TAG =~ /^REL-.*/
 
