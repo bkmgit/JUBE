@@ -361,3 +361,30 @@ If a problem occurs outside of the general *JUBE* handling (e.g. a crashed HPC j
 
 This will rerun the specific workpackage. The *JUBE* configuration will stay unchanged. It is not possible to change the ``<parameter>`` or ``<step>`` configuration later on. Shared ``<do>``
 operations (``shared=true``) will be ignored within such a rerun scenario except if all workpackages of a specific step were removed and the full step is re-executed.
+
+.. index:: automated_execution
+
+.. _automated_execution:
+
+Automate full benchmark execution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The shell script ``jube-autorun`` automates full benchmark execution, including steps that run asynchronously, e.g. in a batch system.
+It executes all necessary JUBE commands:
+
+1. Start the benchmark with ``jube run``
+2. Regularly check progress with ``jube continue`` (every 30 seconds by default) until all workpackages are complete
+3. Analyze the workpackages with ``jube analyse``
+4. Generate the benchmark results with ``jube result``
+
+Additional arguments for the individual JUBE commands can be passed to ``jube-autorun`` via options.
+These arguments correspond directly to the options of the respective JUBE commands and must be enclosed in quotation marks.
+
+.. code-block:: none
+
+   jube-autorun -r "-t de" tagging.xml
+
+This would, for example, automatically execute the file ``tagging.xml`` and pass the argument ``-t de`` to the command ``jube run``. (The files used for this example can be found inside ``examples/tagging``)
+
+Please note: While this script is running, no other benchmarks may be started in the same benchmark directory!
+The script always uses the last benchmark found inside the benchmark directory for all commands. If another benchmark is started while ``jube-autorun`` is running, the commands ``jube continue``, ``jube analyse``, and ``jube result`` no longer refer to the benchmark originally started with ``jube-autorun``, but to the newer run.
+This can lead to incorrect or inconsistent results.

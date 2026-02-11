@@ -509,3 +509,35 @@ stores the path to the system-relevant include configuration files provided by J
 
 ``-h``, ``--help``
    show command help information
+
+.. index:: jube-autorun
+
+jube-autorun
+~~~~~~~~~~~~
+
+automate full benchmark execution, including steps that run asynchronously, e.g. in a batch system.
+
+.. code-block:: none
+
+   jube-autorun [-r ARG] [-c ARG] [-a ARG] [-s ARG] [-p ARG] [-o] FILE
+
+``-r ARG``
+   additional run arguments (see ``jube run`` command)
+
+``-c ARG``
+   additional continue arguments (see ``jube continue`` command)
+
+``-a ARG``
+   additional analyse arguments (see ``jube analyse`` command)
+
+``-s ARG``
+   additional result arguments (see ``jube result`` command)
+
+``-p ARG``
+   progress check interval in seconds (default:30)
+
+``-o``
+   only show result output
+
+``FILE``
+   input file
