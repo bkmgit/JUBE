@@ -86,8 +86,9 @@ shell environment variables are available which can be used to set system specif
   Alternatively, it can be set using the ``--outpath`` command line option or the ``outpath`` attribute of the benchmark tag.
   The command line option overrides the environment variable, which in turn overrides the attribute in the input file.
 
-*BASH* autocompletion can be enabled by using the ``eval "$(jube complete)"`` command. You can store the command in your bash profile
-settings if needed.
+*BASH* autocompletion can be enabled by using the ``eval "$(jube complete)"`` command.
+Additionally, you can store the path to the system-relevant include configuration files provided by JUBE in the environment variable ``JUBE_INCLUDE_PATH`` with the command ``eval "$(jube set_env)"``.
+If necessary, you can save both commands in your Bash profile settings.
 
 .. index:: input format
 

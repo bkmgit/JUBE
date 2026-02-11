@@ -490,8 +490,22 @@ show the configuration and workpackage information of a given benchmark
 ``-h``, ``--help``
    show command help information
 
-``-i ID ``, ``--id ID ``
+``-i ID``, ``--id ID``
    |ID_DESCRIPTION|
 
 ``PATH``
    path to input file or directory which contains benchmarks, default: .
+
+.. index:: set_env
+
+set_env
+~~~~~~~~
+
+stores the path to the system-relevant include configuration files provided by JUBE in the environment variable ``JUBE_INCLUDE_PATH.``. Usage: ``eval "$(jube set_env)"``
+
+.. code-block:: none
+
+   jube set_env [-h]
+
+``-h``, ``--help``
+   show command help information
