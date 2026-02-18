@@ -8,14 +8,14 @@
 <!ATTLIST only          tag CDATA #IMPLIED>
 <!ELEMENT not (#PCDATA)>
 <!ATTLIST not           tag CDATA #IMPLIED>
-<!ELEMENT tag (#PCDATA)>
-<!ATTLIST tag           tag CDATA #IMPLIED>
 <!ELEMENT include-path (#PCDATA|path|include)*>
 <!ATTLIST include-path  tag CDATA #IMPLIED>
 <!ELEMENT path (#PCDATA)>
 <!ATTLIST path          tag CDATA #IMPLIED>
 <!ELEMENT tags ((tag|check_tags)*)>
 <!ATTLIST tags          forced CDATA #IMPLIED>
+<!ELEMENT tag (#PCDATA)>
+<!ATTLIST tag           name CDATA #IMPLIED>
 <!ELEMENT check_tags (#PCDATA)>
 <!ELEMENT benchmark (comment?,(parameterset|substituteset|fileset|step|patternset|analyser|analyzer|result|include)*)>
 <!ATTLIST benchmark     name CDATA #REQUIRED
@@ -168,17 +168,17 @@
                         title CDATA #IMPLIED
                         primekey (true|false|True|False) #IMPLIED
                         tag CDATA #IMPLIED>
-<!ELEMENT figure ((plot,include)*)>
+<!ELEMENT figure ((plot|include)*)>
 <!ATTLIST figure        name CDATA #REQUIRED
                         title CDATA #IMPLIED
                         savefig CDATA #IMPLIED
-                        showfig (true|false) #IMPLIED
+                        showfig (true|false|True|False) #IMPLIED
                         filter CDATA #IMPLIED
                         nrows CDATA #IMPLIED
                         ncols CDATA #IMPLIED
                         tag CDATA #IMPLIED>
-<!ELEMENT plot ((data,include)*)>
-<!ATTLIST plot          legend (true|false) #IMPLIED
+<!ELEMENT plot ((data|include)*)>
+<!ATTLIST plot          legend (true|false|True|False) #IMPLIED
                         xlabel CDATA #IMPLIED
                         ylabel CDATA #IMPLIED
                         xscale (linear|log|logit|symlog) #IMPLIED
@@ -193,6 +193,7 @@
                         color CDATA #IMPLIED
                         marker CDATA #IMPLIED
                         linestyle CDATA #IMPLIED
+                        sort (true|false|True|False) #IMPLIED
                         tag CDATA #IMPLIED>
 <!ELEMENT file (#PCDATA)>
 <!ATTLIST file          tag CDATA #IMPLIED

@@ -20,18 +20,15 @@ only = element only { attlist.only, text }
 attlist.only &= attribute tag { text }?
 not = element not { attlist.not, text }
 attlist.not &= attribute tag { text }?
-tag = element tag { attlist.tag, text }
-attlist.tag &= attribute tag { text }?
-include-path = element include-path { attlist.include-path, mixed (path|include)* }
+include-path = element include-path { attlist.include-path, (path | \include)* }
 attlist.include-path &= attribute tag { text }?
 path = element path { attlist.path, text }
 attlist.path &= attribute tag { text }?
-check_tags = element check_tags { attlist.check_tags, text }
 tags = element tags { attlist.tags, (tag | check_tags)* }
 attlist.tags &= attribute forced { "true" | "false" | "True" | "False" }?
 tag = element tag { attlist.tag, text }
 attlist.tag &= attribute name { text }?
-check_tags = element check_tags { attlist.check_tags, text }
+check_tags = element check_tags { text }
 benchmark =
   element benchmark {
     attlist.benchmark,
@@ -153,7 +150,7 @@ attlist.step &=
   attribute export { "true" | "false" | "True" | "False" }?,
   attribute shared { text }?,
   attribute do_log_file { "true" | "false" | "True" | "False" | text }?,
-  attribute procs { "int" }?,
+  attribute procs { text }?,
   attribute tag { text }?
 analyzer =
   element analyzer { attlist.analyzer, (use | analyse | \include)* }
@@ -198,14 +195,14 @@ attlist.table &=
   attribute sort { text }?,
   attribute filter { text }?,
   attribute tag { text }?
-database = element database { attlist.database, (key | \include)* }
+database = element database { attlist.database, (databasekey | \include)* }
 attlist.database &=
   attribute name { text },
   attribute primekeys { text }?,
   attribute file { text }?,
   attribute filter { text }?,
   attribute tag { text }?
-syslog = element syslog { attlist.syslog, (key | \include)* }
+syslog = element syslog { attlist.syslog, (syslogkey | \include)* }
 attlist.syslog &=
   attribute name { text },
   attribute address { text }?,
@@ -221,11 +218,16 @@ attlist.column &=
   attribute format { text }?,
   attribute title { text }?,
   attribute tag { text }?
-key = element key { attlist.key, text }
-attlist.key &=
+databasekey = element key { attlist.databasekey, text }
+attlist.databasekey &=
   attribute format { text }?,
   attribute title { text }?,
   attribute primekey { "true" | "false" | "True" | "False" }?,
+  attribute tag { text }?
+syslogkey = element key { attlist.syslogkey, text }
+attlist.syslogkey &=
+  attribute format { text }?,
+  attribute title { text }?,
   attribute tag { text }?
 figure = element figure { attlist.figure, (plot | \include)* }
 attlist.figure &=
@@ -255,6 +257,7 @@ attlist.data &=
   attribute color { text }?,
   attribute marker { text }?,
   attribute linestyle { text }?,
+  attribute sort { "true" | "false" | "True" | "False" }?,
   attribute tag { text }?
 file = element file { attlist.file, text }
 attlist.file &=

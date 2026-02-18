@@ -1197,13 +1197,13 @@
 						"type": "array",
 						"items": {
 							"anyOf": [{
-								"$ref": "#/$defs/string_tag_object"
+								"$ref": "#/$defs/database_key_object"
 							}, {
 								"type": "string"
 							}]
 						}
 					}, {
-						"$ref": "#/$defs/string_tag_object"
+						"$ref": "#/$defs/database_key_object"
 					}, {
 						"type": "string"
 					}]
@@ -1256,13 +1256,13 @@
 						"type": "array",
 						"items": {
 							"anyOf": [{
-								"$ref": "#/$defs/column_object"
+								"$ref": "#/$defs/syslog_key_object"
 							}, {
 								"type": "string"
 							}]
 						}
 					}, {
-						"$ref": "#/$defs/column_object"
+						"$ref": "#/$defs/syslog_key_object"
 					}, {
 						"type": "string"
 					}]
@@ -1435,6 +1435,11 @@
 					"description": "It changes the linestyle of the plotted data. Supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'",
 					"type": "string"
 				},
+				"sort": {
+					"description": "It is used to sort the values of the specified parameter/pattern for the x-attribute. Parameter/Pattern of type string will be sorted lexicographical and parameter/pattern of type int or float will be sorted numerically",
+					"type": ["string","boolean"],
+					"pattern": "^(true|false)$"
+				},
 				"tag": {
 					"$ref": "#/$defs/tag"
 				},
@@ -1460,6 +1465,55 @@
 			"required": [ "x","y" ]
 		},
 
+		"syslog_key_object": {
+			"type": "object",
+			"properties": {
+				"format": {
+					"description": "The format can contain a C like format string: e.g. '.2f'",
+					"type": "string"
+				},
+				"title": {
+					"description": "Alternative title",
+					"type": "string"
+				},
+				"tag": {
+					"$ref": "#/$defs/tag"
+				},
+				"_": {
+					"description": "It can contain the name of a single pattern or parameter.",
+					"type": "string"
+				}
+			},
+			"additionalProperties": false
+		},
+
+		"database_key_object": {
+			"type": "object",
+			"properties": {
+				"title": {
+					"description": "Alternative title",
+					"type": "string"
+				},
+				"format": {
+					"description": "The format can contain a C like format string: e.g. '.2f'",
+					"type": "string"
+				},
+				"primekey": {
+					"description": "If primekey is set to true, the key is added to the database primekeys.",
+					"type": ["string","boolean"],
+					"pattern": "^(true|false)$"
+				},
+				"tag": {
+					"$ref": "#/$defs/tag"
+				},
+				"_": {
+					"description": "It can contain the name of a single pattern or parameter.",
+					"type": "string"
+				}
+			},
+			"additionalProperties": false
+		},
+
 		"column_object": {
 			"type": "object",
 			"properties": {
@@ -1474,11 +1528,6 @@
 				"title": {
 					"description": "Alternative title",
 					"type": "string"
-				},
-				"primekey": {
-					"description": "If primekey is set to true, the key is added to the database primekeys.",
-					"type": ["string","boolean"],
-					"pattern": "^(true|false)$"
 				},
 				"tag": {
 					"$ref": "#/$defs/tag"

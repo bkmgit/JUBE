@@ -245,7 +245,7 @@
 
   <xs:complexType name="databaseType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="key" type="stringTagType" />
+      <xs:element name="key" type="databaseKeyType" />
       <xs:element name="include" type="includeType" />
     </xs:choice>
     <xs:attribute name="name" type="xs:string" use="required" />
@@ -257,7 +257,7 @@
 
   <xs:complexType name="syslogType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="key" type="columnType" />
+      <xs:element name="key" type="keyType" />
       <xs:element name="include" type="includeType" />
     </xs:choice>
     <xs:attribute name="name" type="xs:string" use="required" />
@@ -310,6 +310,7 @@
     <xs:attribute name="color" type="xs:string"/>
     <xs:attribute name="marker" type="xs:string"/>
     <xs:attribute name="linestyle" type="xs:string"/>
+    <xs:attribute name="sort" type="booleanType"/>
     <xs:attribute name="tag" type="xs:string"/>
   </xs:complexType>
 
@@ -337,6 +338,13 @@
       <xs:extension base="stringTagType">
         <xs:attribute name="format" type="xs:string" use="optional" />
         <xs:attribute name="title" type="xs:string" use="optional" />
+      </xs:extension> 
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="databaseKeyType">
+    <xs:complexContent>
+      <xs:extension base="keyType">
         <xs:attribute name="primekey" type="booleanType" use="optional" />
       </xs:extension> 
     </xs:complexContent>
@@ -472,7 +480,11 @@
   </xs:complexType>
 
   <xs:complexType name="tagsTagType">
-    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
 
   <xs:complexType name="includeType">
