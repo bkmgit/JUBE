@@ -291,7 +291,8 @@ class FilesetTab(Tab):
                            "target_dir",
                            "name",
                            "rel_path_ref",
-                           "active"]
+                           "active",
+                           "file_path_ref"]
                 link_tree = SortableTreeview(self._content,
                                              columns,
                                              selectmode="none",
@@ -303,8 +304,9 @@ class FilesetTab(Tab):
                                                         link.source_dir,
                                                         link.target_dir,
                                                         link.name,
-                                                        link.is_internal_ref,
-                                                        link.active])
+                                                        "internal" if link.is_internal_ref else "external",
+                                                        link.active,
+                                                        link.file_path_ref])
 
             # Create table for the copy tags
             copy_label = None
@@ -318,7 +320,8 @@ class FilesetTab(Tab):
                            "target_dir",
                            "name",
                            "rel_path_ref",
-                           "active"]
+                           "active",
+                           "file_path_ref"]
                 copy_tree = SortableTreeview(self._content,
                                              columns,
                                              selectmode="none",
@@ -331,7 +334,8 @@ class FilesetTab(Tab):
                                                         copy.target_dir,
                                                         copy.name,
                                                         "internal" if copy.is_internal_ref else "external",
-                                                        copy.active])
+                                                        copy.active,
+                                                        copy.file_path_ref])
 
             # Create table or prepare tags
             prepare_label = None
@@ -725,7 +729,8 @@ class ResultTab(Tab):
                         "", "end", text="filter: " + f"{result.res_filter!r}")
                 columns = ["key",
                            "format",
-                           "title"]
+                           "title",
+                           "primekey"]
                 table = SortableTreeview(self._content,
                                          columns,
                                          selectmode="none",
@@ -735,7 +740,8 @@ class ResultTab(Tab):
                 for key in result.keys:
                     table.insert("", "end", values=[key.name,
                                                     key.title,
-                                                    key.unit])
+                                                    key.unit,
+                                                    key.primekey])
 
             # Create result table for a figure result
             if isinstance(result, Figure):
@@ -743,10 +749,9 @@ class ResultTab(Tab):
                                            selectmode="none",
                                            show="tree",
                                            style="Custom.Treeview",
-                                           height=1 +
+                                           height=3 +
                                            (1 if result.title is not None else 0) +
                                            (1 if result.savefig is not None else 0) +
-                                           (1 if result.showfig is not None else 0) +
                                            (1 if result.res_filter is not None else 0))
                 if result.title is not None:
                     tree_result.insert(
@@ -754,14 +759,17 @@ class ResultTab(Tab):
                 if result.savefig is not None:
                     tree_result.insert(
                         "", "end", text="savefig: " + f"{result.savefig!r}")
-                if result.showfig is not None:
-                    tree_result.insert(
-                        "", "end", text="showfig: " + f"{result.showfig!r}")
+                tree_result.insert(
+                    "", "end", text="showfig: " + f"{result.showfig!r}")
                 if result.res_filter is not None:
                     tree_result.insert(
                         "", "end", text="filter: " + f"{result.res_filter!r}")
+                tree_result.insert(
+                    "", "end", text="nrows: " + f"{result.nrows!r}")
+                tree_result.insert(
+                    "", "end", text="ncols: " + f"{result.ncols!r}")
                 columns = ["Plot", "legend", "xlabel", "ylabel", "xscale", "yscale",
-                           "x", "y", "groupby", "type", "label", "color", "marker", "linestyle"]
+                           "x", "y", "groupby", "type", "label", "color", "marker", "linestyle", "sort"]
                 height = sum([len(plot.plot_data) for plot in result.plots])
                 table = SortableTreeview(self._content,
                                          columns,
@@ -784,7 +792,8 @@ class ResultTab(Tab):
                                                         data.label,
                                                         data.color,
                                                         data.marker,
-                                                        data.linestyle])
+                                                        data.linestyle,
+                                                        data.sort])
 
             self.widget_dict[result.name] = {"label": label,
                                              "tree_general": tree_general,

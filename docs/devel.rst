@@ -51,6 +51,7 @@ Coding standards
   * must be added to schema files
   * must be documented and there must be a small example
   * must be covered by tests
+  * must be included in the gui
 
 Pylint
 ------
