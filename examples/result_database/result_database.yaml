@@ -29,7 +29,6 @@ result:
     # one table of the name "results" is created within the database
     # optionally, you can use the "file" attribute to specify an alternative storage location for the database
     name: results
-    primekeys: "NUM"
     key:
     - {primekey: true, _: number}
-    - {title: NUM, _: number_pat}
+    - {title: NUM, primekey: true, _: number_pat}

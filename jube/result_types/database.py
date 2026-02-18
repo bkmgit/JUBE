@@ -197,7 +197,7 @@ class Database(KeyValuesResult):
             db.insert("ResultDatabase", database_data)
             for key in self._keys:
                 key_data = key.get_information_for_database()
-                if key_data["name"] in self._primekeys or key.primekey:
+                if key.resulting_name in self._primekeys or key.primekey:
                     key_data["is_primary"] = 1
                 key_data["databasekey_name"] = key_data.pop("name")
                 key_data["database_name"] = self._name

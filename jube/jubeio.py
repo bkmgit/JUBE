@@ -1555,9 +1555,10 @@ class Parser(object):
         databases = db.select("ResultDatabase", None, {"result_id": result_id})
         for database in databases:
             name, res_filter, file, result_id = database
-            primekeys = db.select("ResultDatabaseKey", ["databasekey_name"],
+            primekeys = db.select("ResultDatabaseKey", ["databasekey_name", "title"],
                                   {"database_name": name, "is_primary": 1})
-            primekeys = [key for key, in primekeys]
+            primekeys = [title if title is not None else key
+                         for (key, title) in primekeys]
             result = jube.result_types.database.Database(
                 name, res_filter, primekeys, file)
             result.result_dir = result_dir

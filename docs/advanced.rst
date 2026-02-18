@@ -894,25 +894,25 @@ The ``database`` tag takes the argument ``name``. ``name`` is also the name of t
 .. code-block:: none
 
    >>> sqlite3 -header -table bench_run/000000/result/results.dat 'SELECT * FROM results'
-   +--------+------------+
-   | number | number_pat |
-   +--------+------------+
-   | 1      | 1          |
-   | 2      | 2          |
-   | 4      | 4          |
-   +--------+------------+
+   +--------+-----+
+   | number | NUM |
+   +--------+-----+
+   | 1      | 1   |
+   | 2      | 2   |
+   | 4      | 4   |
+   +--------+-----+
 
 The ``key`` tag adds columns to the database table having the same type as the corresponding ``parameter`` or ``pattern``. Information of columns of the database table ``results`` can be shown as follows.
 
 .. code-block:: none
 
    >>> sqlite3 -header -table bench_run/000000/result/results.dat 'PRAGMA table_info(results)'
-   +-----+------------+------+---------+------------+----+
-   | cid |    name    | type | notnull | dflt_value | pk |
-   +-----+------------+------+---------+------------+----+
-   | 0   | number     | int  | 0       |            | 1  |
-   | 1   | number_pat | int  | 0       |            | 2  |
-   +-----+------------+------+---------+------------+----+
+   +-----+--------+------+---------+------------+----+
+   | cid |  name  | type | notnull | dflt_value | pk |
+   +-----+--------+------+---------+------------+----+
+   | 0   | number | INT  | 0       |            | 2  |
+   | 1   | NUM    | INT  | 0       |            | 1  |
+   +-----+--------+------+---------+------------+----+
 
 The ``file`` argument takes a relative (to the current working directory) or absolute path to an alternative/user-defined location for the database file. Assuming that ``file="result_database.dat"`` was set in the above example, a file named ``result_database.dat`` would be created in the current working directory where ``jube result`` was invoked, containing a database named ``results``, and the file ``bench_run/000000/result/results.dat`` would no longer contain the database, but the path specified in the ``file`` attributes.
 

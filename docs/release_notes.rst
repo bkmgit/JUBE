@@ -41,6 +41,7 @@ Release: XXXX-XX-XX
 * Fixed: Fixed escape sequence SyntaxWarning on Python 3.12. 
 * Fixed: Typos in multiple files
 * Fixed: Shadowing of some built-in Python functions
+* Fixed: Bug regarding the `primekey` and the `title` attribute of `<database><key>` 
 * Fixed: URLs for the `jube update` command
 
 Version 2.7.1
