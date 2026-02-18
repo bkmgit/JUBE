@@ -102,9 +102,6 @@ Glossary
       If no benchmark id is given, last benchmark found in directory will be used. If benchmark directory is missing, current
       directory will be used.
 
-   set_env
-      stores the path to the system-relevant include configuration files provided by JUBE in the environment variable ``JUBE_INCLUDE_PATH.``
-
    jube-autorun
       automates full benchmark execution, including steps that run asynchronously, e.g. in a batch system.
 

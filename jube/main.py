@@ -30,8 +30,6 @@ import sys
 import os
 import re
 import shutil
-from importlib import metadata
-from pathlib import Path
 from jube.util.version import StrictVersion
 try:
     from jube.gui.gui import Gui
@@ -85,26 +83,6 @@ def gui(args):
             LOGGER.error(
                 "If you want to use the gui command, you have to install the tkinter module")
             exit()
-
-
-def set_env(args):
-    """set the environment variable JUBE_INCLUDE_PATH"""
-
-    find_parts = Path("share/jube/platform").parts
-    dist = metadata.distribution("jube")
-
-    for pkg_path in dist.files or ():
-        try:
-            parts = dist.locate_file(pkg_path).resolve().parts
-        except Exception:
-            continue
-
-        for i in range(len(parts) - len(find_parts) + 1):
-            if parts[i:i+len(find_parts)] == find_parts:
-                path=Path(*parts[:i+len(find_parts)])
-                if path.is_dir():
-                    print(f"export JUBE_INCLUDE_PATH='{path}':$JUBE_INCLUDE_PATH")
-                    return
 
 
 def tag(args):
@@ -1181,12 +1159,6 @@ def gen_subparser_conf():
                  "help": "name of command to be completed",
                  "default": [os.path.basename(sys.argv[0])]},
         }
-    }
-
-    # gui subparser
-    subparser_configuration["set_env"] = {
-        "help": "set the JUBE_INCLUDE_PATH environment variable",
-        "func": set_env
     }
 
     return subparser_configuration
