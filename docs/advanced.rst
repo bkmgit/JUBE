@@ -305,8 +305,8 @@ The include file ``include_data.yaml``:
 .. literalinclude:: ../examples/include/include_data.yaml
    :language: yaml
 
-All files which contain data to be included must use the *XML*-format. The include files can have a user specific structure (there can be no valid
-*JUBE* tags like ``<dos>``), but the structure must be allowed by the searching mechanism (see below). The resulting file must have a valid *JUBE* structure.
+The include files can have a user specific structure (there can be no valid *JUBE* tags like ``<dos>``), but the structure must be allowed by the 
+searching mechanism (see below). The resulting file must have a valid *JUBE* structure.
 
 The main file ``main.xml``:
 
@@ -425,9 +425,8 @@ so that an error is thrown if a tag is not documented.
 
 All ``<elements>`` which contain a special ``tag="..."`` attribute will be hidden if the value of the tag evaluates to ``false``.
 This means that JUBE will ignore the elements with these tags in its internal processing.
-Caution: This can lead to erroneous execution if you forget to set the necessary tags for execution, as JUBE will ignore e.g. a ``<parameter>`` provided with the corresponding ``tag`` attribute that evaluates to false.
 
-Careful: This can lead to erroneous execution if you forget to set the necessary tags for execution, as JUBE will no longer consider e.g. parameters provided with the corresponding ``tag`` attribute.
+Caution: This can lead to erroneous execution if you forget to set the necessary tags for execution, as JUBE will ignore e.g. a ``<parameter>`` provided with the corresponding ``tag`` attribute that evaluates to false.
 
 To ensure that the user of the script specifies the necessary tag values that the script needs for successful execution, the ``check_tag`` element (added with JUBE version 2.6.0) can be used.
 It allows you to define tag values that must be specified when the script is called in order for it to run successfully.
@@ -582,11 +581,9 @@ You will get the following directory structure:
    |
    +- 000000               # the benchmark id
       |
-      +- configuration.xml # the stored benchmark configuration
-      +- workpackages.xml  # workpackage information
+      +- database.db       # the stored benchmark configuration and workpackage information
       +- 000000_a_step     # the first workpackage
          |
-         +- done           # workpackage finished marker
          +- work           # user sandbox folder
             |
             +- stderr      # standard error messages of used shell commands
@@ -802,8 +799,6 @@ itself is still executed). In the given example the output will be:
    1
    2
    3
-
-In contrast to the iterations, all executions for the cycle feature take place inside of the same folder.
 
 .. index:: parallel
 

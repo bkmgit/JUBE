@@ -25,17 +25,16 @@ Glossary
    output
       Shows path and content of the stdout and stderr files of the given benchmark.
 
-      If no benchmark id is given, last benchmark found in will be used.
+      If no benchmark id is given, last benchmark found in directory will be used. If benchmark directory is missing, current
+      directory will be used.
 
    remove
       The given benchmark will be removed.
 
-      If no benchmark id is given, last benchmark found in directory will be removed.
-
       Only the *JUBE* internal directory structure will be deleted.
       External files and directories will stay unchanged.
 
-      If no benchmark id is given, last benchmark found in directory will be used. If benchmark directory is missing, current
+      If no benchmark id is given, last benchmark found in directory will be removed. If benchmark directory is missing, current
       directory will be used.
 
    comment
@@ -373,7 +372,7 @@ Glossary
       * ``cycle``: reevaluation in each cycle, but not at the begin of a new step (number of workpackages will stay unchanged)
       * ``always``: reevaluation in each step and cycle
 
-   fileset_tag
+   fileset_tag 
       A fileset is a container to store a bundle of links and copy commands.
 
       .. code-block:: xml
@@ -498,7 +497,7 @@ Glossary
 
         <iofile in="..." out="..." out_mode="..." />
 
-     * ``in`` and ``out`` filepath are relative to the current work directory for every single step (not relative to the path of the inputfile)
+     * ``in`` and ``out`` filepath are relative to the current work directory for every single step (not relative to the path of the input file)
      * ``in`` and ``out`` can be the same
      * ``out_mode`` is optional, can be ``w`` or ``a`` (default: ``w``)
 
@@ -639,7 +638,7 @@ Glossary
      .. code-block:: xml
 
         <database name="..." primekeys="..." file="..." filter="...">
-          <key title="..." primekey="...">...</key>
+          <key title="..." primekey="..." format="...">...</key>
           ...
         </database>
 
@@ -670,6 +669,7 @@ Glossary
      * ``<key>`` can be specified in the database result and must contain an single parameter or pattern name.
 
        * ``title`` is optional: alternative key title. Used to define a custom database column name.
+       * ``format`` can contain a C like format string: e.g. ``format=".2f"``
        * ``primekey`` is optional: If primekey is set to true, the key is added to the database primekeys.
          (default: false) The ``primekeys`` attribute of the ``database``-tag is deprecated and will be removed.
 
@@ -850,7 +850,6 @@ Glossary
               +- 000000_compile (step: just an example, can be arbitrary chosen)
                  |
                  +- work (user environment)
-                 +- done (workpackage finished information file)
                  +- ...  (more jube internal information files)
               +- 000001_execute
                  |
@@ -861,8 +860,7 @@ Glossary
                  +- ...
               +- 000002_execute
               +- result (result data)
-              +- configuration.xml (benchmark configuration information file)
-              +- workpackages.xml (workpackage graph information file)
+              +- database.db (benchmark configuration and workpackage information)
               +- analyse.xml (analyse data)
            +- 000001 (determined through benchmark-id)
               |
@@ -890,7 +888,11 @@ Glossary
              ...
            </selection>
            <!-- optional must-have tag specification -->
-           <check_tags>...</check_tags>
+           <tags forced="">
+             <check_tags>...</check_tags>
+             <tag name="">...</tag>
+             ...
+           </tags>
            <!-- global sets -->
            <parameterset name="">...</parameterset>
            <substituteset name="">...</substituteset>
@@ -940,8 +942,11 @@ Glossary
            tag: ...
 
          # optional must-have tag specification
-         check_tags:
-           ...
+         tags:
+           check_tags: ...
+           forced: ...
+           tag:
+             ...
 
          # global sets
          parameterset: 

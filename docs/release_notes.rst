@@ -29,10 +29,12 @@ Release: XXXX-XX-XX
 * Added: New result type `<figure>` to plot the result data with the Python package `matplotlib`.
 * Added: Example for the new result type `<figure>`
 * Added: Documentation for the new command `jube gui` and the new result type `<figure>`
-* Added: Linter for better code-quality
+* Added: Linter `ruff` for better code-quality
 * Added: A database interface that stores the initial configuration and workpackage information in a database
 * Added: Tests for the new database interface
+* Added: Documentation for the script `jube-autorun`
 * Changed: the result type `<database>` now uses the new database interface
+* Changed: Removed deprecated attribute `primekeys` in the example `result_database` and used the attribute `primekey` instead
 * Deprecated: `configuration.xml` and `workpackages.xml` will no longer be supported in future versions. They have been replaced by a database that stores the initial configuration and workpackage information. Running an old benchmark with this version results in an automatic conversion from the xml-files to the database.
 * Deprecated: done files will no longer be supported in future versions. Instead, the status of workpackages will be stored in the new database
 * Removed: `configuration.xml` and `workpackages.xml` are no longer created to store the initial configuration and workpackage information. Instead, the information is stored in the new database

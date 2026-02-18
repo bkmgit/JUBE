@@ -109,7 +109,7 @@ def set_env(args):
 
 def tag(args):
     """Show tag documentation"""
-    # Show tag docu out of inputfile if the given path is a file
+    # Show tag docu out of input file if the given path is a file
     if os.path.isfile(args.dir):
         parser = jube.jubeio.Parser(args.dir)
         benchmarks = parser.benchmarks_from_xml(check_tags=False)[0]
@@ -1082,7 +1082,7 @@ def gen_subparser_conf():
                  "help": "benchmark directory", "default": "."},
             ("-i", "--id"):
                 {"help": "use benchmarks given by id",
-                 "nargs": "?"}
+                 "nargs": "+"}
         }
     }
 

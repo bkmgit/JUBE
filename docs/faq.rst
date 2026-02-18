@@ -218,7 +218,7 @@ As an alternative you can write the key value pairs amongst multiple lines using
 like the key ``do`` in the example.
 If a key like ``use`` has only a value, you can write it in one line without using the special ``_`` key.
 
-Is list of elements can be specific by using ``[]`` or by using ``-`` amongst multiple lines (always keeping the same indent).
+A list of elements can be specified by using ``[]`` or by using ``-`` amongst multiple lines (always keeping the same indent).
 
 *YAML* also has a number of special characters which can be integrated by using quotation marks:
 
@@ -252,7 +252,7 @@ independent result entries:
       </analyse>
    </analyser>
 
-In this example the ``<patternset>`` a_patternset will be used for both files. This is ok if there are only patterns which 
+In this example the patternset ``a_patternset`` will be used for both files. This is ok if there are only patterns which 
 match either the step_A stdout file or the step_B stdout file.
 
 If you want to use a file dependent patternset you can move the use to a ``<file>`` attribute instead:
@@ -362,7 +362,7 @@ If a problem occurs outside of the general *JUBE* handling (e.g. a crashed HPC j
 This will rerun the specific workpackage. The *JUBE* configuration will stay unchanged. It is not possible to change the ``<parameter>`` or ``<step>`` configuration later on. Shared ``<do>``
 operations (``shared=true``) will be ignored within such a rerun scenario except if all workpackages of a specific step were removed and the full step is re-executed.
 
-.. index:: automated_execution
+.. index:: automated execution
 
 .. _automated_execution:
 

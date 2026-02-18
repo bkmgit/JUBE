@@ -490,7 +490,7 @@ show the configuration and workpackage information of a given benchmark
 ``-h``, ``--help``
    show command help information
 
-``-i ID``, ``--id ID``
+``-i ID [ID ...]``, ``--id ID [ID ...]``
    |ID_DESCRIPTION|
 
 ``PATH``
@@ -534,7 +534,7 @@ automate full benchmark execution, including steps that run asynchronously, e.g.
    additional result arguments (see ``jube result`` command)
 
 ``-p ARG``
-   progress check interval in seconds (default:30)
+   progress check interval in seconds (default: ``30``)
 
 ``-o``
    only show result output

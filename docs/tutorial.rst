@@ -103,7 +103,7 @@ features and you can select your more preferred input format.
 The following sections will always show all examples using both formats. However the explanations will mostly stick to the *XML* format but can be easily transferred 
 to the *YAML* solution.
 
-Both formats depends on a specific special character handling. More details can be found in the following FAQ sections:
+Both formats depend on a specific special character handling. More details can be found in the following FAQ sections:
 
 * :ref:`XML_character_handling`
 * :ref:`YAML_character_handling`
@@ -222,12 +222,10 @@ Inside the benchmark directory you will see the following structure:
    |
    +- 000000               # the benchmark id
       |
-      +- configuration.xml # the stored benchmark configuration
-      +- workpackages.xml  # workpackage information
+      +- database.db       # the stored benchmark configuration and workpackage information
       +- run.log           # log information
       +- 000000_say_hello  # the workpackage
          |
-         +- done           # workpackage finished marker
          +- work           # user sandbox folder
             |
             +- stderr      # standard error messages of used shell commands
@@ -441,11 +439,9 @@ The resulting directory-tree will be:
    |
    +- 000000               # the benchmark id
       |
-      +- configuration.xml # the stored benchmark configuration
-      +- workpackages.xml  # workpackage information
+      +- database.db       # the stored benchmark configuration and workpackage information
       +- 000000_sub_step   # the workpackage ($number = 1, $zahl = 2)
          |
-         +- done           # workpackage finished marker
          +- work           # user sandbox folder
             |
             +- stderr      # standard error messages of used shell commands
