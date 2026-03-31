@@ -31,30 +31,33 @@ fi
 function print_usage () {
     echo "usage: ${0##*/} [OPTIONS] BENCHMARK_CONFIG_FILE"
     echo "This script automates full benchmark execution, including"
-    echo "steps the run asynchronously, e.g. in a batch system."
+    echo "steps that run asynchronously, e.g. in a batch system."
     echo ""
     echo "Options:"
-    echo "  -r ARG   additional run args"
-    echo "  -c ARG   additional continue args"
-    echo "  -a ARG   additional analyse args"
-    echo "  -s ARG   additional result args"
-    echo "  -p ARG   progress check interval in seconds (default:30)"
-    echo "  -o       only show result output"
-    echo "Example: ${0##*/} input_file.xml"
+    echo "  -h        show this help message"
+    echo "  -r \"ARG\"  additional run args"
+    echo "  -c \"ARG\"  additional continue args"
+    echo "  -a \"ARG\"  additional analyse args"
+    echo "  -s \"ARG\"  additional result args"
+    echo "  -p \"ARG\"  progress check interval in seconds (default:30)"
+    echo "  -o        only show result output"
+    echo ""
+    echo "Example: ${0##*/} -r \"-t de\" input_file.xml"
 }
 
 # Parse optional arguments
-while getopts r:c:a:s:p:o OPT; do
+while getopts hr:c:a:s:p:o OPT; do
     case $OPT in
+        h) print_usage
+           exit 0;;
         r) RUN_ARG="$OPTARG";;
         c) CONTINUE_ARG="$OPTARG";;
         a) ANALYSE_ARG="$OPTARG";;
         s) RESULT_ARG="$OPTARG";;
         p) PROGRESS_INTERVAL="$OPTARG";;
         o) ONLY_RESULT_OUTPUT=1;;
-        *)
-            print_usage
-            exit 2
+        *) print_usage
+           exit 2
     esac
 done
 shift $(( OPTIND - 1 ))
