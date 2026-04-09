@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS Patternset
 -- Table Pattern
 CREATE TABLE IF NOT EXISTS Pattern
 (
-    pattern_name TEXT NOT NULL PRIMARY KEY,
+    pattern_name TEXT NOT NULL,
     type TEXT DEFAULT "string" NOT NULL,
     unit TEXT DEFAULT "" NOT NULL,
     mode TEXT DEFAULT "pattern" NOT NULL,
@@ -280,6 +280,7 @@ CREATE TABLE IF NOT EXISTS Pattern
     pattern_default TEXT,
     value TEXT NOT NULL,
     patternset_name TEXT NOT NULL,
+    PRIMARY KEY (pattern_name, patternset_name)
     FOREIGN KEY (patternset_name) REFERENCES Patternset(patternset_name) ON DELETE CASCADE
 );
 
