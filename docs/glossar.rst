@@ -205,7 +205,35 @@ Glossary
         * the name of the external set can differ to the local one by using ``init-with="filename.xml:external_name"``
 
       * patternsets can be used inside the analyser tag
-      * different sets, which are used inside the same analyser, must be compatible
+      * patternsets can be combined inside the analyser-tag, but they must be compatible:
+
+        * Two patternsets are compatible if the pattern intersection (given by the pattern-name), only contains
+          pattern based on the same definition
+        * These two sets are compatible:
+
+          .. code-block:: xml
+
+             <patternset name="set1">
+               <pattern name="test" type="int">.*? $jube_pat_int</pattern>
+               <pattern name="test2" type="int">Number: $jube_pat_int</pattern>
+             </patternset>
+             <patternset name="set2">
+               <pattern name="test" type="int">.*? $jube_pat_int</pattern>
+               <pattern name="test3" type="int">Digit: $jube_pat_int</pattern>
+             </patternset>
+
+        * These two sets are not compatible:
+
+          .. code-block:: xml
+
+             <patternset name="set1">
+               <pattern name="test" type="int">.*? $jube_pat_int</pattern>
+               <pattern name="test2" type="int">Number: $jube_pat_int</pattern>
+             </patternset>
+             <patternset name="set2">
+               <pattern name="test" type="int">Count: $jube_pat_int</pattern>
+               <pattern name="test3" type="int">Digit: $jube_pat_int</pattern>
+             </patternset>
 
    pattern_tag
       A pattern is used to parse your output files and create your result data.
@@ -214,6 +242,7 @@ Glossary
 
          <pattern name="..." default="..." unit="..." mode="..." type="..." dotall="...">...</pattern>
 
+      * ``name`` does not need to be unique within a patternset, but later definitions with the same ``name`` overwrite earlier ones.
       * ``unit`` is optional, will be used in the result table
       * ``mode`` is optional, allowed modes:
 
