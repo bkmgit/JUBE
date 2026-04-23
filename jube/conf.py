@@ -18,7 +18,7 @@
 """Configuration"""
 
 # general
-JUBE_VERSION = "2.7.1"
+JUBE_VERSION = "3.0.0"
 ALLOWED_SCRIPTTYPES = set(["python", "perl", "shell"])
 ALLOWED_ADVANCED_MODETYPES = set(["tag", "env"])
 ALLOWED_MODETYPES = set(["text"]).union(ALLOWED_SCRIPTTYPES).union(

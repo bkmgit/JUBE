@@ -21,9 +21,9 @@
 Release notes
 =============
 
-[UNRELEASED]
-~~~~~~~~~~~~
-Release: XXXX-XX-XX
+Version 3.0.0 [UNRELEASED]
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Release: 2026-XX-XX
 
 * Added: `jube gui` command to display the configuration and workpackage information in a GUI.
 * Added: New result type `<figure>` to plot the result data with the Python package `matplotlib`.

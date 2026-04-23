@@ -5,6 +5,19 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7534372.svg)](https://doi.org/10.5281/zenodo.7534372)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+-----------------------------------------------
+-----------------------------------------------
+# REQUEST TO TEST
+
+TL;DR: In this branch, we have incorporated our internal developments based on a master's thesis, including new features (see `docs/release_notes.rst`). We kindly ask you to test this new version, which we plan to release as version 3.0.0, and share your experience with us.
+
+We have made major internal changes to JUBE, which should result in better performance, especially when the number of work packages increases, as well as improved data consistency and persistence. The internal `configuration.xml` and `workpackages.xml` files have been replaced by a database. This version will also come with new features.
+Before releasing these changes, we would like you to test this version with your existing scripts and as many JUBE (command line) commands as possible. We would also like to know if you notice an improvement in the pure JUBE runtime and whether ran into issues or noticed other changes.
+**ATTENTION**: Our own tests have already been successful. However, you should not yet use this unofficial version of JUBE for important production runs or apply it to runs that have already been performed. It should only be used for tests that can be deleted afterwards and on a copy of your existing JUBE runs, e.g. execute the jube info, jube result -a or other commands on these copies to check whether the new version still works for old runs.
+
+-----------------------------------------------
+-----------------------------------------------
+
 # What is JUBE?
 
 The JUBE benchmarking environment provides a script-based framework for easily
